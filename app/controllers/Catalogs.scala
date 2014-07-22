@@ -45,11 +45,13 @@ class Catalogs extends Controller with MongoController {
           collection.insert(entity).map {
             lastError =>
               logger.debug(s"Successfully inserted with id: $id")
-
               val location = Play.application(play.api.Play.current).configuration.getString("context.url").getOrElse("") + controllers.routes.Catalogs.getById(id).toString
               CreatedResponse(location)
           }
-      }.getOrElse(Future.successful(BadRequest("invalid json")))
+      }.recoverTotal(error => {
+        logger.debug("invalid input json: "+JsError.toFlatJson(error))
+        Future.successful(BadRequest(JsError.toFlatJson(error)))
+      })
   }
 
   def getById(id: String) = Action.async {
@@ -90,12 +92,7 @@ class Catalogs extends Controller with MongoController {
 
   private def CreatedResponse(location: String) = {
     Created(ContentTypes.JSON)
-      .withHeaders(
-        (HeaderNames.LOCATION, location),
-        ("Access-Control-Allow-Origin", "*"),
-        ("Access-Control-Allow-Methods", "GET, POST, PUT"),
-        ("Access-Control-Allow-Headers", "Content-Type, api_key, Authorization")
-      )
+      .withHeaders(HeaderNames.LOCATION ->location)
   }
 
 
