@@ -69,7 +69,9 @@ class CatalogsIT extends Specification {
         val response = route(request)
         response.isDefined mustEqual true
         val result = Await.result(response.get, timeout)
-        contentAsString(response.get) mustEqual "invalid json"
+
+        val jsonResponse = contentAsJson(response.get)
+
         result.header.status mustEqual BAD_REQUEST
       }
     }

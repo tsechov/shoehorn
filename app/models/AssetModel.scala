@@ -2,6 +2,7 @@ package models
 
 import org.joda.time.DateTime
 
+
 trait AssetModel {
   def id: Option[String]
 

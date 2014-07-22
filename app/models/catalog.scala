@@ -2,6 +2,14 @@ package models
 
 
 import org.joda.time.DateTime
+case class CreateCatalog(
+                    active: Boolean,
+                    description: String,
+                    year: Int,
+                    season: String,
+                    status: Boolean,
+                    webStatus: Boolean
+                    ) extends CreateAssetModel
 
 
 case class Catalog(
