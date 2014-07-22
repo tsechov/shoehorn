@@ -1,17 +1,25 @@
+# Ignore all dotfiles...
+.*
+# except for .gitignore
+!.gitignore
+
 # Ignore Play! working directory #
-bin/
-/db
-.eclipse
-/lib/
-/logs/
-/modules
-/project/project
-/project/target
-/target
-tmp/
+
+db
+lib
+log
+logs
+modules
+precompiled
+project/project
+project/target
+target
+tmp
 test-result
 server.pid
 *.iml
 *.eml
+activator-*.sbt
 /dist/
-.cache
+setenv.sh
+setenv.bat

@@ -1,0 +1,22 @@
+box: tsechov/oracle-java7-sbt.0.13.0@0.0.3
+build:
+    steps:
+        - script:
+            name: sbt clean compile
+            code: |-
+                sbt clean compile
+        - script:
+            name: sbt test
+            code: |-
+                sbt test
+
+deploy:
+    steps:
+        - script:
+            name: persist commit-id
+            code: |-
+                while read a ; do echo ${a//GIT_COMMIT/${WERCKER_GIT_COMMIT}} ; done < $WERCKER_SOURCE_DIR/conf/application.conf > $WERCKER_SOURCE_DIR/conf/application.conf.tmp
+                mv $WERCKER_SOURCE_DIR/conf/application.conf.tmp $WERCKER_SOURCE_DIR/conf/application.conf
+                cat $WERCKER_SOURCE_DIR/conf/application.conf
+        - heroku-deploy:
+            key-name: HEROKU_KEYPAIR
