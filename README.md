@@ -7,4 +7,4 @@ simple playframework + reactivemongo backend providing rest api for some busines
   * set **MONGO_URI** envvar to a valid mongo connection string
   * run activator from the project's root
 
-[![wercker status](https://app.wercker.com/status/2a02e36e8f1a10f66ddcae1990fc6bfa/m "wercker status")](https://app.wercker.com/project/bykey/2a02e36e8f1a10f66ddcae1990fc6bfa)
+[![wercker status](https://app.wercker.com/status/9d2cc5e7f69c3e2e4400737d107d3d60/m "wercker status")](https://app.wercker.com/project/bykey/9d2cc5e7f69c3e2e4400737d107d3d60)
