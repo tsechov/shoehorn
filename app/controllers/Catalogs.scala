@@ -5,7 +5,7 @@ import play.modules.reactivemongo.json.collection.JSONCollection
 import scala.concurrent.Future
 import reactivemongo.api.Cursor
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import org.slf4j.{LoggerFactory, Logger}
+
 import javax.inject.Singleton
 import play.api.mvc._
 import play.api.libs.json._
@@ -14,17 +14,17 @@ import reactivemongo.bson.BSONObjectID
 import play.api.http.{HeaderNames, ContentTypes}
 import org.joda.time.DateTime
 
-import play.api.Play
+import play.api.{Logger, Play}
 
 
 @Singleton
 class Catalogs extends Controller with MongoController {
 
-  private final val logger: Logger = LoggerFactory.getLogger(classOf[Catalogs])
-
-
   def collection: JSONCollection = db.collection[JSONCollection]("catalogs")
 
+  private val contextUrl = Play.application(play.api.Play.current).configuration.getString("context.url").getOrElse("")
+
+  def locationUrl(id: String) = contextUrl + controllers.routes.Catalogs.getById(id).toString
 
   import models.Catalog
 
@@ -38,18 +38,18 @@ class Catalogs extends Controller with MongoController {
       val result = for {
         transformed <- json.transform(transformer)
         validated <- transformed.validate[Catalog]
+
       } yield validated
 
       result.map {
         entity =>
           collection.insert(entity).map {
             lastError =>
-              logger.debug(s"Successfully inserted with id: $id")
-              val location = Play.application(play.api.Play.current).configuration.getString("context.url").getOrElse("") + controllers.routes.Catalogs.getById(id).toString
-              CreatedResponse(location)
+              Logger.debug(s"Successfully inserted with id: $id")
+              CreatedResponse(locationUrl(id))
           }
       }.recoverTotal(error => {
-        logger.debug("invalid input json: "+JsError.toFlatJson(error))
+        Logger.debug("invalid input json: " + JsError.toFlatJson(error))
         Future.successful(BadRequest(JsError.toFlatJson(error)))
       })
   }
@@ -92,7 +92,7 @@ class Catalogs extends Controller with MongoController {
 
   private def CreatedResponse(location: String) = {
     Created(ContentTypes.JSON)
-      .withHeaders(HeaderNames.LOCATION ->location)
+      .withHeaders(HeaderNames.LOCATION -> location)
   }
 
 
