@@ -28,7 +28,6 @@ class Catalogs extends Controller with MongoController {
 
   import models.Catalog
 
-
   def create = Action.async(parse.json) {
     request =>
       val json = request.body
