@@ -14,7 +14,6 @@ build:
             subdomain: szamos
             token: $SLACK_WEBHOOK_TOKEN
             channel: shoehorn-build
-            username: wercker
 
 deploy:
     steps:
@@ -27,5 +26,10 @@ deploy:
         - heroku-deploy:
             key-name: HEROKU_KEYPAIR
     after-steps:
+        - kobim/slack-post:
+                    subdomain: szamos
+                    token: $SLACK_WEBHOOK_TOKEN
+                    channel: shoehorn-build
+
         - mzp/http-notify@0.1.4:
-            url: https://api.runscope.com/radar/b6a22e79-f98f-9ec3f0d6bd02/trigger
+            url: $RUNSCOPE_TRIGGER_URL
