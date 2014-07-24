@@ -22,7 +22,8 @@ val MaxAge = 1
       ACCESS_CONTROL_ALLOW_HEADERS -> AllowHeaders.mkString(", "),
       ACCESS_CONTROL_ALLOW_CREDENTIALS -> AllowCredentials.toString,
       ACCESS_CONTROL_MAX_AGE -> MaxAge.toString,
-      ACCESS_CONTROL_ALLOW_ORIGIN -> origin)
+      ACCESS_CONTROL_ALLOW_ORIGIN -> origin,
+      "Access-Control-Expose-Headers" -> "Location")
 
   def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[SimpleResult]) = {
     implicit val executionContext = play.api.libs.concurrent.Execution.defaultContext
@@ -34,8 +35,8 @@ val MaxAge = 1
       block(request).map(res =>
         res.withHeaders(
           ACCESS_CONTROL_ALLOW_ORIGIN -> origin,
-          ACCESS_CONTROL_ALLOW_CREDENTIALS -> AllowCredentials.toString
-        ))
+          ACCESS_CONTROL_ALLOW_CREDENTIALS -> AllowCredentials.toString,
+          "Access-Control-Expose-Headers" -> "Location"
     }
   }
 }
