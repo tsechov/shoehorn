@@ -36,7 +36,7 @@ val MaxAge = 1
         res.withHeaders(
           ACCESS_CONTROL_ALLOW_ORIGIN -> origin,
           ACCESS_CONTROL_ALLOW_CREDENTIALS -> AllowCredentials.toString,
-          "Access-Control-Expose-Headers" -> "Location"
+          "Access-Control-Expose-Headers" -> "Location"))
     }
   }
 }
