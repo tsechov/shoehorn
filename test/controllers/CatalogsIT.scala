@@ -28,7 +28,7 @@ class CatalogsIT extends CommonControllerSpecs {
     "insert and get a valid json by http post" in {
       running(FakeApplication()) {
 
-        val result = request(FakeRequest(POST, Catalogs.create.toString).withJsonBody(postJson), CREATED)
+        val result = corsRequest(FakeRequest(POST, Catalogs.create.toString).withJsonBody(postJson), CREATED)
 
         result.header.headers.keySet must contain(HeaderNames.LOCATION)
 
@@ -36,7 +36,7 @@ class CatalogsIT extends CommonControllerSpecs {
 
         val expectedId = location.stripPrefix(location.take(location.lastIndexOf('/') + 1))
 
-        val getResult = request(FakeRequest(GET, Catalogs.getById(expectedId).toString), OK)
+        val getResult = corsRequest(FakeRequest(GET, Catalogs.getById(expectedId).toString), OK)
 
         val jsonResult = contentAsJson(Future.successful(getResult))
 

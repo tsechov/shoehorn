@@ -29,14 +29,14 @@ object Global extends GlobalSettings {
   override def getControllerInstance[A](controllerClass: Class[A]): A = injector.getInstance(controllerClass)
 
 
-  override def doFilter(action: EssentialAction): EssentialAction = EssentialAction { request =>
-    action.apply(request).map(
-      _.withHeaders(
-        (ACCESS_CONTROL_ALLOW_ORIGIN, "*"),
-        (ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT"),
-        (ACCESS_CONTROL_ALLOW_HEADERS, CONTENT_TYPE)
-      )
-    )
-  }
+//  override def doFilter(action: EssentialAction): EssentialAction = EssentialAction { request =>
+//    action.apply(request).map(
+//      _.withHeaders(
+//        (ACCESS_CONTROL_ALLOW_ORIGIN, "*"),
+//        (ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT"),
+//        (ACCESS_CONTROL_ALLOW_HEADERS, CONTENT_TYPE)
+//      )
+//    )
+//  }
 
 }

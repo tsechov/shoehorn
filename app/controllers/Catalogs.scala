@@ -28,7 +28,7 @@ class Catalogs extends Controller with MongoController {
 
   import models.Catalog
 
-  def create = Action.async(parse.json) {
+  def create = CorsAction.async(parse.json) {
     request =>
       val json = request.body
       val id = BSONObjectID.generate.stringify
@@ -53,7 +53,7 @@ class Catalogs extends Controller with MongoController {
       })
   }
 
-  def getById(id: String) = Action.async {
+  def getById(id: String) = CorsAction.async {
     val query = Json.obj(models.AssetModelSupport.idFieldName -> id)
 
     val cursor = collection.find(query).cursor[Catalog].collect[List]()
@@ -66,7 +66,7 @@ class Catalogs extends Controller with MongoController {
     futureJson.map(jsObject => Ok(jsObject))
   }
 
-  def find = Action.async {
+  def find = CorsAction.async {
 
     val cursor: Cursor[Catalog] =
       collection

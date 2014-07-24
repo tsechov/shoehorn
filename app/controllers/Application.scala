@@ -12,21 +12,24 @@ import play.Play
  * @param uuidGenerator the UUID generator service we wish to receive.
  */
 @Singleton
-class Application @Inject() (uuidGenerator: UUIDGenerator) extends Controller {
+class Application @Inject()(uuidGenerator: UUIDGenerator) extends Controller {
 
   private final val logger: Logger = LoggerFactory.getLogger(classOf[Application])
 
   def index = Action {
-    val gitCommitId=Play.application.configuration.getString("git.commit")
-    val scmUrl=Play.application.configuration.getString("scm.url")
+    val gitCommitId = Play.application.configuration.getString("git.commit")
+    val scmUrl = Play.application.configuration.getString("scm.url")
 
-    Ok(views.html.index(scmUrl+"/commit/"+gitCommitId))
+    Ok(views.html.index(scmUrl + "/commit/" + gitCommitId))
   }
 
   def randomUUID = Action {
-      Ok(uuidGenerator.generate.toString)
+    Ok(uuidGenerator.generate.toString)
   }
 
 
+  def preflight(path: String) = CorsAction {
+    Ok
+  }
 
 }

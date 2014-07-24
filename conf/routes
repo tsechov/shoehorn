@@ -5,18 +5,23 @@
 # ~~~~
 
 # Single endpoint for serving AngularJS
-GET         /                    @controllers.Application.index
-GET         /randomUUID          @controllers.Application.randomUUID
+OPTIONS        /                    @controllers.Application.preflight(path: String ?= "")
+OPTIONS        /*path               @controllers.Application.preflight(path)
+
+GET            /                    @controllers.Application.index
+GET            /randomUUI           @controllers.Application.randomUUID
 
 
 # User management API
-GET         /users               @controllers.Users.findUsers
-POST        /user                @controllers.Users.createUser
+GET            /users               @controllers.Users.findUsers
+POST           /user                @controllers.Users.createUser
 
 # User management API
-GET         /catalogs            @controllers.Catalogs.find
-POST        /catalog             @controllers.Catalogs.create
-GET         /catalog/:id         @controllers.Catalogs.getById(id)
+GET            /catalogs            @controllers.Catalogs.find
+POST           /catalog             @controllers.Catalogs.create
+
+GET            /catalog/:id         @controllers.Catalogs.getById(id)
+
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file        controllers.Assets.at(path="/public", file)
+GET            /assets/*file        controllers.Assets.at(path="/public", file)
