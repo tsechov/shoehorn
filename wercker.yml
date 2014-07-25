@@ -34,4 +34,4 @@ deploy:
             username: deploy@werckerbot
 
         - mzp/http-notify@0.1.4:
-            url: $RUNSCOPE_TRIGGER_URL?commit=$WERCKER_GIT_COMMIT
+            url: ${RUNSCOPE_TRIGGER_URL}?commit=${WERCKER_GIT_COMMIT}
