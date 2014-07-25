@@ -1,4 +1,5 @@
 import sbt._
+import sbt.Keys._
 
 object ApplicationBuild extends Build {
 
@@ -16,7 +17,9 @@ object ApplicationBuild extends Build {
 
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+    sources in (Compile,doc) := Seq.empty
   )
+
+
 
 }
