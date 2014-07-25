@@ -33,5 +33,7 @@ deploy:
             channel: shoehorn-build
             username: deploy@werckerbot
 
-        - mzp/http-notify@0.1.4:
-            url: ${RUNSCOPE_TRIGGER_URL}?commit=${WERCKER_GIT_COMMIT}
+        - script:
+            name: runscope trigger
+            code: |-
+                wget -O - ${RUNSCOPE_TRIGGER_URL}?commit=${WERCKER_GIT_COMMIT}
