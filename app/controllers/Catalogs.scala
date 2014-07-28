@@ -15,11 +15,11 @@ import play.api.http.{HeaderNames, ContentTypes}
 import org.joda.time.DateTime
 
 import play.api.{Logger, Play}
-import models.{CatalogSupport, CatalogCreate}
+import models.{CatalogPaths, CatalogUpdate, CatalogSupport, CatalogCreate}
 
 
 @Singleton
-class Catalogs extends Controller with MongoController {
+class Catalogs extends Controller with MongoController with CatalogPaths{
 
   def collection: JSONCollection = db.collection[JSONCollection]("catalogs")
 
@@ -35,11 +35,10 @@ class Catalogs extends Controller with MongoController {
       val id = BSONObjectID.generate.stringify
       val now = new DateTime()
       val transformer = CatalogCreate.transformer(json)(id, now)
+
       val result = for {
         validated <- json.validate[CatalogCreate]
         transformed <- json.transform(transformer)
-
-
       } yield transformed
 
       result.map {
@@ -50,19 +49,41 @@ class Catalogs extends Controller with MongoController {
               CreatedResponse(locationUrl(id))
           }
       }.recoverTotal(error => {
-        Logger.debug("invalid input json: " + JsError.toFlatJson(error))
+        Logger.debug("invalid input json for create: " + JsError.toFlatJson(error))
         Future.successful(BadRequest(JsError.toFlatJson(error)))
       })
   }
 
-  def update = CorsAction.async(parse.json) {
+  def update(id:Catalog.IdType) = CorsAction.async(parse.json) {
     request =>
-      val json=request.body
+      val json = request.body
+      val now = new DateTime()
+      val transformer = CatalogUpdate.transformer(json)(now)
+      val result = for {
+        validated <- {println("validate: "+json);json.validate[CatalogCreate]}
+        transformed <- {println("transform :"+json);json.transform(transformer)}
+      } yield transformed
 
-      ???
+      result.map {
+        entity => {
+          val selector = Json.obj(CatalogSupport.idFieldName->id)
+
+          val modifier = Json.obj("$set" -> entity)
+          collection.update(selector,modifier).map {
+            lastError =>
+              Logger.debug(s"Successfully updated with id: $id")
+              Ok
+          }
+        }
+      }.recoverTotal(error => {
+        Logger.debug(s"invalid input json for update: $id \n" + JsError.toFlatJson(error))
+        Future.successful(BadRequest(JsError.toFlatJson(error)))
+      })
+
+
   }
 
-  def getById(id: String) = CorsAction.async {
+  def getById(id: Catalog.IdType) = CorsAction.async {
     val query = Json.obj(CatalogSupport.idFieldName -> id)
 
     val cursor = collection.find(query).cursor[Catalog].collect[List]()
@@ -76,11 +97,11 @@ class Catalogs extends Controller with MongoController {
   }
 
   def find = CorsAction.async {
-
+    import CatalogSupport._
     val cursor: Cursor[Catalog] =
       collection
-        .find(Json.obj("active" -> true))
-        .sort(Json.obj("createdAt" -> -1))
+        .find(Json.obj(activeFieldName -> true))
+        .sort(Json.obj(createdAtFieldName -> -1))
         .cursor[Catalog]
 
     val futureList: Future[List[Catalog]] = cursor.collect[List]()

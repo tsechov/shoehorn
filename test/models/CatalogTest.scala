@@ -27,7 +27,7 @@ class CatalogTest extends Specification {
       } yield transformed
 
       result match {
-        case c: JsSuccess[JsObject] => val id=c.get \ CatalogSupport.idFieldName; id must equalTo(JsString(expectedId))
+        case c: JsSuccess[JsObject] => c.get \ CatalogSupport.idFieldName must equalTo(JsString(expectedId))
         case e:JsError => println(e);1 must equalTo(0)
       }
 

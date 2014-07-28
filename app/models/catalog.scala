@@ -15,7 +15,7 @@ case class CatalogCreate(
                           webStatus: Boolean
                           )
 
-object CatalogCreate extends CatalogPaths{
+object CatalogCreate extends CatalogPaths {
   implicit val reads: Reads[CatalogCreate] =
     (activePath.read[Boolean] and
       descriptionPath.read[String] and
@@ -25,12 +25,11 @@ object CatalogCreate extends CatalogPaths{
       webStatusPath.read[Boolean])(CatalogCreate.apply _)
 
 
-
   def transformer(json: JsValue): (Catalog.IdType, DateTime) => Reads[JsObject] = {
     (id, date) => {
+      import CatalogSupport._
       (__).json.update(__.read[JsObject].map {
-        root =>
-          root ++ Json.obj(CatalogSupport.idFieldName -> id, "createdAt" -> date, "lastModifiedAt" -> date)
+        root => root ++ Json.obj(idFieldName -> id, createdAtFieldName -> date, lastModifiedAtFieldName -> date)
       })
     }
   }
@@ -47,18 +46,25 @@ case class CatalogUpdate(
                           webStatus: Boolean
                           )
 
-object CatalogUpdate extends CatalogPaths{
-  implicit val reads: Reads[CatalogUpdate] =
-    {
+object CatalogUpdate extends CatalogPaths {
+  implicit val reads: Reads[CatalogUpdate] = {
 
-      (idPath.read[Catalog.IdType] and
-        activePath.read[Boolean] and
-        descriptionPath.read[String] and
-        yearPath.read[Int] and
-        seasonPath.read[String] and
-        statusPath.read[Boolean] and
-        webStatusPath.read[Boolean])(CatalogUpdate.apply _)
+    (idPath.read[Catalog.IdType] and
+      activePath.read[Boolean] and
+      descriptionPath.read[String] and
+      yearPath.read[Int] and
+      seasonPath.read[String] and
+      statusPath.read[Boolean] and
+      webStatusPath.read[Boolean])(CatalogUpdate.apply _)
+  }
+
+  def transformer(json: JsValue): (DateTime) => Reads[JsObject] = {
+    (date) => {
+      (__).json.update(__.read[JsObject].map {
+        root => root ++ Json.obj(CatalogSupport.lastModifiedAtFieldName -> date)
+      })
     }
+  }
 }
 
 case class Catalog(
@@ -73,8 +79,8 @@ case class Catalog(
                     webStatus: Boolean
                     )
 
-object Catalog extends CatalogPaths with DateFormatSupport{
-  val reads:Reads[Catalog] =  {
+object Catalog extends CatalogPaths with DateFormatSupport {
+  val reads: Reads[Catalog] = {
     (idPath.read[Catalog.IdType] and
       createdAtPath.read[DateTime] and
       lastModifiedAtPath.read[DateTime] and
@@ -86,7 +92,7 @@ object Catalog extends CatalogPaths with DateFormatSupport{
       webStatusPath.read[Boolean])(Catalog.apply _)
   }
 
-  val writes:Writes[Catalog] = {
+  val writes: Writes[Catalog] = {
     (idPath.write[Catalog.IdType] and
       createdAtPath.write[DateTime] and
       lastModifiedAtPath.write[DateTime] and
@@ -98,24 +104,30 @@ object Catalog extends CatalogPaths with DateFormatSupport{
       webStatusPath.write[Boolean])(unlift(Catalog.unapply _))
   }
 
-  implicit val catalogFormats:Format[Catalog] = Format(reads,writes)
+  implicit val catalogFormats: Format[Catalog] = Format(reads, writes)
 }
 
-trait CatalogPaths{
-  val idPath= __ \ CatalogSupport.idFieldName
-  val createdAtPath= __ \ "createdAt"
-  val lastModifiedAtPath= __ \ "lastModifiedAt"
-  val activePath= __ \ "active"
-  val descriptionPath= __ \ "description"
-  val yearPath= __ \ "year"
-  val seasonPath= __ \ "season"
+trait CatalogPaths {
+
+  import CatalogSupport._
+
+  val idPath = __ \ idFieldName
+  val createdAtPath = __ \ createdAtFieldName
+  val lastModifiedAtPath = __ \ lastModifiedAtFieldName
+  val activePath = __ \ "active"
+  val descriptionPath = __ \ "description"
+  val yearPath = __ \ "year"
+  val seasonPath = __ \ "season"
   val statusPath = __ \ "status"
   val webStatusPath = __ \ "webStatus"
   type IdType = String
 }
 
 object CatalogSupport {
-  val idFieldName="_id"
+  val idFieldName = "_id"
+  val createdAtFieldName = "createdAt"
+  val lastModifiedAtFieldName = "lastModifiedAt"
+  val activeFieldName = "active"
 }
 
 

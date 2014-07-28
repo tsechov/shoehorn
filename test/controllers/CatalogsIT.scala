@@ -15,7 +15,7 @@ import play.api.mvc.{Request, AnyContent, SimpleResult}
 import controllers.routes.Catalogs
 import models.{CatalogPaths, DateFormatSupport}
 
-class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with CatalogPaths{
+class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with CatalogPaths {
 
 
   def checkDateField(jsValue: JsValue, path: JsPath) = {
@@ -26,7 +26,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
   "Catalogs controller" should {
 
-    "insert and get a valid json by http post" in {
+    "create a catalog using valid json by http post" in {
       running(FakeApplication()) {
 
         val result = corsRequest(FakeRequest(POST, Catalogs.create.toString).withJsonBody(postJson), CREATED)
@@ -46,6 +46,26 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
         jsonResult.transform(idPath.json.prune andThen createdAtPath.json.prune andThen lastModifiedAtPath.json.prune).getOrElse(Json.obj()) must beEqualTo(postJson)
 
+      }
+    }
+
+    "update a catalog using valid json by http put" in {
+      running(FakeApplication()) {
+        println(postJson)
+        val result = corsRequest(FakeRequest(POST, Catalogs.create.toString).withJsonBody(postJson), CREATED)
+
+        result.header.headers.keySet must contain(HeaderNames.LOCATION)
+
+        val location = result.header.headers(HeaderNames.LOCATION)
+
+        val expectedId = location.stripPrefix(location.take(location.lastIndexOf('/') + 1))
+
+
+
+        val newDescription=(__ \ "description").json.update(__.read[JsObject].map{description => Json.obj("description"->"updated description")})
+        val updateResult=corsRequest(FakeRequest(PUT, Catalogs.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
+
+        success
       }
     }
 
