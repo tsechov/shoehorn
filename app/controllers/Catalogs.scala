@@ -15,6 +15,7 @@ import play.api.http.{HeaderNames, ContentTypes}
 import org.joda.time.DateTime
 
 import play.api.{Logger, Play}
+import models.CatalogCreate
 
 
 @Singleton
@@ -33,12 +34,13 @@ class Catalogs extends Controller with MongoController {
       val json = request.body
       val id = BSONObjectID.generate.stringify
       val now = new DateTime()
-      val transformer = Catalog.createTransformer(json)(id, now)
+      val transformer = CatalogCreate.transformer(json)(id, now)
       val result = for {
+        validated <- json.validate[CatalogCreate]
         transformed <- json.transform(transformer)
-        validated <- transformed.validate[Catalog]
 
-      } yield validated
+
+      } yield transformed
 
       result.map {
         entity =>
@@ -51,6 +53,13 @@ class Catalogs extends Controller with MongoController {
         Logger.debug("invalid input json: " + JsError.toFlatJson(error))
         Future.successful(BadRequest(JsError.toFlatJson(error)))
       })
+  }
+
+  def update = CorsAction.async(parse.json) {
+    request =>
+      val json=request.body
+
+      ???
   }
 
   def getById(id: String) = CorsAction.async {

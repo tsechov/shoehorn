@@ -2,17 +2,18 @@ package models
 
 import org.joda.time.DateTime
 
+trait CreateAssetModel {
+  def active: Boolean
 
-trait AssetModel {
+  def description: String
+}
+
+trait AssetModel extends CreateAssetModel {
   def id: Option[String]
 
   def createdAt: DateTime
 
   def lastModifiedAt: DateTime
-
-  def active: Boolean
-
-  def description: String
 
 
 }
@@ -46,6 +47,15 @@ trait AssetModelSupport {
       active.read[Boolean] and
       description.read[String]
 
+  val createReadsBuilder =
+    active.read[Boolean] and
+      description.read[String]
+
+  val updateReadsBuilder =
+    idPath.read[IdType] and
+      active.read[Boolean] and
+      description.read[String]
+
 
   val writesBuilder =
     idPath.writeNullable[IdType] and
@@ -54,17 +64,20 @@ trait AssetModelSupport {
       active.write[Boolean] and
       description.write[String]
 
-  /**
-   *
-   * @param json
-   * @return
-   */
-  def createTransformer(json: JsValue): (IdType,DateTime) => Reads[JsObject] = { (id,date) => {
+
+  def createTransformer(json: JsValue): (IdType, DateTime) => Reads[JsObject] = { (id, date) => {
     (__).json.update(__.read[JsObject].map { root =>
-      root ++ Json.obj(idFieldName -> id,createdAtFieldName -> date, lastModifiedAtFieldName -> date)
+      root ++ Json.obj(idFieldName -> id, createdAtFieldName -> date, lastModifiedAtFieldName -> date)
     })
   }
   }
+
+  def updateTransformer(json: JsValue): DateTime => Reads[JsObject] = {
+    lastModifiedDate => {
+      (__).json.update(__.read[JsObject].map { root => root ++ Json.obj(lastModifiedAtFieldName -> lastModifiedDate)})
+    }
+  }
+
 
 }
 
