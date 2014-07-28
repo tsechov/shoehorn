@@ -4,6 +4,7 @@ import org.specs2.mutable._
 import play.api.libs.json._
 import org.joda.time.DateTime
 
+
 class CatalogTest extends Specification {
 
   import CatalogTestSupport._
@@ -14,18 +15,19 @@ class CatalogTest extends Specification {
 
       val expectedId: String = "123"
       val expectedDate=new DateTime
-      import models.AssetModelSupport._
+
       println(Json.prettyPrint(Json.toJson(new DateTime("1952-03-11"))))
       println(Json.prettyPrint(postJson))
-      val transformer=Catalog.createTransformer(postJson)(expectedId,expectedDate)
+      val transformer=CatalogCreate.transformer(postJson)(expectedId,expectedDate)
 
       val result = for {
+        validated <- {println(Json.prettyPrint(postJson)); postJson.validate[CatalogCreate]}
         transformed <- postJson.transform(transformer)
-        validated <- {println(Json.prettyPrint(transformed)); transformed.validate[Catalog]}
-      } yield validated
+
+      } yield transformed
 
       result match {
-        case c: JsSuccess[Catalog] => c.get.id must beSome(expectedId)
+        case c: JsSuccess[JsObject] => val id=c.get \ CatalogSupport.idFieldName; id must equalTo(JsString(expectedId))
         case e:JsError => println(e);1 must equalTo(0)
       }
 

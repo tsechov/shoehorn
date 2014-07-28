@@ -9,12 +9,13 @@ import play.api.test.Helpers._
 import models.CatalogTestSupport._
 import play.api.http.{Writeable, ContentTypes, HeaderNames}
 import org.joda.time.DateTime
-import models.AssetModelSupport._
+
 import play.api.mvc.{Request, AnyContent, SimpleResult}
 
 import controllers.routes.Catalogs
+import models.{CatalogPaths, DateFormatSupport}
 
-class CatalogsIT extends CommonControllerSpecs {
+class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with CatalogPaths{
 
 
   def checkDateField(jsValue: JsValue, path: JsPath) = {

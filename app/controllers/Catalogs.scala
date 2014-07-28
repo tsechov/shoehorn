@@ -15,7 +15,7 @@ import play.api.http.{HeaderNames, ContentTypes}
 import org.joda.time.DateTime
 
 import play.api.{Logger, Play}
-import models.CatalogCreate
+import models.{CatalogSupport, CatalogCreate}
 
 
 @Singleton
@@ -63,7 +63,7 @@ class Catalogs extends Controller with MongoController {
   }
 
   def getById(id: String) = CorsAction.async {
-    val query = Json.obj(models.AssetModelSupport.idFieldName -> id)
+    val query = Json.obj(CatalogSupport.idFieldName -> id)
 
     val cursor = collection.find(query).cursor[Catalog].collect[List]()
     val futureJson = cursor.map {
