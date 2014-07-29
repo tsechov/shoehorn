@@ -62,7 +62,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
 
 
-        val newDescription=(__ \ "description").json.update(__.read[JsObject].map{description => Json.obj("description"->"updated description")})
+        val newDescription=(__).json.update(__.read[JsObject].map{root => root ++ Json.obj("description"->"updated description")})
         val updateResult=corsRequest(FakeRequest(PUT, Catalogs.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
 
         success
