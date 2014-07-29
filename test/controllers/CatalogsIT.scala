@@ -24,22 +24,34 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
     Json.fromJson(createdAt.get)(dateFormat) must beAnInstanceOf[JsSuccess[DateTime]]
   }
 
+  def idExtract(result:SimpleResult) = {
+    val location = result.header.headers(HeaderNames.LOCATION)
+
+    location.stripPrefix(location.take(location.lastIndexOf('/') + 1))
+
+  }
+
+  def create = {
+    val result = corsRequest(FakeRequest(POST, Catalogs.create.toString).withJsonBody(postJson), CREATED)
+
+    result.header.headers.keySet must contain(HeaderNames.LOCATION)
+
+    result
+
+  }
+
+  def get(id:String) = {
+    val getResult = corsRequest(FakeRequest(GET, Catalogs.getById(id).toString), OK)
+
+    contentAsJson(Future.successful(getResult))
+  }
+
   "Catalogs controller" should {
 
     "create a catalog using valid json by http post" in {
       running(FakeApplication()) {
 
-        val result = corsRequest(FakeRequest(POST, Catalogs.create.toString).withJsonBody(postJson), CREATED)
-
-        result.header.headers.keySet must contain(HeaderNames.LOCATION)
-
-        val location = result.header.headers(HeaderNames.LOCATION)
-
-        val expectedId = location.stripPrefix(location.take(location.lastIndexOf('/') + 1))
-
-        val getResult = corsRequest(FakeRequest(GET, Catalogs.getById(expectedId).toString), OK)
-
-        val jsonResult = contentAsJson(Future.successful(getResult))
+        val jsonResult = get((idExtract(create)))
 
         checkDateField(jsonResult, createdAtPath)
         checkDateField(jsonResult, lastModifiedAtPath)
@@ -51,18 +63,12 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
     "update a catalog using valid json by http put" in {
       running(FakeApplication()) {
-        println(postJson)
-        val result = corsRequest(FakeRequest(POST, Catalogs.create.toString).withJsonBody(postJson), CREATED)
 
-        result.header.headers.keySet must contain(HeaderNames.LOCATION)
+        val expectedId = idExtract(create)
 
-        val location = result.header.headers(HeaderNames.LOCATION)
+        val expectedDescription=Json.obj("description"->"updated description")
 
-        val expectedId = location.stripPrefix(location.take(location.lastIndexOf('/') + 1))
-
-
-
-        val newDescription=(__).json.update(__.read[JsObject].map{root => root ++ Json.obj("description"->"updated description")})
+        val newDescription=(__).json.update(__.read[JsObject].map{root => root ++ expectedDescription})
         val updateResult=corsRequest(FakeRequest(PUT, Catalogs.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
 
         success
