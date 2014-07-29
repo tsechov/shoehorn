@@ -90,7 +90,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
     val futureJson = cursor.map {
       list => list match {
         case head :: _ => Json.toJson(head)
-        case Nil => Json.obj()
+        case Nil => JsUndefined(s"$id not found")
       }
     }
     futureJson.map(jsObject => Ok(jsObject))
