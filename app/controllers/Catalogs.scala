@@ -60,15 +60,16 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
       val now = new DateTime()
       val transformer = CatalogUpdate.transformer(json)(now)
       val result = for {
-        validated <- {println("validate: "+json);json.validate[CatalogCreate]}
         transformed <- {println("transform :"+json);json.transform(transformer)}
-      } yield transformed
+        validated <- {println("validate: "+transformed);transformed.validate[CatalogUpdate]}
+
+      } yield (validated,transformed)
 
       result.map {
         entity => {
           val selector = Json.obj(CatalogSupport.idFieldName->id)
 
-          val modifier = Json.obj("$set" -> entity)
+          val modifier = Json.obj("$set" -> entity._2)
           collection.update(selector,modifier).map {
             lastError =>
               Logger.debug(s"Successfully updated with id: $id")

@@ -8,18 +8,17 @@ import java.util.concurrent.TimeUnit._
 
 
 object CorsAction extends ActionBuilder[Request] with Results {
-  val maxAge = Duration(30,DAYS).toSeconds.toString
+  val maxAge = 1.toString//Duration(30,DAYS).toSeconds.toString
 
   val allowHeaders = List("Content-Type", "Accept",
-    "X-Auth-Token", "X-HTTP-Method-Override", "X-Json", "X-Prototype-Version", "X-Requested-With").mkString(", ")
+    "X-Auth-Token", "X-HTTP-Method-Override", "X-Json", "X-Prototype-Version", "X-Requested-With").mkString(",")
 
-  val allowMethods = List("PUT","POST", "GET",  "DELETE", "OPTIONS").mkString(", ")
+  val allowMethods = List("POST", "PUT", "GET",  "DELETE", "OPTIONS").mkString(",")
 
   val allowCredentials = true.toString
 
   def corsPreflight[A](origin: String) =
     Ok.withHeaders(
-
       ACCESS_CONTROL_ALLOW_METHODS -> allowMethods,
       ACCESS_CONTROL_ALLOW_HEADERS -> allowHeaders,
       ACCESS_CONTROL_ALLOW_CREDENTIALS -> allowCredentials,

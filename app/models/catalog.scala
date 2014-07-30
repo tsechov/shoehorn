@@ -37,7 +37,7 @@ object CatalogCreate extends CatalogPaths {
 
 
 case class CatalogUpdate(
-                          _id: Catalog.IdType,
+                          lastModifiedAt: DateTime,
                           active: Boolean,
                           description: String,
                           year: Int,
@@ -49,7 +49,7 @@ case class CatalogUpdate(
 object CatalogUpdate extends CatalogPaths {
   implicit val reads: Reads[CatalogUpdate] = {
 
-    (idPath.read[Catalog.IdType] and
+    (lastModifiedAtPath.read[DateTime] and
       activePath.read[Boolean] and
       descriptionPath.read[String] and
       yearPath.read[Int] and
@@ -62,7 +62,8 @@ object CatalogUpdate extends CatalogPaths {
     (date) => {
       (__).json.update(__.read[JsObject].map {
         root => root ++ Json.obj(CatalogSupport.lastModifiedAtFieldName -> date)
-      })
+      }) andThen createdAtPath.json.prune andThen idPath.json.prune
+
     }
   }
 }

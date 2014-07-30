@@ -20,8 +20,9 @@ POST           /user                @controllers.Users.createUser
 # User management API
 GET            /catalogs            @controllers.Catalogs.find
 GET            /catalogs/:id        @controllers.Catalogs.getById(id)
+POST           /catalogs/:id        @controllers.Catalogs.update(id)
 POST           /catalogs            @controllers.Catalogs.create
-PUT            /catalogs/:id        @controllers.Catalogs.update(id)
+
 
 
 
