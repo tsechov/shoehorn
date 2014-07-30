@@ -32,4 +32,10 @@ class Application @Inject()(uuidGenerator: UUIDGenerator) extends Controller {
     Ok
   }
 
+  def index2 = Action {
+    val gitCommitId = Play.application.configuration.getString("git.commit")
+    val scmUrl = Play.application.configuration.getString("scm.url")
+
+    Ok(views.html.index2(scmUrl + "/commit/" + gitCommitId))
+  }
 }

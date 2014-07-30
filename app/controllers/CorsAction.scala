@@ -13,7 +13,7 @@ object CorsAction extends ActionBuilder[Request] with Results {
   val allowHeaders = List("Content-Type", "Accept",
     "X-Auth-Token", "X-HTTP-Method-Override", "X-Json", "X-Prototype-Version", "X-Requested-With").mkString(", ")
 
-  val allowMethods = List("POST", "GET", "PUT", "DELETE", "OPTIONS").mkString(", ")
+  val allowMethods = List("PUT","POST", "GET",  "DELETE", "OPTIONS").mkString(", ")
 
   val allowCredentials = true.toString
 

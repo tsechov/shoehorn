@@ -9,6 +9,7 @@ OPTIONS        /                    @controllers.Application.preflight(path: Str
 OPTIONS        /*path               @controllers.Application.preflight(path)
 
 GET            /                    @controllers.Application.index
+GET            /index2              @controllers.Application.index2
 GET            /randomUUI           @controllers.Application.randomUUID
 
 
