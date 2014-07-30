@@ -18,10 +18,10 @@ POST           /user                @controllers.Users.createUser
 
 # User management API
 GET            /catalogs            @controllers.Catalogs.find
-POST           /catalog             @controllers.Catalogs.create
-PUT            /catalog/:id         @controllers.Catalogs.update(id)
+GET            /catalogs/:id        @controllers.Catalogs.getById(id)
+POST           /catalogs            @controllers.Catalogs.create
+PUT            /catalogs/:id        @controllers.Catalogs.update(id)
 
-GET            /catalog/:id         @controllers.Catalogs.getById(id)
 
 
 # Map static resources from the /public folder to the /assets URL path
