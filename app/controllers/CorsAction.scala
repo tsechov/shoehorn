@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit._
 object CorsAction extends ActionBuilder[Request] with Results {
   val maxAge = Duration(30,DAYS).toSeconds.toString
 
-  val allowHeaders = List("Content-Type",
+  val allowHeaders = List("Content-Type", "Accept",
     "X-Auth-Token", "X-HTTP-Method-Override", "X-Json", "X-Prototype-Version", "X-Requested-With").mkString(", ")
 
   val allowMethods = List("POST", "GET", "PUT", "DELETE", "OPTIONS").mkString(", ")
