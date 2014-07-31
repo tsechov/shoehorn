@@ -29,7 +29,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
 
   import models.Catalog
 
-  def create = CorsAction.async(parse.json) {
+  def create = Action.async(parse.json) {
     request =>
       val json = request.body
       val id = BSONObjectID.generate.stringify
@@ -54,7 +54,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
       })
   }
 
-  def update(id:Catalog.IdType) = CorsAction.async(parse.json) {
+  def update(id:Catalog.IdType) = Action.async(parse.json) {
     request =>
       val json = request.body
       val now = new DateTime()
@@ -84,7 +84,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
 
   }
 
-  def getById(id: Catalog.IdType) = CorsAction.async {
+  def getById(id: Catalog.IdType) = Action.async {
     val query = Json.obj(CatalogSupport.idFieldName -> id)
 
     val cursor = collection.find(query).cursor[Catalog].collect[List]()
@@ -97,7 +97,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
     futureJson.map(jsObject => Ok(jsObject))
   }
 
-  def find = CorsAction.async {
+  def find = Action.async {
     import CatalogSupport._
     val cursor: Cursor[Catalog] =
       collection
@@ -126,4 +126,5 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
   }
 
 
+  def delete(id: String) = play.mvc.Results.TODO
 }

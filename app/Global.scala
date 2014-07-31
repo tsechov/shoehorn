@@ -11,7 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 /**
  * Set up the Guice injector and provide the mechanism for return objects from the dependency graph.
  */
-object Global extends GlobalSettings {
+object Global extends WithFilters(CORSFilter()) with GlobalSettings {
 
   /**
    * Bind types such that whenever UUIDGenerator is required, an instance of SimpleUUIDGenerator will be used.

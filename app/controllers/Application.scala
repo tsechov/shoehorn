@@ -28,7 +28,7 @@ class Application @Inject()(uuidGenerator: UUIDGenerator) extends Controller {
   }
 
 
-  def preflight(path: String) = CorsAction {
+  def preflight(path: String) = Action {
     Ok
   }
 
