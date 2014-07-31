@@ -90,11 +90,14 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
     val cursor = collection.find(query).cursor[Catalog].collect[List]()
     val futureJson = cursor.map {
       list => list match {
-        case head :: _ => Json.toJson(head)
-        case Nil => JsUndefined(s"$id not found")
+        case head :: _ => Some(Json.toJson(head))
+        case Nil => None
       }
     }
-    futureJson.map(jsObject => Ok(jsObject))
+    futureJson.map(jsObjectOpt => jsObjectOpt match {
+      case Some(jsObject) => Ok(jsObject)
+      case None => NotFound
+    })
   }
 
   def find = Action.async {
@@ -126,5 +129,16 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
   }
 
 
-  def delete(id: String) = play.mvc.Results.TODO
+  def delete(id: String) = Action.async {
+    val query = Json.obj(CatalogSupport.idFieldName -> id)
+    val result=collection.remove(query)
+    result.map{
+      lastError =>
+      {
+        Logger.debug(s"Successfully deleted with id: $id")
+        Ok
+      }
+    }
+
+  }
 }
