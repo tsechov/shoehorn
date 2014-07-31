@@ -3,12 +3,13 @@ package controllers
 import play.modules.reactivemongo.MongoController
 import play.modules.reactivemongo.json.collection.JSONCollection
 import scala.concurrent.Future
-import reactivemongo.api.Cursor
+import reactivemongo.api.{Cursor}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import javax.inject.Singleton
 import play.api.mvc._
 import play.api.libs.json._
+import play.api.libs.json.Json._
 import reactivemongo.bson.BSONObjectID
 
 import play.api.http.{HeaderNames, ContentTypes}
@@ -16,6 +17,8 @@ import org.joda.time.DateTime
 
 import play.api.{Logger, Play}
 import models.{CatalogPaths, CatalogUpdate, CatalogSupport, CatalogCreate}
+import scala.util.{Failure, Success, Try}
+import javax.management.relation.InvalidRelationIdException
 
 
 @Singleton
@@ -46,11 +49,13 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
           collection.insert(entity).map {
             lastError =>
               Logger.debug(s"Successfully inserted with id: $id")
-              CreatedResponse(locationUrl(id))
+              Created.as(ContentTypes.JSON)
+                .withHeaders(HeaderNames.LOCATION -> locationUrl(id))
           }
       }.recoverTotal(error => {
-        Logger.debug("invalid input json for create: " + JsError.toFlatJson(error))
-        Future.successful(BadRequest(JsError.toFlatJson(error)))
+        val jsonError=JsError.toFlatJson(error)
+        Logger.debug("invalid input json for create: " + prettyPrint(jsonError))
+        Future.successful(BadRequest(jsonError))
       })
   }
 
@@ -67,9 +72,9 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
 
       result.map {
         entity => {
-          val selector = Json.obj(CatalogSupport.idFieldName->id)
+          val selector = obj(CatalogSupport.idFieldName->id)
 
-          val modifier = Json.obj("$set" -> entity._2)
+          val modifier = obj("$set" -> entity._2)
           collection.update(selector,modifier).map {
             lastError =>
               Logger.debug(s"Successfully updated with id: $id")
@@ -85,12 +90,12 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
   }
 
   def getById(id: Catalog.IdType) = Action.async {
-    val query = Json.obj(CatalogSupport.idFieldName -> id)
+    val query = obj(CatalogSupport.idFieldName -> id)
 
     val cursor = collection.find(query).cursor[Catalog].collect[List]()
     val futureJson = cursor.map {
       list => list match {
-        case head :: _ => Some(Json.toJson(head))
+        case head :: _ => Some(toJson(head))
         case Nil => None
       }
     }
@@ -100,32 +105,41 @@ class Catalogs extends Controller with MongoController with CatalogPaths{
     })
   }
 
-  def find = Action.async {
-    import CatalogSupport._
-    val cursor: Cursor[Catalog] =
-      collection
-        .find(Json.obj(activeFieldName -> true))
-        .sort(Json.obj(createdAtFieldName -> -1))
-        .cursor[Catalog]
+  def find(queryString:Option[String]) = Action.async {
+    request =>
+      Logger.debug(s"find queryString: $queryString")
 
-    val futureList: Future[List[Catalog]] = cursor.collect[List]()
+      val query = for {
+        q<-request.getQueryString("q") match {case Some(value) => Success(value);case None => Failure(new IllegalArgumentException("blah"))}
+        json <- Try(Json.parse(q))
 
-    val futureJsonArray: Future[JsArray] = futureList.map {
-      entities => {
-        entities.foldLeft(JsArray())((acc, elem) => acc ++ Json.arr(elem))
+      } yield json
+      Logger.debug(s"find query json: $query")
+    Logger.debug(Json.prettyPrint(query.get))
+      import CatalogSupport._
+      val cursor: Cursor[Catalog] =
+        collection
+          .find(query.get)
+          .sort(obj(createdAtFieldName -> -1))
+          .cursor[Catalog]
+
+      val futureList: Future[List[Catalog]] = cursor.collect[List]()
+
+      val futureJsonArray: Future[JsArray] = futureList.map {
+        entities => {
+          entities.foldLeft(JsArray())((acc, elem) => acc ++ Json.arr(elem))
+        }
       }
-    }
 
-    futureJsonArray.map {
-      jsArray => {
-        Ok(jsArray).as(ContentTypes.JSON)
+      futureJsonArray.map {
+        jsArray => {
+          Ok(jsArray).as(ContentTypes.JSON)
+        }
       }
-    }
   }
 
   private def CreatedResponse(location: String) = {
-    Created(ContentTypes.JSON)
-      .withHeaders(HeaderNames.LOCATION -> location)
+
   }
 
 

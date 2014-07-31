@@ -18,7 +18,7 @@ GET            /users               @controllers.Users.findUsers
 POST           /user                @controllers.Users.createUser
 
 # Catalog management API
-GET            /catalogs            @controllers.Catalogs.find
+GET            /catalogs            @controllers.Catalogs.find(q:Option[String])
 GET            /catalogs/:id        @controllers.Catalogs.getById(id)
 PUT            /catalogs/:id        @controllers.Catalogs.update(id)
 POST           /catalogs/:id        @controllers.Catalogs.update(id)
