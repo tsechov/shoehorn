@@ -25,6 +25,14 @@ POST           /catalogs/:id        @controllers.Catalogs.update(id)
 POST           /catalogs            @controllers.Catalogs.create
 DELETE         /catalogs/:id        @controllers.Catalogs.delete(id)
 
+GET            /models              @controllers.Models.find(q:Option[String])
+GET            /models/:id          @controllers.Models.getById(id)
+PUT            /models/:id          @controllers.Models.update(id)
+POST           /models/:id          @controllers.Models.update(id)
+POST           /models              @controllers.Models.create
+DELETE         /models/:id          @controllers.Models.delete(id)
+
+
 
 
 # Map static resources from the /public folder to the /assets URL path

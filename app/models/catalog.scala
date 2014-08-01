@@ -25,14 +25,6 @@ object CatalogCreate extends CatalogPaths {
       webStatusPath.read[Boolean])(CatalogCreate.apply _)
 
 
-  def transformer(json: JsValue): (Catalog.IdType, DateTime) => Reads[JsObject] = {
-    (id, date) => {
-      import CatalogSupport._
-      (__).json.update(__.read[JsObject].map {
-        root => root ++ Json.obj(idFieldName -> id, createdAtFieldName -> date, lastModifiedAtFieldName -> date)
-      })
-    }
-  }
 }
 
 
@@ -46,7 +38,7 @@ case class CatalogUpdate(
                           webStatus: Boolean
                           )
 
-object CatalogUpdate extends CatalogPaths {
+object CatalogUpdate extends CatalogPaths with DateFormatSupport {
   implicit val reads: Reads[CatalogUpdate] = {
 
     (lastModifiedAtPath.read[DateTime] and
@@ -58,25 +50,11 @@ object CatalogUpdate extends CatalogPaths {
       webStatusPath.read[Boolean])(CatalogUpdate.apply _)
   }
 
-  def transformer(json: JsValue): (DateTime) => Reads[JsObject] = {
-    (date) => {
-      addDate(date) andThen createdAtPath.json.prune andThen idPath.json.prune
-    }
-
-
-  }
-
-  private def addDate(date: DateTime) = {
-    (__).json.update(__.read[JsObject].map {
-      root => root ++ Json.obj(CatalogSupport.lastModifiedAtFieldName -> date)
-    })
-  }
-
 
 }
 
 case class Catalog(
-                    id: Catalog.IdType,
+                    id: AssetSupport.IdType,
                     createdAt: DateTime,
                     lastModifiedAt: DateTime,
                     active: Boolean,
@@ -90,7 +68,7 @@ case class Catalog(
 object Catalog extends CatalogPaths with DateFormatSupport {
 
   val reads: Reads[Catalog] = {
-    (idPath.read[Catalog.IdType] and
+    (idPath.read[AssetSupport.IdType] and
       createdAtPath.read[DateTime] and
       lastModifiedAtPath.read[DateTime] and
       activePath.read[Boolean] and
@@ -102,7 +80,7 @@ object Catalog extends CatalogPaths with DateFormatSupport {
   }
 
   val writes: Writes[Catalog] = {
-    (idPath.write[Catalog.IdType] and
+    (idPath.write[AssetSupport.IdType] and
       createdAtPath.write[DateTime] and
       lastModifiedAtPath.write[DateTime] and
       activePath.write[Boolean] and
@@ -113,38 +91,19 @@ object Catalog extends CatalogPaths with DateFormatSupport {
       webStatusPath.write[Boolean])(unlift(Catalog.unapply _))
   }
 
-  implicit val catalogFormats: Format[Catalog] = Format(reads, writes)
+  implicit val catalogFormats = Format(reads, writes)
 }
 
-trait CatalogPaths {
+trait CatalogPaths extends AssetPaths {
 
-  import CatalogSupport._
-
-  val idPath = __ \ idFieldName
-  val createdAtPath = __ \ createdAtFieldName
-  val lastModifiedAtPath = __ \ lastModifiedAtFieldName
-  val activePath = __ \ activeFieldName
-  val descriptionPath = __ \ "description"
   val yearPath = __ \ "year"
   val seasonPath = __ \ "season"
   val statusPath = __ \ "status"
   val webStatusPath = __ \ "webStatus"
-  type IdType = String
-
-
-
-
-
-
 
 }
 
-object CatalogSupport {
-  val idFieldName = "_id"
-  val createdAtFieldName = "createdAt"
-  val lastModifiedAtFieldName = "lastModifiedAt"
-  val activeFieldName = "active"
-}
+
 
 
 

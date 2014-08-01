@@ -1,42 +1,69 @@
 package controllers
 
+import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.MongoController
-import play.modules.reactivemongo.json.collection.JSONCollection
-import scala.concurrent.Future
-import reactivemongo.api.{Cursor}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
+import models.{AssetTransform, AssetSupport}
+import models.models.{ModelUpdate, ModelCreate, Model, ModelPaths}
 import javax.inject.Singleton
-import play.api.mvc._
-import play.api.libs.json._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json._
-import reactivemongo.bson.BSONObjectID
-
+import play.modules.reactivemongo.json.collection.JSONCollection
+import scala.Some
+import play.api.Logger
+import scala.util.{Failure, Success, Try}
+import play.api.libs.json.{JsError, Json}
 import play.api.http.{HeaderNames, ContentTypes}
+import scala.concurrent.Future
+import reactivemongo.bson.BSONObjectID
 import org.joda.time.DateTime
 
-import play.api.{Logger, Play}
-import models._
-import scala.util.{Failure, Success, Try}
-import OptionWrapperImplicits._
-import LastErrorWrapperImplicits._
-import play.api.libs.json.JsArray
-import play.modules.reactivemongo.json.collection.JSONCollection
-import scala.util.Failure
-import scala.Some
-import scala.util.Success
-import play.api.libs.json.JsObject
-
-
 @Singleton
-class Catalogs extends Controller with MongoController with CatalogPaths with ControllerUtils with MongoUtils{
+class Models extends Controller with MongoController with ModelPaths with ControllerUtils with MongoUtils{
+  def collection: JSONCollection = db.collection[JSONCollection]("models")
+  private def locationUrl(id: String) = contextUrl + controllers.routes.Models.getById(id).toString
 
-  def collection: JSONCollection = db.collection[JSONCollection]("catalogs")
+  def getById(id: AssetSupport.IdType) = Action.async {
+    val query = obj(AssetSupport.idFieldName -> id)
 
+    val cursor = collection.find(query).cursor[Model].collect[List]()
 
+    val futureJson = cursor.map {
+      case head :: _ => Some(toJson(head))
+      case Nil => None
+    }
 
-  private def locationUrl(id: String) = contextUrl + controllers.routes.Catalogs.getById(id).toString
+    futureJson.map {
+      case Some(jsObject) => Ok(jsObject)
+      case None => NotFound
+    }
 
+  }
+
+  def find(q: Option[String]) = Action.async {
+    request =>
+
+      Logger.debug(s"find queryString: $q")
+
+      q match {
+        case Some(queryString) => {
+          Try(Json.parse(queryString)) match {
+            case Success(queryJson) => {
+              collectionFind[Model](Some(queryJson)).map {
+                jsArray => if (jsArray.value.isEmpty) NotFound else Ok(jsArray).as(ContentTypes.JSON)
+              }
+            }
+            case Failure(error) => {
+              Logger.debug(s"error parsing query: $queryString")
+              Future.successful(BadRequest(Json.obj("error" -> error.getMessage)))
+            }
+          }
+        }
+        case None => collectionFind[Model]().map {
+          Ok(_).as(ContentTypes.JSON)
+        }
+      }
+
+  }
 
 
   def create = Action.async(parse.json) {
@@ -47,7 +74,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths with Co
       val transformer = AssetTransform.create(json)(id, now)
 
       val result = for {
-        validated <- json.validate[CatalogCreate]
+        validated <- json.validate[ModelCreate]
         transformed <- json.transform(transformer)
       } yield collectionInsert(transformed)
 
@@ -73,6 +100,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths with Co
       })
   }
 
+
   def update(id: AssetSupport.IdType) = Action.async(parse.json) {
     request =>
       val json = request.body
@@ -85,7 +113,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths with Co
         }
         validated <- {
           println("validate: " + transformed);
-          transformed.validate[CatalogUpdate]
+          transformed.validate[ModelUpdate]
         }
 
       } yield (validated, transformed)
@@ -108,55 +136,6 @@ class Catalogs extends Controller with MongoController with CatalogPaths with Co
 
 
   }
-
-  def getById(id: AssetSupport.IdType) = Action.async {
-    val query = obj(AssetSupport.idFieldName -> id)
-
-    val cursor = collection.find(query).cursor[Catalog].collect[List]()
-
-    val futureJson = cursor.map {
-      case head :: _ => Some(toJson(head))
-      case Nil => None
-    }
-
-    futureJson.map {
-      case Some(jsObject) => Ok(jsObject)
-      case None => NotFound
-    }
-
-  }
-
-  def find(q: Option[String]) = Action.async {
-    request =>
-
-      Logger.debug(s"find queryString: $q")
-
-      q match {
-        case Some(queryString) => {
-          Try(Json.parse(queryString)) match {
-            case Success(queryJson) => {
-              collectionFind[Catalog](Some(queryJson)).map {
-                jsArray => if (jsArray.value.isEmpty) NotFound else Ok(jsArray).as(ContentTypes.JSON)
-              }
-            }
-            case Failure(error) => {
-              Logger.debug(s"error parsing query: $queryString")
-              Future.successful(BadRequest(Json.obj("error" -> error.getMessage)))
-            }
-          }
-        }
-        case None => collectionFind[Catalog]().map {
-          Ok(_).as(ContentTypes.JSON)
-        }
-      }
-
-  }
-
-
-
-
-
-
 
   def delete(id: String) = Action.async {
     val query = Json.obj(AssetSupport.idFieldName -> id)

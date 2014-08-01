@@ -18,7 +18,7 @@ class CatalogTest extends Specification {
 
       println(Json.prettyPrint(Json.toJson(new DateTime("1952-03-11"))))
       println(Json.prettyPrint(postJson))
-      val transformer = CatalogCreate.transformer(postJson)(expectedId, expectedDate)
+      val transformer = AssetTransform.create(postJson)(expectedId, expectedDate)
 
       val result = for {
         validated <- {
@@ -29,7 +29,7 @@ class CatalogTest extends Specification {
       } yield transformed
 
       result match {
-        case c: JsSuccess[JsObject] => c.get \ CatalogSupport.idFieldName must equalTo(JsString(expectedId))
+        case c: JsSuccess[JsObject] => c.get \ AssetSupport.idFieldName must equalTo(JsString(expectedId))
         case e: JsError => println(e); 1 must equalTo(0)
       }
 
