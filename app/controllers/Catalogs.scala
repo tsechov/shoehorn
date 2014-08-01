@@ -130,7 +130,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths {
           Try(Json.parse(queryString)) match {
             case Success(queryJson) => {
               collectionFind[Catalog](Some(queryJson)).map {
-                Ok(_).as(ContentTypes.JSON)
+                jsArray => if (jsArray.value.isEmpty) NotFound else Ok(jsArray).as(ContentTypes.JSON)
               }
             }
             case Failure(error) => {
