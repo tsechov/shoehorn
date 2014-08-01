@@ -27,7 +27,7 @@ import scala.Some
 import scala.util.Success
 import play.api.libs.json.JsObject
 
-
+//TODO: generalize
 @Singleton
 class Catalogs extends Controller with MongoController with CatalogPaths with ControllerUtils with MongoUtils{
 

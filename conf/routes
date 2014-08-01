@@ -20,6 +20,7 @@ POST           /user                @controllers.Users.createUser
 # Catalog management API
 GET            /catalogs            @controllers.Catalogs.find(q:Option[String])
 GET            /catalogs/:id        @controllers.Catalogs.getById(id)
+GET            /catalogscake/:id    controllers.CatalogsCake.getById(id)
 PUT            /catalogs/:id        @controllers.Catalogs.update(id)
 POST           /catalogs/:id        @controllers.Catalogs.update(id)
 POST           /catalogs            @controllers.Catalogs.create

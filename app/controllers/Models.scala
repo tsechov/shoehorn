@@ -17,6 +17,7 @@ import scala.concurrent.Future
 import reactivemongo.bson.BSONObjectID
 import org.joda.time.DateTime
 
+//TODO: generalize
 @Singleton
 class Models extends Controller with MongoController with ModelPaths with ControllerUtils with MongoUtils{
   def collection: JSONCollection = db.collection[JSONCollection]("models")
