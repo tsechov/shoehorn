@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{SimpleResult, Action, Controller}
 import models.{Catalog, AssetSupport}
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -26,6 +26,10 @@ object CatalogsCake extends Controller with ControllerUtils{
 
   }
 
+  def f: PartialFunction[Throwable, Future[SimpleResult]] = {
+    case t:Throwable => Future.successful(Ok)
+  }
+
   def find(q: Option[String]) = Action.async {
     request =>
 
@@ -33,17 +37,10 @@ object CatalogsCake extends Controller with ControllerUtils{
 
       q match {
         case Some(queryString) => {
-          val tried=Try(Json.parse(queryString))
-          val mapped=tried.map(service.find[Catalog](_).map(foundOrNot[Catalog]))
-
-
-           tried match {
+           Try(Json.parse(queryString)) match {
             case Success(queryJson) => service.find[Catalog](queryJson).map(foundOrNot[Catalog])
             case Failure(error) => badQuery(queryString,error)
           }
-
-
-
         }
         case None => service.findAll[Catalog].map(foundOrNot[Catalog])
         }
