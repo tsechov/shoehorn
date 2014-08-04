@@ -30,7 +30,7 @@ class ServicesTest extends Specification with Mockito{
 
       when(mockedMongo.find(query)).thenReturn(Future.successful(expectedResultList))
 
-      import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
 
       val result=target.repository.getById(expectedId)
       val timeout: FiniteDuration = FiniteDuration(5, TimeUnit.SECONDS)
