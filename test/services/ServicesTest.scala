@@ -27,9 +27,7 @@ class ServicesTest extends Specification with Mockito{
       val expectedId="blah"
       val query = Json.obj(AssetSupport.idFieldName -> expectedId)
       val expectedResultList=List("foo")
-      implicit val colName=new CollectionName[Test] {
-        override def get: String ="blah"
-      }
+      implicit val colName=mock[CollectionName[Test]]
       implicit val reads=mock[Reads[Test]]
       when(mockedMongo.find[Test](query)).thenReturn(Future.successful(expectedResultList))
 
