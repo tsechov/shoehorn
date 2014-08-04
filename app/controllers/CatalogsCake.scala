@@ -4,22 +4,53 @@ import play.api.mvc.{Action, Controller}
 import models.{Catalog, AssetSupport}
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.Json
+import play.api.libs.json.{JsArray, Json}
 import services.catalogs.production
+import play.api.Logger
+import scala.util.{Failure, Success, Try}
+import play.api.http.ContentTypes
 
-object CatalogsCake extends Controller {
+object CatalogsCake extends Controller with ControllerUtils{
 
 
-  val catalogsService = production service
+  val service = production service
 
   //import models.Catalog.collectionName
 
   def getById(id: AssetSupport.IdType) = Action.async {
 
-      catalogsService.getById[Catalog](id).map {
+    service.getById[Catalog](id).map {
         case Some(catalog) => Ok(Json.toJson(catalog))
         case None => NotFound
       }
 
   }
+
+  def find(q: Option[String]) = Action.async {
+    request =>
+
+      Logger.debug(s"find queryString: $q")
+
+      q match {
+        case Some(queryString) => {
+          val tried=Try(Json.parse(queryString))
+          val mapped=tried.map(service.find[Catalog](_).map(foundOrNot[Catalog]))
+
+
+           tried match {
+            case Success(queryJson) => service.find[Catalog](queryJson).map(foundOrNot[Catalog])
+            case Failure(error) => badQuery(queryString,error)
+          }
+
+
+
+        }
+        case None => service.findAll[Catalog].map(foundOrNot[Catalog])
+        }
+      }
+
+
+
+
+
 }

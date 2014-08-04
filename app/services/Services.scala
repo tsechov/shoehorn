@@ -1,17 +1,18 @@
 package services
 
 import scala.concurrent.Future
-import play.api.libs.json.Reads
+import play.api.libs.json.{JsValue, Reads, JsObject}
 import models.AssetSupport
 import play.api.libs.json.Json._
-import play.api.libs.json.JsObject
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
 trait ServiceComponent {
-
+  type Query=JsValue
   trait Service {
     def getById[A](id: models.AssetSupport.IdType)(implicit r: Reads[A],ev:CollectionName[A]): Future[Option[A]]
+    def find[A](query:Query)(implicit r:Reads[A],ev:CollectionName[A]):Future[List[A]]
+    def findAll[A](implicit r:Reads[A],ev:CollectionName[A]):Future[List[A]]
   }
 
   val service: Service
@@ -26,6 +27,10 @@ trait RealServiceComponent extends ServiceComponent {
   override val service = new Service {
     // Use the repository in the service
     override def getById[A](id: models.AssetSupport.IdType)(implicit r: Reads[A],ev:CollectionName[A]) = repository.getById(id)
+
+    override def find[A](query: RealServiceComponent.this.type#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = ???
+
+    override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = ???
   }
 }
 
