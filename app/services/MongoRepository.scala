@@ -9,7 +9,7 @@ import play.modules.reactivemongo.json.collection.JSONCollection
 
 
 
-class MongoRepository[A](collectionName:String)(implicit app: Application) extends MongoComponent[A]{
+class MongoRepository(implicit app: Application) extends MongoComponent{
   /** Returns the current instance of the driver. */
   def driver = ReactiveMongoPlugin.driver
   /** Returns the current MongoConnection instance (the connection pool manager). */
@@ -17,11 +17,11 @@ class MongoRepository[A](collectionName:String)(implicit app: Application) exten
   /** Returns the default database (as specified in `application.conf`). */
   def db = ReactiveMongoPlugin.db
 
-  def collection: JSONCollection = db.collection[JSONCollection](collectionName)
+  def collection(name:String): JSONCollection = db.collection[JSONCollection](name)
 
-  override val mongo = new Mongo[A] {
-    def find(query:JsObject)(implicit r:Reads[A]):Future[List[A]] = {
-      collection.find(query).cursor[A].collect[List]()
+  override val mongo = new Mongo {
+    def find[A](query:JsObject)(implicit r:Reads[A],ev:CollectionName[A]):Future[List[A]] = {
+      collection(ev.get).find(query).cursor[A].collect[List]()
     }
   }
 

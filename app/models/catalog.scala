@@ -4,6 +4,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import org.joda.time.DateTime
+import services.CollectionName
 
 
 case class CatalogCreate(
@@ -65,7 +66,7 @@ case class Catalog(
                     webStatus: Boolean
                     )
 
-object Catalog extends CatalogPaths with DateFormatSupport {
+object Catalog extends CatalogPaths with DateFormatSupport{
 
   val reads: Reads[Catalog] = {
     (idPath.read[AssetSupport.IdType] and
@@ -92,6 +93,11 @@ object Catalog extends CatalogPaths with DateFormatSupport {
   }
 
   implicit val catalogFormats = Format(reads, writes)
+
+  implicit val collectionName = new CollectionName[Catalog]{
+    override def get: String = "catalogs"
+  }
+
 }
 
 trait CatalogPaths extends AssetPaths {

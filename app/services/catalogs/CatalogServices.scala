@@ -9,7 +9,7 @@ import play.api.libs.json.Reads
 
 
 // Fake implmentation of the repository
-trait MockCatalogRepositoryComponent extends RepositoryComponent[Catalog] {
+trait MockCatalogRepositoryComponent extends RepositoryComponent {
   override val repository: Repository = sys.error("TODO") // i.e. mock[CatalogRepository]
 }
 
@@ -19,7 +19,8 @@ trait MockCatalogRepositoryComponent extends RepositoryComponent[Catalog] {
 
 // "Real" top level environment usable in controllers.
 import play.api.Play.current
-object production extends MongoRepository[Catalog]("catalogs") with RealServiceComponent[Catalog] with RealRepositoryComponent[Catalog]
+
+object production extends MongoRepository with RealServiceComponent with RealRepositoryComponent
 
 // "Fake" top level environment usable in controllers.
 
