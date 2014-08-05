@@ -26,10 +26,6 @@ object CatalogsCake extends Controller with ControllerUtils{
 
   }
 
-  def f: PartialFunction[Throwable, Future[SimpleResult]] = {
-    case t:Throwable => Future.successful(Ok)
-  }
-
   def find(q: Option[String]) = Action.async {
     request =>
 
