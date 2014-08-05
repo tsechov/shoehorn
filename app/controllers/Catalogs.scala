@@ -35,7 +35,7 @@ class Catalogs extends Controller with MongoController with CatalogPaths with Co
 
 
 
-  private def locationUrl(id: String) = contextUrl + controllers.routes.Catalogs.getById(id).toString
+  private def locationUrl(id: String) = contextUrl + controllers.routes.CatalogsCake.getById(id).toString
 
 
 

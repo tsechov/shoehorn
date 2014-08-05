@@ -18,16 +18,19 @@ GET            /users                   @controllers.Users.findUsers
 POST           /user                    @controllers.Users.createUser
 
 # Catalog management API
-GET            /catalogs                @controllers.Catalogs.find(q:Option[String])
-GET            /catalogs/:id            @controllers.Catalogs.getById(id)
+#GET            /catalogs                @controllers.Catalogs.find(q:Option[String])
+#GET            /catalogs/:id            @controllers.Catalogs.getById(id)
+#PUT            /catalogs/:id            @controllers.Catalogs.update(id)
+#POST           /catalogs/:id            @controllers.Catalogs.update(id)
+#POST           /catalogs                @controllers.Catalogs.create
+#DELETE         /catalogs/:id            @controllers.Catalogs.delete(id)
 
-GET            /catalogscake/:id        controllers.CatalogsCake.getById(id)
-GET            /catalogscake            controllers.CatalogsCake.find(q:Option[String])
+GET             /catalogs/:id           controllers.CatalogsCake.getById(id)
+GET             /catalogs               controllers.CatalogsCake.find(q:Option[String])
+PUT             /catalogs/:id           controllers.CatalogsCake.update(id)
+POST            /catalogs/:id           controllers.CatalogsCake.update(id)
+POST            /catalogs               controllers.CatalogsCake.create
 
-PUT            /catalogs/:id            @controllers.Catalogs.update(id)
-POST           /catalogs/:id            @controllers.Catalogs.update(id)
-POST           /catalogs                @controllers.Catalogs.create
-DELETE         /catalogs/:id            @controllers.Catalogs.delete(id)
 
 GET            /models                  @controllers.Models.find(q:Option[String])
 GET            /models/:id              @controllers.Models.getById(id)

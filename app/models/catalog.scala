@@ -8,8 +8,6 @@ import org.joda.time.DateTime
 import services.CollectionName
 
 
-
-
 case class CatalogCreate(
                           active: Boolean,
                           description: String,
@@ -17,8 +15,8 @@ case class CatalogCreate(
                           season: String,
                           status: Boolean,
                           webStatus: Boolean
-                          ) extends AssetCreate[Catalog]{
-  def fillup(id:AssetSupport.IdType,createdAt:DateTime,lastModifiedAt:DateTime) = Catalog(id, createdAt, lastModifiedAt, active, description, year, season, status, webStatus)
+                          ) extends AssetCreate[Catalog] {
+  def fillup(id: AssetSupport.IdType, createdAt: DateTime, lastModifiedAt: DateTime) = Catalog(id, createdAt, lastModifiedAt, active, description, year, season, status, webStatus)
 }
 
 object CatalogCreate extends CatalogPaths {
@@ -29,8 +27,6 @@ object CatalogCreate extends CatalogPaths {
       seasonPath.read[String] and
       statusPath.read[Boolean] and
       webStatusPath.read[Boolean])(CatalogCreate.apply _)
-
-
 
 
 }
@@ -58,19 +54,23 @@ object CatalogUpdate extends CatalogPaths with DateFormatSupport {
       webStatusPath.read[Boolean])(CatalogUpdate.apply _)
   }
 
-  val writes:Writes[CatalogUpdate] = {
+  val writes: Writes[CatalogUpdate] = {
     (
 
       lastModifiedAtPath.write[DateTime] and
-      activePath.write[Boolean] and
-      descriptionPath.write[String] and
-      yearPath.write[Int] and
-      seasonPath.write[String] and
-      statusPath.write[Boolean] and
-      webStatusPath.write[Boolean])(unlift(CatalogUpdate.unapply _))
+        activePath.write[Boolean] and
+        descriptionPath.write[String] and
+        yearPath.write[Int] and
+        seasonPath.write[String] and
+        statusPath.write[Boolean] and
+        webStatusPath.write[Boolean])(unlift(CatalogUpdate.unapply _))
   }
 
-  implicit val format=Format[CatalogUpdate](reads,writes)
+  implicit val format = Format[CatalogUpdate](reads, writes)
+
+  implicit val collectionName = new CollectionName[CatalogUpdate] {
+    override def get: String = "catalogs"
+  }
 
 
 }
@@ -85,8 +85,8 @@ case class Catalog(
                     season: String,
                     status: Boolean,
                     webStatus: Boolean
-                    ) extends AssetUpdate[CatalogUpdate]{
-  override def fillup(lastModifiedAt: DateTime): CatalogUpdate = CatalogUpdate(lastModifiedAt,active,description,year,season,status,webStatus)
+                    ) extends AssetUpdate[CatalogUpdate] {
+  override def fillup(lastModifiedAt: DateTime): CatalogUpdate = CatalogUpdate(lastModifiedAt, active, description, year, season, status, webStatus)
 }
 
 object Catalog extends CatalogPaths with DateFormatSupport {

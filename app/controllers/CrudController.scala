@@ -57,53 +57,28 @@ trait CrudController extends Results with ControllerUtils {
     }
   }
 
-  def create[C <: AssetCreate[A], A](input: JsValue, getByIdRoute: String => Call)(implicit r: Reads[C], w: Writes[A], ev: CollectionName[A]) = {
 
-    input.validate[C] match {
-      case JsSuccess(validated, _) => {
-        val futureResult = service.insert[C, A](validated)
-        futureResult.map {
-          internalServerError[AssetSupport.IdType]("error inserting") orElse {
-            case Success(id) => {
-              Logger.debug(s"Successfully inserted with id: $id")
-              Created.as(ContentTypes.JSON)
-                .withHeaders(HeaderNames.LOCATION -> locationUrl(id, getByIdRoute))
-            }
-          }
-        }
-      }
-      case error: JsError => {
-        val jsonError = JsError.toFlatJson(error)
-        Logger.debug("invalid input json for create: " + prettyPrint(jsonError))
-        Future.successful(BadRequest(jsonError))
-      }
+  def create[C <: AssetCreate[A], A](input: JsValue, getByIdRoute: String => Call)(implicit r: Reads[C], w: Writes[A], ev: CollectionName[A]) = {
+    def operation[C <: AssetCreate[A], A](implicit w: Writes[A], ev: CollectionName[A]) = service.insert[C, A] _
+    def createdResult(id: AssetSupport.IdType, msg: String): SimpleResult = {
+      Logger.debug(s"$msg with id: $id")
+      Created.as(ContentTypes.JSON)
+        .withHeaders(HeaderNames.LOCATION -> locationUrl(id, getByIdRoute))
     }
 
+
+    (performOperation[C, AssetSupport.IdType]("create", operation[C, A], createdResult))(input.validate[C])
 
   }
 
-  def update[A <: AssetUpdate[U], U](id: AssetSupport.IdType, input: JsValue)(implicit r: Reads[A], ev: CollectionName[A]) = {
-    input.validate[A] match {
-    badJsonRequest("") orElse {}
-      case JsSuccess(entity, _) => {
-        val futureResult = service.update[A, U](entity)
-        futureResult.map {
-          internalServerError("error updating") orElse {
-            case Success(_) => {
-              Logger.debug(s"Successfully updated with id: $id")
-              Ok
-            }
-
-          }
-        }
-      }
-      case error: JsError => {
-        val jsonError = JsError.toFlatJson(error)
-        Logger.debug("invalid input json for update: " + prettyPrint(jsonError))
-        Future.successful(BadRequest(jsonError))
-      }
+  def update[A <: AssetUpdate[U], U](id: AssetSupport.IdType, input: JsValue)(implicit r: Reads[A], w: Writes[U], ev: CollectionName[U]) = {
+    Logger.debug("input: \n" + Json.prettyPrint(input))
+    def operation[A <: AssetUpdate[U], U](implicit w: Writes[U], ev: CollectionName[U]) = service.update[A, U] _
+    def okResult(n: Unit, msg: String): SimpleResult = {
+      Logger.debug(s"$msg with id: $id")
+      Ok
     }
-
+    (performOperation[A, Unit]("update", operation[A, U], okResult))(input.validate[A])
 
   }
 }

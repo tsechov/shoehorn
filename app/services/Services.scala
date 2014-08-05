@@ -22,7 +22,7 @@ trait ServiceComponent {
     def find[A](query:Query)(implicit r:Reads[A],ev:CollectionName[A]):Future[List[A]]
     def findAll[A](implicit r:Reads[A],ev:CollectionName[A]):Future[List[A]]
     def insert[C <: AssetCreate[A],A](input:C)(implicit w: Writes[A],ev:CollectionName[A]):Future[Try[IdType]]
-    def update[A <: AssetUpdate[U],U](input:A):Future[Try[Nothing]]
+    def update[A <: AssetUpdate[U],U](input:A)(implicit w:Writes[U],ev:CollectionName[U]):Future[Try[Unit]]
   }
 
   val service: Service
@@ -59,7 +59,12 @@ trait RealServiceComponent extends ServiceComponent {
 
     }
 
-    override def update[A <: AssetUpdate[U], U](input: A): Future[Try[Nothing]] = ???
+    override def update[A <: AssetUpdate[U], U](input: A)(implicit w:Writes[U],ev:CollectionName[U]): Future[Try[Unit]] = {
+      val now = new DateTime()
+      val model=input.fillup(now)
+      import LastErrorWrapperImplicits._
+      repository.update[U](model).map(_.orFail.map(_ => Unit))
+    }
   }
 }
 
@@ -70,6 +75,7 @@ trait RepositoryComponent {
     def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
     def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
     def insert[A](model:A)(implicit w: Writes[A], ev: CollectionName[A]):Future[LastError]
+    def update[A](model:A)(implicit w:Writes[A],ev:CollectionName[A]):Future[LastError]
   }
 
   val repository: Repository
@@ -94,6 +100,8 @@ trait RealRepositoryComponent extends RepositoryComponent {
       mongo.insert[A](jsonToInsert)
 
     }
+
+    override def update[A](model: A)(implicit w: Writes[A], ev: CollectionName[A]): Future[LastError] = ???
   }
 }
 

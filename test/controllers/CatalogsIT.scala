@@ -12,7 +12,7 @@ import org.joda.time.DateTime
 
 import play.api.mvc.{Request, AnyContent, SimpleResult}
 
-import controllers.routes.Catalogs
+import controllers.routes.CatalogsCake
 import models.{CatalogPaths, DateFormatSupport}
 
 class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with CatalogPaths {
@@ -32,7 +32,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
   }
 
   def create = {
-    val result = corsRequest(FakeRequest(POST, Catalogs.create.toString).withJsonBody(postJson), CREATED)
+    val result = corsRequest(FakeRequest(POST, CatalogsCake.create.toString).withJsonBody(postJson), CREATED)
 
     result.header.headers.keySet must contain(HeaderNames.LOCATION)
 
@@ -41,7 +41,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
   }
 
   def get(id:String) = {
-    val getResult = corsRequest(FakeRequest(GET, Catalogs.getById(id).toString), OK)
+    val getResult = corsRequest(FakeRequest(GET, CatalogsCake.getById(id).toString), OK)
 
     contentAsJson(Future.successful(getResult))
   }
@@ -69,7 +69,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
         val expectedDescription=Json.obj("description"->"updated description")
 
         val newDescription=(__).json.update(__.read[JsObject].map{root => root ++ expectedDescription})
-        val updateResult=corsRequest(FakeRequest(POST, Catalogs.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
+        val updateResult=corsRequest(FakeRequest(POST, CatalogsCake.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
 
         success
       }
@@ -77,7 +77,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
     "fail inserting a non valid json" in {
       running(FakeApplication()) {
-        val request = FakeRequest.apply(POST, Catalogs.create.toString).withJsonBody(Json.obj(
+        val request = FakeRequest.apply(POST, CatalogsCake.create.toString).withJsonBody(Json.obj(
           "firstName" -> 98,
           "lastName" -> "London",
           "age" -> 27))
