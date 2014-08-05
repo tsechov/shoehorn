@@ -24,7 +24,7 @@ class ServicesTest extends Specification with Mockito{
 
       }
 
-      val expectedId="blah"
+      val expectedId=Json.obj("foo"->"blah")
       val query = Json.obj(AssetSupport.idFieldName -> expectedId)
       val expectedResultList=List("foo")
       implicit val colName=mock[CollectionName[Test]]

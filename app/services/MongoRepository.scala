@@ -3,10 +3,10 @@ package services
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.api.Application
 import scala.concurrent.Future
-import play.api.libs.json.{Json, Reads, JsObject}
+import play.api.libs.json.{JsValue, Json, Reads, JsObject}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.modules.reactivemongo.json.collection.JSONCollection
-
+import reactivemongo.core.commands.LastError
 
 
 class MongoRepository(implicit app: Application) extends MongoComponent{
@@ -27,6 +27,10 @@ class MongoRepository(implicit app: Application) extends MongoComponent{
     }
 
     override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = collection(ev.get).find(emptyQuery).cursor[A].collect[List]()
+
+    override def insert[A: CollectionName](jsonToInsert: JsValue): Future[LastError] = {
+      collection(implicitly[CollectionName[A]].get).insert(jsonToInsert)
+    }
   }
 
 

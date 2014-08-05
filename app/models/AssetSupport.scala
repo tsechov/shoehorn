@@ -53,3 +53,11 @@ object AssetTransform extends AssetPaths{
     })
   }
 }
+
+trait AssetCreate[A] {
+  def fillup(id:AssetSupport.IdType,createdAt:DateTime,lastModifiedAt:DateTime):A
+}
+
+trait AssetUpdate[U] {
+  def fillup(lastModifiedAt:DateTime):U
+}

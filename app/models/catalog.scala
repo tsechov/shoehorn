@@ -1,10 +1,13 @@
 package models
 
+
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import org.joda.time.DateTime
 import services.CollectionName
+
+
 
 
 case class CatalogCreate(
@@ -14,7 +17,9 @@ case class CatalogCreate(
                           season: String,
                           status: Boolean,
                           webStatus: Boolean
-                          )
+                          ) extends AssetCreate[Catalog]{
+  def fillup(id:AssetSupport.IdType,createdAt:DateTime,lastModifiedAt:DateTime) = Catalog(id, createdAt, lastModifiedAt, active, description, year, season, status, webStatus)
+}
 
 object CatalogCreate extends CatalogPaths {
   implicit val reads: Reads[CatalogCreate] =
@@ -24,6 +29,8 @@ object CatalogCreate extends CatalogPaths {
       seasonPath.read[String] and
       statusPath.read[Boolean] and
       webStatusPath.read[Boolean])(CatalogCreate.apply _)
+
+
 
 
 }
@@ -40,7 +47,7 @@ case class CatalogUpdate(
                           )
 
 object CatalogUpdate extends CatalogPaths with DateFormatSupport {
-  implicit val reads: Reads[CatalogUpdate] = {
+  val reads: Reads[CatalogUpdate] = {
 
     (lastModifiedAtPath.read[DateTime] and
       activePath.read[Boolean] and
@@ -50,6 +57,20 @@ object CatalogUpdate extends CatalogPaths with DateFormatSupport {
       statusPath.read[Boolean] and
       webStatusPath.read[Boolean])(CatalogUpdate.apply _)
   }
+
+  val writes:Writes[CatalogUpdate] = {
+    (
+
+      lastModifiedAtPath.write[DateTime] and
+      activePath.write[Boolean] and
+      descriptionPath.write[String] and
+      yearPath.write[Int] and
+      seasonPath.write[String] and
+      statusPath.write[Boolean] and
+      webStatusPath.write[Boolean])(unlift(CatalogUpdate.unapply _))
+  }
+
+  implicit val format=Format[CatalogUpdate](reads,writes)
 
 
 }
@@ -64,9 +85,11 @@ case class Catalog(
                     season: String,
                     status: Boolean,
                     webStatus: Boolean
-                    )
+                    ) extends AssetUpdate[CatalogUpdate]{
+  override def fillup(lastModifiedAt: DateTime): CatalogUpdate = CatalogUpdate(lastModifiedAt,active,description,year,season,status,webStatus)
+}
 
-object Catalog extends CatalogPaths with DateFormatSupport{
+object Catalog extends CatalogPaths with DateFormatSupport {
 
   val reads: Reads[Catalog] = {
     (idPath.read[AssetSupport.IdType] and
@@ -94,7 +117,7 @@ object Catalog extends CatalogPaths with DateFormatSupport{
 
   implicit val catalogFormats = Format(reads, writes)
 
-  implicit val collectionName = new CollectionName[Catalog]{
+  implicit val collectionName = new CollectionName[Catalog] {
     override def get: String = "catalogs"
   }
 
