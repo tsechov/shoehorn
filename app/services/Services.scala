@@ -8,7 +8,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
 trait ServiceComponent {
-  type Query=JsValue
+  type Query=JsObject
   trait Service {
     def getById[A](id: models.AssetSupport.IdType)(implicit r: Reads[A],ev:CollectionName[A]): Future[Option[A]]
     def find[A](query:Query)(implicit r:Reads[A],ev:CollectionName[A]):Future[List[A]]
@@ -25,12 +25,12 @@ trait RealServiceComponent extends ServiceComponent {
   self: RepositoryComponent =>
 
   override val service = new Service {
-    // Use the repository in the service
-    override def getById[A](id: models.AssetSupport.IdType)(implicit r: Reads[A],ev:CollectionName[A]) = repository.getById(id)
 
-    override def find[A](query: RealServiceComponent.this.type#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = ???
+    override def getById[A](id: models.AssetSupport.IdType)(implicit r: Reads[A],ev:CollectionName[A]) = repository.getById[A](id)
 
-    override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = ???
+    override def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = repository.find[A](query)
+
+    override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = repository.findAll[A]
   }
 }
 
@@ -38,6 +38,8 @@ trait RepositoryComponent {
 
   trait Repository {
     def getById[A](id: models.AssetSupport.IdType)(implicit r: Reads[A],ev:CollectionName[A]): Future[Option[A]]
+    def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
+    def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
   }
 
   val repository: Repository
@@ -53,6 +55,9 @@ trait RealRepositoryComponent extends RepositoryComponent {
         case Nil => None
       }
     }
+
+    override def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = mongo.find[A](query)
+    override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]] = mongo.findAll[A]
   }
 }
 
@@ -62,6 +67,7 @@ trait MongoComponent {
 
 trait Mongo {
   def find[A](query: JsObject)(implicit r: Reads[A],ev:CollectionName[A]): Future[List[A]]
+  def findAll[A](implicit r: Reads[A],ev:CollectionName[A]): Future[List[A]]
 }
 
 
