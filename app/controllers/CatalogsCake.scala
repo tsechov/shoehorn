@@ -19,7 +19,7 @@ object CatalogsCake extends CrudController {
     super.find[Catalog](q)
   }
 
-  def create: Action[JsValue] = Action.async(parse.json) {
+  def create = Action.async(parse.json) {
     request =>
       super.create[CatalogCreate, Catalog](request.body, id => controllers.routes.CatalogsCake.getById(id))
   }

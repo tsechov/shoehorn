@@ -9,9 +9,10 @@ import play.api.mvc.SimpleResult
 import scala.concurrent.Await
 import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.TimeUnit
+import play.api.test.PlaySpecification
 
 
-trait CommonControllerSpecs extends Specification {
+trait CommonControllerSpecs extends PlaySpecification {
 
   val timeout: FiniteDuration = FiniteDuration(5, TimeUnit.SECONDS)
 

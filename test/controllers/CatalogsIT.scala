@@ -12,11 +12,13 @@ import org.joda.time.DateTime
 
 import play.api.mvc.{Request, AnyContent, SimpleResult}
 
-import controllers.routes.CatalogsCake
+
 import models.{CatalogPaths, DateFormatSupport}
 
 class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with CatalogPaths {
 
+
+  val targetReverseRoute = controllers.routes.CatalogsCake
 
   def checkDateField(jsValue: JsValue, path: JsPath) = {
     val createdAt = jsValue.transform(path.json.pick)
@@ -24,15 +26,14 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
     Json.fromJson(createdAt.get)(dateFormat) must beAnInstanceOf[JsSuccess[DateTime]]
   }
 
-  def idExtract(result:SimpleResult) = {
+  def idExtract(result: SimpleResult) = {
     val location = result.header.headers(HeaderNames.LOCATION)
-
     location.stripPrefix(location.take(location.lastIndexOf('/') + 1))
 
   }
 
   def create = {
-    val result = corsRequest(FakeRequest(POST, CatalogsCake.create.toString).withJsonBody(postJson), CREATED)
+    val result = corsRequest(FakeRequest(POST, targetReverseRoute.create.toString).withJsonBody(postJson), CREATED)
 
     result.header.headers.keySet must contain(HeaderNames.LOCATION)
 
@@ -40,8 +41,8 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
   }
 
-  def get(id:String) = {
-    val getResult = corsRequest(FakeRequest(GET, CatalogsCake.getById(id).toString), OK)
+  def get(id: String) = {
+    val getResult = corsRequest(FakeRequest(GET, targetReverseRoute.getById(id).toString), OK)
 
     contentAsJson(Future.successful(getResult))
   }
@@ -66,10 +67,10 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
         val expectedId = idExtract(create)
 
-        val expectedDescription=Json.obj("description"->"updated description")
+        val expectedDescription = Json.obj("description" -> "updated description")
 
-        val newDescription=(__).json.update(__.read[JsObject].map{root => root ++ expectedDescription})
-        val updateResult=corsRequest(FakeRequest(POST, CatalogsCake.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
+        val newDescription = (__).json.update(__.read[JsObject].map { root => root ++ expectedDescription})
+        val updateResult = corsRequest(FakeRequest(POST, targetReverseRoute.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
 
         success
       }
@@ -77,7 +78,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
     "fail inserting a non valid json" in {
       running(FakeApplication()) {
-        val request = FakeRequest.apply(POST, CatalogsCake.create.toString).withJsonBody(Json.obj(
+        val request = FakeRequest.apply(POST, targetReverseRoute.create.toString).withJsonBody(Json.obj(
           "firstName" -> 98,
           "lastName" -> "London",
           "age" -> 27))

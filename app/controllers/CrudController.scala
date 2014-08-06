@@ -59,6 +59,7 @@ trait CrudController extends Results with ControllerUtils {
 
 
   def create[C <: AssetCreate[A], A](input: JsValue, getByIdRoute: String => Call)(implicit r: Reads[C], w: Writes[A], ev: CollectionName[A]) = {
+    Logger.debug("input for create: \n" + Json.prettyPrint(input))
     def operation[C <: AssetCreate[A], A](implicit w: Writes[A], ev: CollectionName[A]) = service.insert[C, A] _
     def createdResult(id: AssetSupport.IdType, msg: String): SimpleResult = {
       Logger.debug(s"$msg with id: $id")
@@ -72,7 +73,7 @@ trait CrudController extends Results with ControllerUtils {
   }
 
   def update[A <: AssetUpdate[U], U](id: AssetSupport.IdType, input: JsValue)(implicit r: Reads[A], w: Writes[U], ev: CollectionName[U]) = {
-    Logger.debug("input: \n" + Json.prettyPrint(input))
+    Logger.debug("input for update: \n" + Json.prettyPrint(input))
     def operation[A <: AssetUpdate[U], U](implicit w: Writes[U], ev: CollectionName[U]) = service.update[A, U](id) _
     def okResult(n: Unit, msg: String): SimpleResult = {
       Logger.debug(s"$msg with id: $id")
