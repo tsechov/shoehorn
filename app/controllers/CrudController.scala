@@ -81,4 +81,16 @@ trait CrudController extends Results with ControllerUtils {
     (performOperation[A, Unit]("update", operation[A, U], okResult))(input.validate[A])
 
   }
+
+  def delete[A: CollectionName](id: AssetSupport.IdType) = {
+    val result = service.remove[A](id)
+    result.map {
+      internalServerError[Unit](s"[delete] error with id: $id") orElse {
+        case Success(_) => {
+          Logger.debug(s"[delete] successful with id: $id")
+          Ok
+        }
+      }
+    }
+  }
 }

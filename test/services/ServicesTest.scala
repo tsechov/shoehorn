@@ -10,37 +10,35 @@ import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.TimeUnit
 
 
-class ServicesTest extends Specification with Mockito{
-
+class ServicesTest extends Specification with Mockito {
 
 
   "RealRepositoryComponent" should {
     "should be mockeable" in {
-      type Test=String
-      val mockedMongo=mock[Mongo]
+      type Test = String
+      val mockedMongo = mock[Mongo]
 
-      val target:RealRepositoryComponent = new RealRepositoryComponent with MongoComponent{
-        override val mongo=mockedMongo
+      val target: RealRepositoryComponent = new RealRepositoryComponent with MongoComponent {
+        override val mongo = mockedMongo
 
       }
 
-      val expectedId=Json.obj("foo"->"blah")
+      val expectedId = "blah"
       val query = Json.obj(AssetSupport.idFieldName -> expectedId)
-      val expectedResultList=List("foo")
-      implicit val colName=mock[CollectionName[Test]]
-      implicit val reads=mock[Reads[Test]]
+      val expectedResultList = List("foo")
+      implicit val colName = mock[CollectionName[Test]]
+      implicit val reads = mock[Reads[Test]]
+
       when(mockedMongo.find[Test](query)).thenReturn(Future.successful(expectedResultList))
 
 
 
-      val result=target.repository.getById(expectedId)
+      val result = target.repository.getById[Test](query)
       val timeout: FiniteDuration = FiniteDuration(5, TimeUnit.SECONDS)
       Await.result(result, timeout) match {
-        case Some(value) => success//value must beEqualTo("foo")
+        case Some(value) => success //value must beEqualTo("foo")
         case None => failure
       }
-
-
 
 
     }
