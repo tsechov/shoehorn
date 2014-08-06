@@ -1,12 +1,12 @@
 package controllers
 
-import services.production
+import services.{production, CollectionName}
+
 import models._
 import play.api.libs.json._
 import play.api.mvc._
-import play.api.Logger
+import play.api.{Play, Logger}
 import scala.util.{Failure, Success, Try}
-import services.CollectionName
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import reactivemongo.bson.BSONObjectID
@@ -34,6 +34,8 @@ import scala.util.Success
 import play.api.libs.json.JsObject
 
 trait CrudController extends Results with ControllerUtils {
+
+
   private val service = production service
 
   def getById[A](id: AssetSupport.IdType)(implicit f: Format[A], ev: CollectionName[A]): Future[SimpleResult] = {

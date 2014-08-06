@@ -32,7 +32,7 @@ trait RepositoryComponent {
 }
 
 trait RealRepositoryComponent extends RepositoryComponent {
-  self: MongoComponent =>
+  self: Mongo =>
 
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
   import LastErrorWrapperImplicits._

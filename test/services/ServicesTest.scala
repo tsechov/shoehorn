@@ -16,9 +16,9 @@ class ServicesTest extends Specification with Mockito {
   "RealRepositoryComponent" should {
     "should be mockeable" in {
       type Test = String
-      val mockedMongo = mock[Mongo]
+      val mockedMongo = mock[MongoDb]
 
-      val target: RealRepositoryComponent = new RealRepositoryComponent with MongoComponent {
+      val target: RealRepositoryComponent = new RealRepositoryComponent with Mongo {
         override val mongo = mockedMongo
 
       }

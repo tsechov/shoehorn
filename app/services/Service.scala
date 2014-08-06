@@ -16,8 +16,11 @@ import controllers.LastErrorWrapperImplicits
 
 
 import play.api.Play.current
+import play.api.Play
 
-object production extends MongoRepository with RealServiceComponent with RealRepositoryComponent
+
+object production extends RealMongo with RealServiceComponent with RealRepositoryComponent
+
 
 trait ServiceComponent {
   type Query = JsObject
@@ -82,22 +85,6 @@ trait RealServiceComponent extends ServiceComponent {
   }
 }
 
-
-trait MongoComponent {
-  val mongo: Mongo
-}
-
-trait Mongo {
-  def find[A](query: JsObject)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
-
-  def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
-
-  def insert[A: CollectionName](jsonToInsert: JsValue): Future[LastError]
-
-  def update[A: CollectionName](selector: JsObject, json: JsValue): Future[LastError]
-
-  def remove[A: CollectionName](selector: JsObject): Future[LastError]
-}
 
 
 
