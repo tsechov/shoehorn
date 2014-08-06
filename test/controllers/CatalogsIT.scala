@@ -14,6 +14,7 @@ import play.api.mvc.{Request, AnyContent, SimpleResult}
 
 
 import models.{CatalogPaths, DateFormatSupport}
+import play.Logger
 
 class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with CatalogPaths {
 
@@ -28,6 +29,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
 
   def idExtract(result: SimpleResult) = {
     val location = result.header.headers(HeaderNames.LOCATION)
+    Logger.info(s"received location: $location")
     location.stripPrefix(location.take(location.lastIndexOf('/') + 1))
 
   }
@@ -70,6 +72,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
         val expectedDescription = Json.obj("description" -> "updated description")
 
         val newDescription = (__).json.update(__.read[JsObject].map { root => root ++ expectedDescription})
+
         val updateResult = corsRequest(FakeRequest(POST, targetReverseRoute.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
 
         success

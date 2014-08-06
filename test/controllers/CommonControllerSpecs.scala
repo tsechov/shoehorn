@@ -10,6 +10,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.TimeUnit
 import play.api.test.PlaySpecification
+import play.Logger
 
 
 trait CommonControllerSpecs extends PlaySpecification {
@@ -17,13 +18,13 @@ trait CommonControllerSpecs extends PlaySpecification {
   val timeout: FiniteDuration = FiniteDuration(5, TimeUnit.SECONDS)
 
   def corsRequest[T](request: Request[T], exptectedStatus: Int)(implicit w: Writeable[T]): SimpleResult = {
+    Logger.info(s"test firing corsrequest: $request")
     val response = route(request)
     response.isDefined mustEqual true
     val result = Await.result(response.get, timeout)
     result.header.status must equalTo(exptectedStatus)
 
     result.header.headers.keySet must contain(ACCESS_CONTROL_ALLOW_ORIGIN)
-
     result
   }
 }
