@@ -73,7 +73,7 @@ trait CrudController extends Results with ControllerUtils {
 
   def update[A <: AssetUpdate[U], U](id: AssetSupport.IdType, input: JsValue)(implicit r: Reads[A], w: Writes[U], ev: CollectionName[U]) = {
     Logger.debug("input: \n" + Json.prettyPrint(input))
-    def operation[A <: AssetUpdate[U], U](implicit w: Writes[U], ev: CollectionName[U]) = service.update[A, U] _
+    def operation[A <: AssetUpdate[U], U](implicit w: Writes[U], ev: CollectionName[U]) = service.update[A, U](id) _
     def okResult(n: Unit, msg: String): SimpleResult = {
       Logger.debug(s"$msg with id: $id")
       Ok

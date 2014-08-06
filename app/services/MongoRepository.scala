@@ -7,6 +7,10 @@ import play.api.libs.json.{JsValue, Json, Reads, JsObject}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.core.commands.LastError
+import play.api.libs.json.Json._
+import play.modules.reactivemongo.json.collection.JSONCollection
+import play.api.libs.json.JsObject
+import models.AssetSupport
 
 
 class MongoRepository(implicit app: Application) extends MongoComponent{
@@ -30,6 +34,12 @@ class MongoRepository(implicit app: Application) extends MongoComponent{
 
     override def insert[A: CollectionName](jsonToInsert: JsValue): Future[LastError] = {
       collection(implicitly[CollectionName[A]].get).insert(jsonToInsert)
+    }
+
+
+    override def update[A: CollectionName](id:AssetSupport.IdType,json: JsValue): Future[LastError] = {
+      val selector = obj(AssetSupport.idFieldName -> id)
+      collection(implicitly[CollectionName[A]].get).update(selector,json)
     }
   }
 
