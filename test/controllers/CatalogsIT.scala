@@ -49,6 +49,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
     contentAsJson(Future.successful(getResult))
   }
 
+
   "Catalogs controller" should {
 
     "create a catalog using valid json by http post" in {
@@ -64,20 +65,7 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
       }
     }
 
-    "update a catalog using valid json by http put" in {
-      running(FakeApplication()) {
 
-        val expectedId = idExtract(create)
-
-        val expectedDescription = Json.obj("description" -> "updated description")
-
-        val newDescription = (__).json.update(__.read[JsObject].map { root => root ++ expectedDescription})
-
-        val updateResult = corsRequest(FakeRequest(POST, targetReverseRoute.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
-
-        success
-      }
-    }
 
     "fail inserting a non valid json" in {
       running(FakeApplication()) {
@@ -95,6 +83,22 @@ class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with Catal
       }
     }
 
+    // "update a catalog using valid json by http put" in {
+    //      running(FakeApplication()) {
+    //
+    //        val expectedId = idExtract(create)
+    //
+    //        val expectedDescription = Json.obj("description" -> "updated description")
+    //
+    //        val newDescription = (__).json.update(__.read[JsObject].map { root => root ++ expectedDescription})
+    //
+    //        val updateResult = corsRequest(FakeRequest(POST, targetReverseRoute.update(expectedId).toString).withJsonBody(postJson.transform(newDescription).get), OK)
+    //
+    //        success
+    //      }
+    //    }
+
   }
 
 }
+

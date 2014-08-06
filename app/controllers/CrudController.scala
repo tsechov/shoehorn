@@ -67,7 +67,6 @@ trait CrudController extends Results with ControllerUtils {
         .withHeaders(HeaderNames.LOCATION -> locationUrl(id, getByIdRoute))
     }
 
-
     (performOperation[C, AssetSupport.IdType]("create", operation[C, A], createdResult))(input.validate[C])
 
   }
