@@ -38,7 +38,7 @@ trait ControllerUtils {
 
   def internalServerError[A](msg: String): PartialFunction[Try[A], SimpleResult] = {
     case Failure(error) => {
-      Logger.debug(s"$msg: $error")
+      Logger.error(s"$msg: $error")
       InternalServerError
     }
   }
@@ -53,16 +53,16 @@ trait ControllerUtils {
 
   def performOperation[A, R](operationName: String, operation: A => Future[Try[R]], successfulResult: (R, String) => SimpleResult): PartialFunction[JsResult[A], Future[SimpleResult]] = {
     badJsonRequest[A](s"[$operationName] invalid input json") orElse {
-    case jsSuccess: JsSuccess[A] => {
-      val futureResult = operation(jsSuccess.get)
+      case jsSuccess: JsSuccess[A] => {
+        val futureResult = operation(jsSuccess.get)
 
-      import play.api.libs.concurrent.Execution.Implicits.defaultContext
-      futureResult.map {
-        internalServerError[R](s"[$operationName] error") orElse {
-          case Success(r) => successfulResult(r, s"[$operationName] successful")
+        import play.api.libs.concurrent.Execution.Implicits.defaultContext
+        futureResult.map {
+          internalServerError[R](s"[$operationName] error") orElse {
+            case Success(r) => successfulResult(r, s"[$operationName] successful")
+          }
         }
       }
-    }
     }
 
   }

@@ -1,6 +1,6 @@
 package controllers
 
-import services.catalogs.production
+import services.production
 import models._
 import play.api.libs.json._
 import play.api.mvc._

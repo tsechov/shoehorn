@@ -15,6 +15,10 @@ import reactivemongo.core.commands.LastError
 import controllers.LastErrorWrapperImplicits
 
 
+import play.api.Play.current
+
+object production extends MongoRepository with RealServiceComponent with RealRepositoryComponent
+
 trait ServiceComponent {
   type Query = JsObject
 
@@ -58,10 +62,7 @@ trait RealServiceComponent extends ServiceComponent {
 
       val model = input.fillup(id, now, now)
 
-
-      import LastErrorWrapperImplicits._
-
-      repository.insert[A](model).map(_.orFail.map(_ => id))
+      repository.insert[A](model).map(_.map(_ => id))
 
 
     }
@@ -69,74 +70,18 @@ trait RealServiceComponent extends ServiceComponent {
     override def update[A <: AssetUpdate[U], U](id: AssetSupport.IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]): Future[Try[Unit]] = {
       val now = new DateTime()
       val model = input.fillup(now)
-      import LastErrorWrapperImplicits._
-      repository.update[U](id, model).map(_.orFail.map(_ => Unit))
+
+      repository.update[U](id, model)
     }
 
     override def remove[A: CollectionName](id: IdType): Future[Try[Unit]] = {
-      import LastErrorWrapperImplicits._
-      repository.remove(id).map(_.orFail.map(_ => Unit))
+
+      repository.remove(id)
 
     }
   }
 }
 
-trait RepositoryComponent {
-
-  trait Repository {
-
-
-    def getById[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Option[A]]
-
-    def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
-
-    def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
-
-    def insert[A](model: A)(implicit w: Writes[A], ev: CollectionName[A]): Future[LastError]
-
-    def update[A](id: AssetSupport.IdType, model: A)(implicit w: Writes[A], ev: CollectionName[A]): Future[LastError]
-
-    def remove[A: CollectionName](idType: IdType): Future[LastError]
-  }
-
-  val repository: Repository
-}
-
-trait RealRepositoryComponent extends RepositoryComponent {
-  self: MongoComponent =>
-  override val repository = new Repository {
-    override def getById[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Option[A]] = {
-
-      val result = mongo.find[A](query)
-
-      result.map {
-        case head :: _ => Some(head)
-        case Nil => None
-      }
-    }
-
-    override def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]) = mongo.find[A](query)
-
-    override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]) = mongo.findAll[A]
-
-    override def insert[A](model: A)(implicit w: Writes[A], ev: CollectionName[A]) = {
-      val jsonToInsert = Json.toJson[A](model)
-      mongo.insert[A](jsonToInsert)
-
-    }
-
-    override def update[A](id: IdType, model: A)(implicit w: Writes[A], ev: CollectionName[A]): Future[LastError] = {
-      val jsonToUpdate = Json.toJson[A](model)
-      val selector = obj(AssetSupport.idFieldName -> id)
-      mongo.update[A](selector, jsonToUpdate)
-    }
-
-    override def remove[A: CollectionName](id: IdType): Future[LastError] = {
-      val selector = obj(AssetSupport.idFieldName -> id)
-      mongo.remove[A](selector)
-    }
-  }
-}
 
 trait MongoComponent {
   val mongo: Mongo
