@@ -19,8 +19,9 @@ import org.joda.time.DateTime
 
 //TODO: generalize
 @Singleton
-class Models extends Controller with MongoController with ModelPaths with ControllerUtils with MongoUtils{
+class Models extends Controller with MongoController with ModelPaths with ControllerUtils with MongoUtils {
   def collection: JSONCollection = db.collection[JSONCollection]("models")
+
   private def locationUrl(id: String) = contextUrl + controllers.routes.Models.getById(id).toString
 
   def getById(id: AssetSupport.IdType) = Action.async {
@@ -50,7 +51,7 @@ class Models extends Controller with MongoController with ModelPaths with Contro
           Try(Json.parse(queryString)) match {
             case Success(queryJson) => {
               collectionFind[Model](Some(queryJson)).map {
-                jsArray => if (jsArray.value.isEmpty) NotFound else Ok(jsArray).as(ContentTypes.JSON)
+                jsArray => Ok(jsArray).as(ContentTypes.JSON)
               }
             }
             case Failure(error) => {
