@@ -7,7 +7,7 @@ import models.AssetSupport
 import models.AssetSupport._
 import play.api.libs.json.Json._
 import scala.Some
-import scala.util.Try
+import scala.util.{Success, Try}
 import controllers.LastErrorWrapperImplicits
 
 trait RepositoryComponent {
@@ -15,11 +15,11 @@ trait RepositoryComponent {
   trait Repository {
 
 
-    def getById[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Option[A]]
+    def getById[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[Option[A]]]
 
-    def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
+    def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
 
-    def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
+    def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
 
     def insert[A](model: A)(implicit w: Writes[A], ev: CollectionName[A]): Future[Try[Unit]]
 
@@ -38,14 +38,19 @@ trait RealRepositoryComponent extends RepositoryComponent {
   import LastErrorWrapperImplicits._
 
   override val repository = new Repository {
-    override def getById[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Option[A]] = {
+    override def getById[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]) = {
 
       val result = mongo.find[A](query)
 
-      result.map {
-        case head :: _ => Some(head)
-        case Nil => None
-      }
+      result.map(_.map {
+        _ match {
+
+          case head :: _ => Some(head)
+          case Nil => None
+
+        }
+      })
+
     }
 
     override def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]) = mongo.find[A](query)

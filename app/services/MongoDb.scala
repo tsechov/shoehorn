@@ -13,6 +13,7 @@ import play.api.libs.json.Json._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import play.modules.reactivemongo.json.collection.JSONCollection
 import play.api.libs.json.JsObject
+import scala.util.Try
 
 
 trait Mongo {
@@ -20,9 +21,9 @@ trait Mongo {
 }
 
 trait MongoDb {
-  def find[A](query: JsObject)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
+  def find[A](query: JsObject)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
 
-  def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
+  def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
 
   def insert[A: CollectionName](jsonToInsert: JsValue): Future[LastError]
 
@@ -40,12 +41,15 @@ class RealMongo(implicit app: Application) extends Mongo {
 
   override val mongo = new MongoDb {
     def find[A](query: JsObject)(implicit r: Reads[A], ev: CollectionName[A]) = {
-      collection(ev.get).find(query).cursor[JsObject].collect[List]().map(_.map {
-        _.validate[A] match {
-          case JsSuccess(elem, _) => elem
-          case JsError(error) => throw new IllegalArgumentException(s"error reading collection [" + ev.get + "]: " + JsError.toFlatJson(error).toString)
-        }
-      })
+
+      collection(ev.get).find(query).cursor[JsObject].collect[List]().map(
+        list => Try(list.map {
+          _.validate[A] match {
+            case JsSuccess(elem, _) => elem
+            case JsError(error) => throw new IllegalArgumentException(s"error reading collection [" + ev.get + "]: " + JsError.toFlatJson(error).toString)
+          }
+        })
+      )
     }
 
     override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]) = find(emptyQuery)

@@ -8,6 +8,7 @@ import scala.concurrent.{Await, Future}
 import play.api.libs.json.{Reads, Json}
 import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.TimeUnit
+import scala.util.{Failure, Success, Try}
 
 
 class ServicesTest extends Specification with Mockito {
@@ -29,15 +30,15 @@ class ServicesTest extends Specification with Mockito {
       implicit val colName = mock[CollectionName[Test]]
       implicit val reads = mock[Reads[Test]]
 
-      when(mockedMongo.find[Test](query)).thenReturn(Future.successful(expectedResultList))
+      when(mockedMongo.find[Test](query)).thenReturn(Future.successful(Success(expectedResultList)))
 
 
 
       val result = target.repository.getById[Test](query)
       val timeout: FiniteDuration = FiniteDuration(5, TimeUnit.SECONDS)
       Await.result(result, timeout) match {
-        case Some(value) => success //value must beEqualTo("foo")
-        case None => failure
+        case Success(Some(value)) => success //value must beEqualTo("foo")
+        case Failure(_) => failure
       }
 
 

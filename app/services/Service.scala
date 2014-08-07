@@ -26,11 +26,11 @@ trait ServiceComponent {
   type Query = JsObject
 
   trait Service {
-    def getById[A](id: IdType)(implicit r: Reads[A], ev: CollectionName[A]): Future[Option[A]]
+    def getById[A](id: IdType)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[Option[A]]]
 
-    def find[A](query: Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
+    def find[A](query: Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
 
-    def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[List[A]]
+    def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
 
     def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]): Future[Try[IdType]]
 
