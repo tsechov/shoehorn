@@ -28,7 +28,7 @@ trait ControllerUtils {
 
   def toJsArray[A](list: List[A])(implicit w: Writes[A]): JsArray = list.foldLeft(JsArray())((acc, elem) => acc ++ Json.arr(elem))
 
-  def foundOrNot[A](resultList: List[A])(implicit w: Writes[A]) = Ok(toJsArray(resultList)).as(ContentTypes.JSON)
+  def okResultWithList[A](resultList: List[A])(implicit w: Writes[A]) = Ok(toJsArray(resultList)).as(ContentTypes.JSON)
 
   def badQuery(query: String, error: Throwable) = {
     Logger.debug(s"error parsing query: $query")
@@ -65,6 +65,12 @@ trait ControllerUtils {
       }
     }
 
+  }
+
+  def listResult[A](operationName: String)(implicit w: Writes[A]): PartialFunction[Try[List[A]], SimpleResult] = {
+    internalServerError[List[A]](s"[$operationName] error") orElse {
+      case Success(resultList) => okResultWithList[A](resultList)
+    }
   }
 
 }
