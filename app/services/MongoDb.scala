@@ -10,6 +10,9 @@ import play.modules.reactivemongo.json.collection.JSONCollection
 import play.api.libs.json.JsObject
 import scala.concurrent.Future
 import reactivemongo.core.commands.LastError
+import play.api.libs.json.Json._
+import play.modules.reactivemongo.json.collection.JSONCollection
+import play.api.libs.json.JsObject
 
 
 trait Mongo {
@@ -37,12 +40,16 @@ class RealMongo(implicit app: Application) extends Mongo {
 
   override val mongo = new MongoDb {
     def find[A](query: JsObject)(implicit r: Reads[A], ev: CollectionName[A]) = collection(ev.get).find(query).cursor[A].collect[List]()
-    
+
     override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]) = find(emptyQuery)
 
     override def insert[A: CollectionName](jsonToInsert: JsValue) = collection(implicitly[CollectionName[A]].get).insert(jsonToInsert)
 
-    override def update[A: CollectionName](selector: JsObject, json: JsValue) = collection(implicitly[CollectionName[A]].get).update(selector, json)
+    override def update[A: CollectionName](selector: JsObject, json: JsValue) = {
+      val updateValue = Json.obj("$set" -> json)
+      collection(implicitly[CollectionName[A]].get).update(selector, updateValue)
+
+    }
 
     override def remove[A: CollectionName](selector: JsObject) = collection(implicitly[CollectionName[A]].get).remove(selector)
 
