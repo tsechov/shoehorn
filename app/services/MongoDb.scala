@@ -3,14 +3,14 @@ package services
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.api.Application
 
-import play.api.libs.json.{JsValue, Json, Reads}
+import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import play.modules.reactivemongo.json.collection.JSONCollection
-import play.api.libs.json.JsObject
 import scala.concurrent.Future
 import reactivemongo.core.commands.LastError
 import play.api.libs.json.Json._
+import play.modules.reactivemongo.json.collection.JSONCollection
 import play.modules.reactivemongo.json.collection.JSONCollection
 import play.api.libs.json.JsObject
 
@@ -39,7 +39,14 @@ class RealMongo(implicit app: Application) extends Mongo {
   def collection(name: String): JSONCollection = ReactiveMongoPlugin.db.collection[JSONCollection](name)
 
   override val mongo = new MongoDb {
-    def find[A](query: JsObject)(implicit r: Reads[A], ev: CollectionName[A]) = collection(ev.get).find(query).cursor[A].collect[List]()
+    def find[A](query: JsObject)(implicit r: Reads[A], ev: CollectionName[A]) = {
+      collection(ev.get).find(query).cursor[JsObject].collect[List]().map(_.map {
+        _.validate[A] match {
+          case JsSuccess(elem, _) => elem
+          case JsError(error) => throw new IllegalArgumentException(s"error reading collection [" + ev.get + "]: " + JsError.toFlatJson(error).toString)
+        }
+      })
+    }
 
     override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]) = find(emptyQuery)
 
