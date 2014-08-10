@@ -22,7 +22,8 @@ object ApplicationBuild extends Build {
 
   val main = play.Project(appName, appVersion, appDependencies, settings = Defaults.defaultSettings ++ playScalaSettings ++ releaseSettings).settings(
     sources in(Compile, doc) := Seq.empty,
-    publishTo := Some(Resolver.file("file", new File(target.value.absolutePath + "/publish")))
+    publishTo := Some(Resolver.file("file", new File(target.value.absolutePath + "/publish"))),
+    version := (version in ThisBuild).value
   )
 
 
