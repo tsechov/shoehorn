@@ -1,6 +1,7 @@
 
 import sbt._
 import sbt.Keys._
+import play.Project._
 import sbtrelease.ReleasePlugin._
 
 object ApplicationBuild extends Build {
@@ -19,7 +20,7 @@ object ApplicationBuild extends Build {
   )
 
 
-  val main = play.Project(appName, appVersion, appDependencies).settings(
+  val main = play.Project(appName, appVersion, appDependencies, settings = Defaults.defaultSettings ++ playScalaSettings ++ releaseSettings).settings(
     sources in(Compile, doc) := Seq.empty,
     publishTo := Some(Resolver.file("file", new File(target.value.absolutePath + "/publish")))
   )
