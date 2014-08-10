@@ -1,10 +1,13 @@
+
 import sbt._
 import sbt.Keys._
+import sbtrelease.ReleasePlugin._
 
 object ApplicationBuild extends Build {
+  releaseSettings
 
-  val appName         = "shoehorn-backend"
-  val appVersion      = "0.1-SNAPSHOT"
+  val appName = "shoehorn-backend"
+  val appVersion = "N/A"
 
   val appDependencies = Seq(
     "com.google.inject" % "guice" % "3.0",
@@ -17,9 +20,9 @@ object ApplicationBuild extends Build {
 
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    sources in (Compile,doc) := Seq.empty
+    sources in(Compile, doc) := Seq.empty,
+    publishTo := Some(Resolver.file("file", new File(target.value.absolutePath + "/publish")))
   )
-
 
 
 }
