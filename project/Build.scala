@@ -8,7 +8,7 @@ object ApplicationBuild extends Build {
   releaseSettings
 
   val appName = "shoehorn-backend"
-  val appVersion = "N/A"
+  val appVersion = "NA"
 
   val appDependencies = Seq(
     "com.google.inject" % "guice" % "3.0",
