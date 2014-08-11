@@ -19,9 +19,13 @@ build:
 deploy:
     steps:
         - script:
-            name: show branch
+            name: switch to release
             code: |-
-                git status
+                if [ ${WERCKER_GIT_BRANCH} == "release" ]
+                then
+                  latest_tag=$(git describe --abbrev=0 --tags)
+                  git checkout ${latest_tag}
+                fi
         - script:
             name: persist commit-id
             code: |-

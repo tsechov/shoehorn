@@ -14,3 +14,8 @@ for EXT in jar jar.md5 jar.sha1 pom pom.md5 pom.sha1; do
     echo "uploading to: "${UPLOAD_URL}
     curl -XPOST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/zip" --data-binary target/publish/shoehorn/shoehorn_2.10/${VERSION}/${FILENAME}.${EXT} ${UPLOAD_URL}
 done
+
+CONTENT=$(echo "${VERSION}" |base64)
+API_JSON=$(printf '{"message": "releasing ${VERSION}","content": "%s"}' ${CONTENT})
+curl -XPUT --data "$API_JSON" https://api.github.com/repos/tschoohuy/shoehorn-release-deploy/contents/release-${VERSION}?access_token=${GITHUB_TOKEN}
+
