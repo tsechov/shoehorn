@@ -21,11 +21,7 @@ deploy:
         - script:
             name: switch to release
             code: |-
-                if [ ${WERCKER_GIT_BRANCH} == "release" ]
-                then
-                  latest_tag=$(git describe --abbrev=0 --tags)
-                  git checkout ${latest_tag}
-                fi
+                if [ ${WERCKER_GIT_BRANCH} == "release" ]; then latest_tag=$(git describe --abbrev=0 --tags); git checkout ${latest_tag}; fi
         - script:
             name: persist commit-id
             code: |-
