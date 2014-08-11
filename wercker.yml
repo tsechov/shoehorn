@@ -19,6 +19,10 @@ build:
 deploy:
     steps:
         - script:
+            name: show branch
+            code: |-
+                git status
+        - script:
             name: persist commit-id
             code: |-
                 while read a ; do echo ${a//GIT_COMMIT/${WERCKER_GIT_COMMIT}} ; done < $WERCKER_SOURCE_DIR/conf/application.conf > $WERCKER_SOURCE_DIR/conf/application.conf.tmp
