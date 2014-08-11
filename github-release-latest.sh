@@ -9,7 +9,6 @@ UPLOAD_URL_TEMPLATE=$(curl --data "$API_JSON" https://api.github.com/repos/tsech
 
 EXT="jar"
 for EXT in jar jar.md5 jar.sha1 pom pom.md5 pom.sha1; do
-
     UPLOAD_URL=$(echo ${UPLOAD_URL_TEMPLATE} |sed "s/{?name}/?name=${FILENAME}.${EXT}/")
     echo "uploading to: "${UPLOAD_URL}
     curl -XPOST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: application/zip" --data-binary target/publish/shoehorn/shoehorn_2.10/${VERSION}/${FILENAME}.${EXT} ${UPLOAD_URL}
