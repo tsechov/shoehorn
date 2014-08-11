@@ -1,4 +1,4 @@
-@(gitInfo:String)
+@(gitInfo:String, version:String)
 <!doctype html>
 <html lang="en" ng-app="myApp">
 <head>
@@ -33,7 +33,7 @@
             <hr/>
             <div>
                 <span><a href="@gitInfo">scm</a></span>
-                <span class="pull-right">version : <span app-version></span></span>
+                <span class="pull-right">version : <span>@version</span></span>
             </div>
         </footer>
     </div>

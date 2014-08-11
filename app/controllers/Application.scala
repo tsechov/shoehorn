@@ -19,8 +19,9 @@ class Application @Inject()(uuidGenerator: UUIDGenerator) extends Controller {
   def index = Action {
     val gitCommitId = Play.application.configuration.getString("git.commit")
     val scmUrl = Play.application.configuration.getString("scm.url")
+    val version = release.CurrentVersion()
 
-    Ok(views.html.index(scmUrl + "/commit/" + gitCommitId))
+    Ok(views.html.index(scmUrl + "/commit/" + gitCommitId, version))
   }
 
   def randomUUID = Action {
