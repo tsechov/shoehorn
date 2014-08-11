@@ -17,5 +17,5 @@ done
 
 CONTENT=$(echo "${VERSION}" |base64)
 API_JSON=$(printf '{"message": "releasing ${VERSION}","content": "%s"}' ${CONTENT})
-curl -XPUT --data "$API_JSON" https://api.github.com/repos/tschoohuy/shoehorn-release-deploy/contents/release-${VERSION}?access_token=${GITHUB_TOKEN}
+curl -XPUT --data "$API_JSON" https://api.github.com/repos/tschoohuy/shoehorn-release/contents/release-${VERSION}?access_token=${GITHUB_TOKEN}
 
