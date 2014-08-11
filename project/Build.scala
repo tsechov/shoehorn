@@ -7,7 +7,7 @@ import sbtrelease.ReleasePlugin._
 object ApplicationBuild extends Build {
   releaseSettings
 
-  val appName = "shoehorn-backend"
+  val appName = "shoehorn"
   val appVersion = "NA"
 
   val appDependencies = Seq(
