@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ] ;then { echo "not on master branch" 1>&2; exit; }; fi
+
 . setenv.sh
 
 sbt "release with-defaults" || { echo "sbt release failed" 1>&2; exit; }
