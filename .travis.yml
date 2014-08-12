@@ -1,14 +1,10 @@
 language: scala
 scala:
-   - 2.10.4
-#env:
-#  - PLAY_VERSION=2.2.1
-#before_script:
-#  - wget http://download.playframework.org/releases/play-${PLAY_VERSION}.zip
-#  - unzip -q play-${PLAY_VERSION}.zip
-#script: play-${PLAY_VERSION}/play test
+- 2.10.4
 notifications:
-  # Email notifications are disabled to not annoy anybody.
-  # See http://about.travis-ci.org/docs/user/build-configuration/ to learn more
-  # about configuring notification recipients and more.
   email: false
+  slack:
+    secure: KWySc6qfN4WJYFNjeww3Hkh+/DsNDCJk2tG429BTe6waRn/FXDfbEhHIKAawx7boUQT+xyofwuVCN2chlnm66QlZqwo/ZBlvmAby2lbAsIWTMFYknOm2j1E2Z8tqQSsQO7auSJuXWc13PgAJ3yUOPCDJE1KEz2gg3F8zE/68ItM=
+env:
+  global:
+    secure: AJu1vB/SJzKdcxNZ+yn01rIOef/c+FVtMMn+Y6wOOnCm66GmIM4aL51orT3cG9mg8VWZ8C2c7kcBms6YFk7cUb+PsBWr9UlLRrfGFHNjdt5K2LB/P36wv8E6y0oc/7zfi1rpG4TwexG489C5k5zdq9q+taDF8gKkuVzNywIcMoc=
