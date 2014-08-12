@@ -1,10 +1,14 @@
 #!/bin/bash
 
-if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ] ;then { echo "not on master branch" 1>&2; exit; }; fi
+function error {
+    { echo "not on master branch" 1>&2; git checkout master; exit; }
+}
+
+if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ] ;then error "not on master branch"; fi
 
 . setenv.sh
 
-sbt "release with-defaults" || { echo "sbt release failed" 1>&2; exit; }
+sbt "release with-defaults" || error "sbt release failed"
 
 VERSION=$(git describe --abbrev=0 --tags|sed 's/^v//')
 
