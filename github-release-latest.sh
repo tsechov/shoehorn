@@ -9,8 +9,9 @@ sbt "release with-defaults" || { echo "sbt release failed" 1>&2; exit; }
 VERSION=$(git describe --abbrev=0 --tags|sed 's/^v//')
 
 git checkout release
-git reset ${VERSION}
+git rebase v${VERSION}
 git push origin release
+git checkout master
 
 API_JSON=$(printf '{"tag_name": "v%s","target_commitish": "master","name": "v%s","body": "Release of version %s","draft": false,"prerelease": false}' $VERSION $VERSION $VERSION)
 
