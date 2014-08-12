@@ -1,1 +1,1 @@
-web: target/universal/stage/bin/shoehorn-backend -Dhttp.port=$PORT
+web: target/universal/stage/bin/shoehorn -Dhttp.port=$PORT

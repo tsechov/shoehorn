@@ -19,7 +19,7 @@ git checkout master
 
 API_JSON=$(printf '{"tag_name": "v%s","target_commitish": "master","name": "v%s","body": "Release of version %s","draft": false,"prerelease": false}' $VERSION $VERSION $VERSION)
 
-UPLOAD_URL_TEMPLATE=$(curl --data "$API_JSON" https://api.github.com/repos/tsechov/shoehorn/releases?access_token=${GITHUB_TOKEN} |jq -r ".upload_url" )
+UPLOAD_URL_TEMPLATE=$(curl -s --data "$API_JSON" https://api.github.com/repos/tsechov/shoehorn/releases?access_token=${GITHUB_TOKEN} |jq -r ".upload_url" )
 
 #FILENAME=shoehorn_2.10-${VERSION}
 
