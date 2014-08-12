@@ -19,10 +19,6 @@ build:
 deploy:
     steps:
         - script:
-            name: switch to release
-            code: |-
-                if [ ${WERCKER_GIT_BRANCH} == "release" ]; then latest_tag=$(git describe --abbrev=0 --tags); git checkout ${latest_tag}; fi
-        - script:
             name: persist commit-id
             code: |-
                 while read a ; do echo ${a//GIT_COMMIT/${WERCKER_GIT_COMMIT}} ; done < $WERCKER_SOURCE_DIR/conf/application.conf > $WERCKER_SOURCE_DIR/conf/application.conf.tmp
