@@ -3,7 +3,7 @@ package controllers
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.MongoController
 import models.{AssetTransform, AssetSupport}
-import models.models.{ModelUpdate, ModelCreate, Model, ModelPaths}
+import models.{ProductUpdate, ProductCreate, Product, ProductPaths}
 import javax.inject.Singleton
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json._
@@ -19,15 +19,15 @@ import org.joda.time.DateTime
 
 //TODO: generalize
 @Singleton
-class Models extends Controller with MongoController with ModelPaths with ControllerUtils with MongoUtils {
-  def collection: JSONCollection = db.collection[JSONCollection]("models")
+class Products extends Controller with MongoController with ProductPaths with ControllerUtils with MongoUtils {
+  def collection: JSONCollection = db.collection[JSONCollection]("products")
 
-  private def locationUrl(id: String) = contextUrl + controllers.routes.Models.getById(id).toString
+  private def locationUrl(id: String) = contextUrl + controllers.routes.Products.getById(id).toString
 
   def getById(id: AssetSupport.IdType) = Action.async {
     val query = obj(AssetSupport.idFieldName -> id)
 
-    val cursor = collection.find(query).cursor[Model].collect[List]()
+    val cursor = collection.find(query).cursor[Product].collect[List]()
 
     val futureJson = cursor.map {
       case head :: _ => Some(toJson(head))
@@ -50,7 +50,7 @@ class Models extends Controller with MongoController with ModelPaths with Contro
         case Some(queryString) => {
           Try(Json.parse(queryString)) match {
             case Success(queryJson) => {
-              collectionFind[Model](Some(queryJson)).map {
+              collectionFind[Product](Some(queryJson)).map {
                 jsArray => Ok(jsArray).as(ContentTypes.JSON)
               }
             }
@@ -60,7 +60,7 @@ class Models extends Controller with MongoController with ModelPaths with Contro
             }
           }
         }
-        case None => collectionFind[Model]().map {
+        case None => collectionFind[Product]().map {
           Ok(_).as(ContentTypes.JSON)
         }
       }
@@ -76,7 +76,7 @@ class Models extends Controller with MongoController with ModelPaths with Contro
       val transformer = AssetTransform.create(json)(id, now)
 
       val result = for {
-        validated <- json.validate[ModelCreate]
+        validated <- json.validate[ProductCreate]
         transformed <- json.transform(transformer)
       } yield collectionInsert(transformed)
 
@@ -115,7 +115,7 @@ class Models extends Controller with MongoController with ModelPaths with Contro
         }
         validated <- {
           println("validate: " + transformed);
-          transformed.validate[ModelUpdate]
+          transformed.validate[ProductUpdate]
         }
 
       } yield (validated, transformed)

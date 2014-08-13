@@ -19,7 +19,7 @@ import play.Logger
 class CatalogsIT extends CommonControllerSpecs with DateFormatSupport with CatalogPaths {
 
 
-  val targetReverseRoute = controllers.routes.CatalogsCake
+  val targetReverseRoute = controllers.routes.Catalogs
 
   def checkDateField(jsValue: JsValue, path: JsPath) = {
     val createdAt = jsValue.transform(path.json.pick)

@@ -13,31 +13,19 @@ GET            /index2              @controllers.Application.index2
 GET            /randomUUI           @controllers.Application.randomUUID
 
 
-# User management API
-GET            /users               @controllers.Users.findUsers
-POST           /user                @controllers.Users.createUser
+GET            /catalogs/:id        controllers.Catalogs.getById(id)
+GET            /catalogs            controllers.Catalogs.find(q:Option[String])
+PUT            /catalogs/:id        controllers.Catalogs.update(id)
+POST           /catalogs/:id        controllers.Catalogs.update(id)
+POST           /catalogs            controllers.Catalogs.create
+DELETE         /catalogs/:id        controllers.Catalogs.delete(id)
 
-# Catalog management API
-#GET            /catalogs                @controllers.Catalogs.find(q:Option[String])
-#GET            /catalogs/:id            @controllers.Catalogs.getById(id)
-#PUT            /catalogs/:id            @controllers.Catalogs.update(id)
-#POST           /catalogs/:id            @controllers.Catalogs.update(id)
-#POST           /catalogs                @controllers.Catalogs.create
-#DELETE         /catalogs/:id            @controllers.Catalogs.delete(id)
-
-GET            /catalogs/:id        controllers.CatalogsCake.getById(id)
-GET            /catalogs            controllers.CatalogsCake.find(q:Option[String])
-PUT            /catalogs/:id        controllers.CatalogsCake.update(id)
-POST           /catalogs/:id        controllers.CatalogsCake.update(id)
-POST           /catalogs            controllers.CatalogsCake.create
-DELETE         /catalogs/:id        controllers.CatalogsCake.delete(id)
-
-GET            /models              @controllers.Models.find(q:Option[String])
-GET            /models/:id          @controllers.Models.getById(id)
-PUT            /models/:id          @controllers.Models.update(id)
-POST           /models/:id          @controllers.Models.update(id)
-POST           /models              @controllers.Models.create
-DELETE         /models/:id          @controllers.Models.delete(id)
+GET            /products              @controllers.Products.find(q:Option[String])
+GET            /products/:id          @controllers.Products.getById(id)
+PUT            /products/:id          @controllers.Products.update(id)
+POST           /products/:id          @controllers.Products.update(id)
+POST           /products              @controllers.Products.create
+DELETE         /products/:id          @controllers.Products.delete(id)
 
 
 
