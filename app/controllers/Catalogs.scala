@@ -10,23 +10,23 @@ import play.api.libs.json.JsValue
 
 
 object Catalogs extends CrudController {
-  type MODEL = Catalog
-  type UPDATEMODEL = CatalogUpdate
-  type CREATEMODEL = CatalogCreate
+  override type MODEL = Catalog
+  override type UPDATEMODEL = CatalogUpdate
+  override type CREATEMODEL = CatalogCreate
 
 
   def create = Action.async(parse.json) {
     request =>
-      super.create[CREATEMODEL, MODEL](request.body, id => controllers.routes.Catalogs.getById(id))
+      super.create(request.body, id => controllers.routes.Catalogs.getById(id))
   }
 
   def update(id: IdType) = Action.async(parse.json) {
     request =>
-      super.update[MODEL, UPDATEMODEL](id, request.body)
+      super.update(id, request.body)
   }
 
   def delete(id: String) = Action.async {
-    super.delete[MODEL](id)
+    super.delete(id)
   }
 
 }

@@ -36,7 +36,9 @@ import play.api.mvc.BodyParsers.parse
 
 trait CrudController extends Results with ControllerUtils {
 
-  type MODEL
+  type MODEL <: AssetUpdate[UPDATEMODEL]
+
+
   type UPDATEMODEL
   type CREATEMODEL <: AssetCreate[MODEL]
 
@@ -69,33 +71,34 @@ trait CrudController extends Results with ControllerUtils {
   }
 
 
-  def create[CREATEMODEL <: AssetCreate[MODEL], MODEL](input: JsValue, getByIdRoute: String => Call)(implicit r: Reads[CREATEMODEL], w: Writes[MODEL], ev: CollectionName[MODEL]) = {
+  def create(input: JsValue, getByIdRoute: String => Call)(implicit r: Reads[CREATEMODEL], w: Writes[MODEL], ev: CollectionName[MODEL]) = {
 
     Logger.debug("input for create: \n" + Json.prettyPrint(input))
-    def operation[CREATEMODEL <: AssetCreate[MODEL], MODEL](implicit w: Writes[MODEL], ev: CollectionName[MODEL]) = service.insert[CREATEMODEL, MODEL] _
+    //    def operation[C <: AssetCreate[M], M](implicit w: Writes[M], ev: CollectionName[M]) = service.insert[C, M] _
+    def operation = service.insert[CREATEMODEL, MODEL] _
     def createdResult(id: AssetSupport.IdType, msg: String): SimpleResult = {
       Logger.debug(s"$msg with id: $id")
       Created.as(ContentTypes.JSON)
         .withHeaders(HeaderNames.LOCATION -> locationUrl(id, getByIdRoute))
     }
 
-    (performOperation[CREATEMODEL, AssetSupport.IdType]("create", operation[CREATEMODEL, MODEL], createdResult))(input.validate[CREATEMODEL])
+    (performOperation[CREATEMODEL, AssetSupport.IdType]("create", operation, createdResult))(input.validate[CREATEMODEL])
 
   }
 
-  def update[A <: AssetUpdate[U], U](id: AssetSupport.IdType, input: JsValue)(implicit r: Reads[A], w: Writes[U], ev: CollectionName[U]) = {
+  def update(id: AssetSupport.IdType, input: JsValue)(implicit r: Reads[MODEL], w: Writes[UPDATEMODEL], ev: CollectionName[UPDATEMODEL]) = {
     Logger.debug("input for update: \n" + Json.prettyPrint(input))
-    def operation[A <: AssetUpdate[U], U](implicit w: Writes[U], ev: CollectionName[U]) = service.update[A, U](id) _
+    def operation = service.update[MODEL, UPDATEMODEL](id) _
     def okResult(n: Unit, msg: String): SimpleResult = {
       Logger.debug(s"$msg with id: $id")
       Ok
     }
-    (performOperation[A, Unit]("update", operation[A, U], okResult))(input.validate[A])
+    (performOperation[MODEL, Unit]("update", operation, okResult))(input.validate[MODEL])
 
   }
 
-  def delete[A: CollectionName](id: AssetSupport.IdType) = {
-    val result = service.remove[A](id)
+  def delete(id: AssetSupport.IdType)(implicit ev: CollectionName[MODEL]) = {
+    val result = service.remove[MODEL](id)
     result.map {
       internalServerError[Unit](s"[delete] error with id: $id") orElse {
         case Success(_) => {
