@@ -32,15 +32,20 @@ import play.api.mvc.SimpleResult
 import play.api.mvc.Call
 import scala.util.Success
 import play.api.libs.json.JsObject
+import play.api.mvc.BodyParsers.parse
 
 trait CrudController extends Results with ControllerUtils {
+
+  type MODEL
+  type UPDATEMODEL
+  type CREATEMODEL <: AssetCreate[MODEL]
 
 
   private val service = production service
 
-  def getById[A](id: AssetSupport.IdType)(implicit f: Format[A], ev: CollectionName[A]): Future[SimpleResult] = {
-    service.getById[A](id).map {
-      internalServerError[Option[A]]("[getById] error") orElse {
+  def getById(id: AssetSupport.IdType)(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
+    service.getById[MODEL](id).map {
+      internalServerError[Option[MODEL]]("[getById] error") orElse {
         case Success(result) => result match {
           case Some(entity) => Ok(Json.toJson(entity))
           case None => NotFound
@@ -49,31 +54,32 @@ trait CrudController extends Results with ControllerUtils {
     }
   }
 
-  def find[A](q: Option[String])(implicit f: Format[A], ev: CollectionName[A]): Future[SimpleResult] = {
+  def find(q: Option[String])(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
     Logger.debug(s"find queryString: $q")
 
     q match {
       case Some(queryString) => {
         Try(Json.parse(queryString).as[JsObject]) match {
-          case Success(queryJson) => service.find[A](queryJson).map(listResult[A]("find"))
+          case Success(queryJson) => service.find[MODEL](queryJson).map(listResult[MODEL]("find"))
           case Failure(error) => badQuery(queryString, error)
         }
       }
-      case None => service.findAll[A].map(listResult[A]("find"))
+      case None => service.findAll[MODEL].map(listResult[MODEL]("find"))
     }
   }
 
 
-  def create[C <: AssetCreate[A], A](input: JsValue, getByIdRoute: String => Call)(implicit r: Reads[C], w: Writes[A], ev: CollectionName[A]) = {
+  def create[CREATEMODEL <: AssetCreate[MODEL], MODEL](input: JsValue, getByIdRoute: String => Call)(implicit r: Reads[CREATEMODEL], w: Writes[MODEL], ev: CollectionName[MODEL]) = {
+
     Logger.debug("input for create: \n" + Json.prettyPrint(input))
-    def operation[C <: AssetCreate[A], A](implicit w: Writes[A], ev: CollectionName[A]) = service.insert[C, A] _
+    def operation[CREATEMODEL <: AssetCreate[MODEL], MODEL](implicit w: Writes[MODEL], ev: CollectionName[MODEL]) = service.insert[CREATEMODEL, MODEL] _
     def createdResult(id: AssetSupport.IdType, msg: String): SimpleResult = {
       Logger.debug(s"$msg with id: $id")
       Created.as(ContentTypes.JSON)
         .withHeaders(HeaderNames.LOCATION -> locationUrl(id, getByIdRoute))
     }
 
-    (performOperation[C, AssetSupport.IdType]("create", operation[C, A], createdResult))(input.validate[C])
+    (performOperation[CREATEMODEL, AssetSupport.IdType]("create", operation[CREATEMODEL, MODEL], createdResult))(input.validate[CREATEMODEL])
 
   }
 
