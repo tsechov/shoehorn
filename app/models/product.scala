@@ -4,6 +4,8 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import org.joda.time.DateTime
+import services.CollectionName
+import models.AssetSupport.IdType
 
 case class SizeGroup(from: Int, to: Int)
 
@@ -31,10 +33,12 @@ case class ProductCreate(
                           sizeRanges: List[SizeGroup],
                           image: Product.ImageUrl,
                           catalogs: List[AssetSupport.IdType]
-                          )
+                          ) extends AssetCreate[Product] {
+  override def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = Product(id, createdAt, lastModifiedAt, active, description, name, itemNumber, sizeRanges, image, catalogs)
+}
 
 object ProductCreate extends ProductPaths {
-  implicit val r: Reads[ProductCreate] =
+  implicit val reads: Reads[ProductCreate] =
     (activePath.read[Boolean] and
       descriptionPath.read[String] and
       namePath.read[String] and
@@ -59,7 +63,7 @@ case class ProductUpdate(
                           )
 
 object ProductUpdate extends ProductPaths with DateFormatSupport {
-  implicit val r: Reads[ProductUpdate] =
+  val reads: Reads[ProductUpdate] =
     (lastModifiedAtPath.read[DateTime] and
       activePath.read[Boolean] and
       descriptionPath.read[String] and
@@ -68,6 +72,22 @@ object ProductUpdate extends ProductPaths with DateFormatSupport {
       sizeGroupPath.read[List[SizeGroup]] and
       imagePath.read[ImageUrl] and
       catalogsPath.read[List[AssetSupport.IdType]])(ProductUpdate.apply _)
+
+  val writes: Writes[ProductUpdate] =
+    (lastModifiedAtPath.write[DateTime] and
+      activePath.write[Boolean] and
+      descriptionPath.write[String] and
+      namePath.write[String] and
+      itemNumberPath.write[String] and
+      sizeGroupPath.write[List[SizeGroup]] and
+      imagePath.write[ImageUrl] and
+      catalogsPath.write[List[AssetSupport.IdType]])(unlift(ProductUpdate.unapply _))
+
+  implicit val format = Format(reads, writes)
+
+  implicit val collectionName = new CollectionName[ProductUpdate] {
+    override def get: String = "products"
+  }
 
 }
 
@@ -81,10 +101,12 @@ case class Product(
                     itemNumber: Product.ItemNumber,
                     sizeRanges: List[SizeGroup],
                     image: Product.ImageUrl,
-                    catalogs: List[AssetSupport.IdType])
+                    catalogs: List[AssetSupport.IdType]) extends AssetUpdate[ProductUpdate] {
+  override def fillup(lastModifiedAt: DateTime) = ProductUpdate(lastModifiedAt, active, description, name, itemNumber, sizeRanges, image, catalogs)
+}
 
 object Product extends ProductPaths with DateFormatSupport {
-  val r: Reads[Product] = (
+  val reads: Reads[Product] = (
     idPath.read[AssetSupport.IdType] and
       createdAtPath.read[DateTime] and
       lastModifiedAtPath.read[DateTime] and
@@ -96,7 +118,7 @@ object Product extends ProductPaths with DateFormatSupport {
       imagePath.read[ImageUrl] and
       catalogsPath.read[List[AssetSupport.IdType]])(Product.apply _)
 
-  val w: Writes[Product] = (
+  val writes: Writes[Product] = (
     idPath.write[AssetSupport.IdType] and
       createdAtPath.write[DateTime] and
       lastModifiedAtPath.write[DateTime] and
@@ -108,7 +130,11 @@ object Product extends ProductPaths with DateFormatSupport {
       imagePath.write[ImageUrl] and
       catalogsPath.write[List[AssetSupport.IdType]])(unlift(Product.unapply _))
 
-  implicit val format = Format(r, w)
+  implicit val format = Format(reads, writes)
+
+  implicit val collectionName = new CollectionName[Product] {
+    override def get: String = "products"
+  }
 }
 
 

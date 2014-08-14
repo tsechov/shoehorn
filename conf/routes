@@ -1,17 +1,7 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-#
-# Note: @controllers syntax signifies the actual controller instance, retrieved via GlobalSettings.getController().
-# ~~~~
+OPTIONS        /                    controllers.Application.preflight(path: String ?= "")
+OPTIONS        /*path               controllers.Application.preflight(path)
 
-# Single endpoint for serving AngularJS
-OPTIONS        /                    @controllers.Application.preflight(path: String ?= "")
-OPTIONS        /*path               @controllers.Application.preflight(path)
-
-GET            /                    @controllers.Application.index
-GET            /index2              @controllers.Application.index2
-GET            /randomUUI           @controllers.Application.randomUUID
-
+GET            /                    controllers.Application.index
 
 GET            /catalogs/:id        controllers.Catalogs.getById(id)
 GET            /catalogs            controllers.Catalogs.find(q:Option[String])
@@ -20,15 +10,11 @@ POST           /catalogs/:id        controllers.Catalogs.update(id)
 POST           /catalogs            controllers.Catalogs.create
 DELETE         /catalogs/:id        controllers.Catalogs.delete(id)
 
-GET            /products              @controllers.Products.find(q:Option[String])
-GET            /products/:id          @controllers.Products.getById(id)
-PUT            /products/:id          @controllers.Products.update(id)
-POST           /products/:id          @controllers.Products.update(id)
-POST           /products              @controllers.Products.create
-DELETE         /products/:id          @controllers.Products.delete(id)
+GET            /products/:id        controllers.Products.getById(id)
+GET            /products            controllers.Products.find(q:Option[String])
+PUT            /products/:id        controllers.Products.update(id)
+POST           /products/:id        controllers.Products.update(id)
+POST           /products            controllers.Products.create
+DELETE         /products/:id        controllers.Products.delete(id)
 
-
-
-
-# Map static resources from the /public folder to the /assets URL path
 GET            /assets/*file        controllers.Assets.at(path="/public", file)

@@ -1,12 +1,11 @@
 package controllers
 
-import play.api.mvc.{Call, Action}
+import play.api.mvc.Action
 import models.AssetSupport.IdType
 import models.Catalog
 import models.CatalogCreate
 import models.CatalogUpdate
 import play.api.mvc.BodyParsers.parse
-import play.api.libs.json.JsValue
 
 
 object Catalogs extends CrudController {
