@@ -36,4 +36,4 @@ deploy:
         - script:
             name: runscope trigger
             code: |-
-                wget -O - ${RUNSCOPE_TRIGGER_URL}?commitId=${WERCKER_GIT_COMMIT}&app=${HEROKU_APP_NAME}
+                wget -O - "${RUNSCOPE_TRIGGER_URL}?commitId=${WERCKER_GIT_COMMIT}&app=${HEROKU_APP_NAME}"
