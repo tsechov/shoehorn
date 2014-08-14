@@ -69,7 +69,7 @@ object CatalogUpdate extends CatalogPaths with DateFormatSupport {
   implicit val format = Format[CatalogUpdate](reads, writes)
 
   implicit val collectionName = new CollectionName[CatalogUpdate] {
-    override def get: String = "catalogs"
+    override def get: String = Catalog.collectionName.get
   }
 
 
