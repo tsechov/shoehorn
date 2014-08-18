@@ -2,10 +2,8 @@ package controllers
 
 import play.api.mvc.Action
 import models.AssetSupport.IdType
-import models.Product
-import models.ProductCreate
-import models.ProductUpdate
 import play.api.mvc.BodyParsers.parse
+import models.product.{Product, ProductUpdate, ProductCreate}
 
 
 object Products extends CrudController {

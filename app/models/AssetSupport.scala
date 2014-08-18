@@ -12,7 +12,7 @@ object AssetSupport {
   val descriptionFieldName = "description"
 
   type IdType = String
-
+  type UrlType = String
 
 
 }
@@ -28,7 +28,7 @@ trait AssetPaths {
   val descriptionPath = __ \ descriptionFieldName
 }
 
-object AssetTransform extends AssetPaths{
+object AssetTransform extends AssetPaths {
 
   def create(json: JsValue): (AssetSupport.IdType, DateTime) => Reads[JsObject] = {
     (id, date) => {
@@ -55,9 +55,9 @@ object AssetTransform extends AssetPaths{
 }
 
 trait AssetCreate[A] {
-  def fillup(id:AssetSupport.IdType,createdAt:DateTime,lastModifiedAt:DateTime):A
+  def fillup(id: AssetSupport.IdType, createdAt: DateTime, lastModifiedAt: DateTime): A
 }
 
 trait AssetUpdate[U] {
-  def fillup(lastModifiedAt:DateTime):U
+  def fillup(lastModifiedAt: DateTime): U
 }

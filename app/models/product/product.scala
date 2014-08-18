@@ -1,11 +1,12 @@
-package models
+package models.product
 
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import org.joda.time.DateTime
 import services.CollectionName
-import models.AssetSupport.IdType
+import models.AssetSupport.{IdType, UrlType}
+import models.{AssetUpdate, DateFormatSupport, AssetCreate, AssetPaths}
 
 
 case class SizeGroup(from: Int, to: Int)
@@ -26,14 +27,14 @@ object Price {
 }
 
 case class CatalogSw(
-                      catalogid: AssetSupport.IdType,
+                      catalogid: IdType,
                       sizeGroups: List[SizeGroup],
                       price: Price
                       )
 
 object CatalogSw {
-  val reads: Reads[CatalogSw] = ((__ \ "catalogId").read[AssetSupport.IdType] and (__ \ "sizeGroups").read[List[SizeGroup]] and (__ \ "price").read[Price])(CatalogSw.apply _)
-  val writes: Writes[CatalogSw] = ((__ \ "catalogId").write[AssetSupport.IdType] and (__ \ "sizeGroups").write[List[SizeGroup]] and (__ \ "price").write[Price])(unlift(CatalogSw.unapply _))
+  val reads: Reads[CatalogSw] = ((__ \ "catalogId").read[IdType] and (__ \ "sizeGroups").read[List[SizeGroup]] and (__ \ "price").read[Price])(CatalogSw.apply _)
+  val writes: Writes[CatalogSw] = ((__ \ "catalogId").write[IdType] and (__ \ "sizeGroups").write[List[SizeGroup]] and (__ \ "price").write[Price])(unlift(CatalogSw.unapply _))
   implicit val format = Format(reads, writes)
 }
 
@@ -42,7 +43,7 @@ trait ProductPaths extends AssetPaths {
   val itemNumberPath = __ \ "itemNumber"
   val imagePath = __ \ "image"
   val catalogsPath = __ \ "catalogs"
-  type ImageUrl = String
+
   type ItemNumber = String
 }
 
@@ -51,7 +52,7 @@ case class ProductCreate(
                           description: String,
                           name: String,
                           itemNumber: Product.ItemNumber,
-                          image: Product.ImageUrl,
+                          image: UrlType,
                           catalogs: List[CatalogSw]
                           ) extends AssetCreate[Product] {
   override def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = Product(id, createdAt, lastModifiedAt, active, description, name, itemNumber, image, catalogs)
@@ -63,7 +64,7 @@ object ProductCreate extends ProductPaths {
       descriptionPath.read[String] and
       namePath.read[String] and
       itemNumberPath.read[String] and
-      imagePath.read[ImageUrl] and
+      imagePath.read[UrlType] and
       catalogsPath.read[List[CatalogSw]]
       )(ProductCreate.apply _)
 
@@ -76,7 +77,7 @@ case class ProductUpdate(
                           description: String,
                           name: String,
                           itemNumber: Product.ItemNumber,
-                          image: Product.ImageUrl,
+                          image: UrlType,
                           catalogs: List[CatalogSw]
                           )
 
@@ -87,7 +88,7 @@ object ProductUpdate extends ProductPaths with DateFormatSupport {
       descriptionPath.read[String] and
       namePath.read[String] and
       itemNumberPath.read[String] and
-      imagePath.read[ImageUrl] and
+      imagePath.read[UrlType] and
       catalogsPath.read[List[CatalogSw]])(ProductUpdate.apply _)
 
   val writes: Writes[ProductUpdate] =
@@ -96,7 +97,7 @@ object ProductUpdate extends ProductPaths with DateFormatSupport {
       descriptionPath.write[String] and
       namePath.write[String] and
       itemNumberPath.write[String] and
-      imagePath.write[ImageUrl] and
+      imagePath.write[UrlType] and
       catalogsPath.write[List[CatalogSw]])(unlift(ProductUpdate.unapply _))
 
   implicit val format = Format(reads, writes)
@@ -108,7 +109,7 @@ object ProductUpdate extends ProductPaths with DateFormatSupport {
 }
 
 case class Product(
-                    id: AssetSupport.IdType,
+                    id: IdType,
                     createdAt: DateTime,
                     lastModifiedAt: DateTime,
                     active: Boolean,
@@ -116,7 +117,7 @@ case class Product(
                     name: String,
                     itemNumber: Product.ItemNumber,
 
-                    image: Product.ImageUrl,
+                    image: UrlType,
 
                     catalogs: List[CatalogSw]) extends AssetUpdate[ProductUpdate] {
   override def fillup(lastModifiedAt: DateTime) = ProductUpdate(lastModifiedAt, active, description, name, itemNumber, image, catalogs)
@@ -124,25 +125,25 @@ case class Product(
 
 object Product extends ProductPaths with DateFormatSupport {
   val reads: Reads[Product] = (
-    idPath.read[AssetSupport.IdType] and
+    idPath.read[IdType] and
       createdAtPath.read[DateTime] and
       lastModifiedAtPath.read[DateTime] and
       activePath.read[Boolean] and
       descriptionPath.read[String] and
       namePath.read[String] and
       itemNumberPath.read[String] and
-      imagePath.read[ImageUrl] and
+      imagePath.read[UrlType] and
       catalogsPath.read[List[CatalogSw]])(Product.apply _)
 
   val writes: Writes[Product] = (
-    idPath.write[AssetSupport.IdType] and
+    idPath.write[IdType] and
       createdAtPath.write[DateTime] and
       lastModifiedAtPath.write[DateTime] and
       activePath.write[Boolean] and
       descriptionPath.write[String] and
       namePath.write[String] and
       itemNumberPath.write[String] and
-      imagePath.write[ImageUrl] and
+      imagePath.write[UrlType] and
       catalogsPath.write[List[CatalogSw]])(unlift(Product.unapply _))
 
   implicit val format = Format(reads, writes)
