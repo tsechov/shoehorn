@@ -7,35 +7,24 @@ import org.joda.time.DateTime
 import services.CollectionName
 import models.AssetSupport.{IdType, UrlType}
 import models.{AssetUpdate, DateFormatSupport, AssetCreate, AssetPaths}
+import models.common._
 
 
 case class SizeGroup(from: Int, to: Int)
 
 object SizeGroup {
-  val reads: Reads[SizeGroup] = ((__ \ "from").read[Int] and (__ \ "to").read[Int])(SizeGroup.apply _)
-  val writes: Writes[SizeGroup] = ((__ \ "from").write[Int] and (__ \ "to").write[Int])(unlift(SizeGroup.unapply _))
-  implicit val format = Format(reads, writes)
+  implicit val format = Json.format[SizeGroup]
 }
 
-
-case class Price(price: Int, unit: String, quantity: Int)
-
-object Price {
-  val reads: Reads[Price] = ((__ \ "price").read[Int] and (__ \ "unit").read[String] and (__ \ "quantity").read[Int])(Price.apply _)
-  val writes: Writes[Price] = ((__ \ "price").write[Int] and (__ \ "unit").write[String] and (__ \ "quantity").write[Int])(unlift(Price.unapply _))
-  implicit val format = Format(reads, writes)
-}
 
 case class CatalogSw(
                       catalogid: IdType,
-                      sizeGroups: List[SizeGroup],
+                      sizeGroupIds: List[IdType],
                       price: Price
                       )
 
 object CatalogSw {
-  val reads: Reads[CatalogSw] = ((__ \ "catalogId").read[IdType] and (__ \ "sizeGroups").read[List[SizeGroup]] and (__ \ "price").read[Price])(CatalogSw.apply _)
-  val writes: Writes[CatalogSw] = ((__ \ "catalogId").write[IdType] and (__ \ "sizeGroups").write[List[SizeGroup]] and (__ \ "price").write[Price])(unlift(CatalogSw.unapply _))
-  implicit val format = Format(reads, writes)
+  implicit val format = Json.format[CatalogSw]
 }
 
 trait ProductPaths extends AssetPaths {

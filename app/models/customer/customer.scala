@@ -2,8 +2,92 @@ package models.customer
 
 import models.AssetSupport.{IdType, UrlType}
 import org.joda.time.DateTime
-import models.product.Price
+import models.common._
+import play.api.libs.json.Json
 
+
+case class TermsOfPayment(
+                           term: Int,
+                           description: String
+                           )
+
+object TermsOfPayment {
+  implicit val formats = Json.format[TermsOfPayment]
+}
+
+case class MethodOfPayment(
+                            method: Int,
+                            description: String
+                            )
+
+object MethodOfPayment {
+  implicit val format = Json.format[MethodOfPayment]
+}
+
+case class PaymentSchedule(
+                            period: DateTime,
+                            percent: String
+                            )
+
+object PaymentSchedule {
+  implicit val format = Json.format[PaymentSchedule]
+}
+
+case class Payment(
+                    termsOfPayment: TermsOfPayment,
+                    methodOfPayment: MethodOfPayment,
+                    paymentSchedule: PaymentSchedule,
+                    paymentDay: DateTime,
+                    bankAccount: String,
+                    bankAccountNumber: String
+                    )
+
+object Payment {
+  implicit val format = Json.format[Payment]
+}
+
+
+case class Place(
+                  year: String,
+                  season: String,
+                  place: Int
+                  )
+
+object Place {
+  implicit val format = Json.format[Place]
+}
+
+
+case class Group(
+                  name: String
+                  )
+
+object Group {
+  implicit val format = Json.format[Group]
+}
+
+case class CreditInformation(
+                              mandatoryCreditLimit: Boolean,
+                              creditRating: Int,
+                              creditLimit: Int,
+                              currency: String
+                              )
+
+object CreditInformation {
+  implicit val format = Json.format[CreditInformation]
+}
+
+
+case class Discount(
+                     multilineDiscount: String,
+                     totalDiscount: String,
+                     price: Price,
+                     lineDiscount: Int
+                     )
+
+object Discount {
+  implicit val format = Json.format[Discount]
+}
 
 case class Customer(
                      id: IdType,
@@ -22,112 +106,11 @@ case class Customer(
                      customergroups: List[Group],
                      contacts: List[Contact],
                      lineOfBusiness: String,
-                     creditInformation: CreditInformation,
+                     creditInformation: Option[CreditInformation],
                      site: District,
-                     discount: Discount,
-                     payment: Payment)
+                     discount: Option[Discount],
+                     payment: Option[Payment])
 
-case class PhoneNumber(
-                        typeOfPhoneNumberId: IdType,
-                        country: String,
-                        extension: Int,
-                        number: Int
-
-                        )
-
-case class Email(
-                  typeOfEmailId: IdType,
-                  address: String
-                  )
-
-
-case class Contact(
-                    typeOfContactId: IdType,
-                    status: String,
-                    title: String,
-                    firstName: String,
-                    lastName: String,
-                    phonenumbers: List[PhoneNumber],
-                    emails: List[Email]
-                    )
-
-
-case class Agent(
-                  warehouse: Warehouse,
-                  districts: List[District],
-                  contact: Contact)
-
-case class Warehouse(
-                      name: String,
-                      address: Address,
-                      status: Boolean,
-                      url: UrlType
-                      )
-
-case class District(name: String)
-
-case class Address(
-                    typeOfAddressId: IdType,
-                    country: String,
-                    district: String,
-                    postalcode: String,
-                    city: String,
-                    address: String,
-                    description: String
-                    )
-
-case class Payment(
-                    termsOfPayment: TermsOfPayment,
-                    methodOfPayment: MethodOfPayment,
-                    paymentSchedule: PaymentSchedule,
-                    paymentDay: DateTime,
-                    bankAccount: String,
-                    bankAccountNumber: String
-                    )
-
-case class TermsOfPayment(
-                           term: Int,
-                           description: String
-                           )
-
-case class MethodOfPayment(
-                            method: Int,
-                            description: String
-                            )
-
-case class PaymentSchedule(
-                            period: DateTime,
-                            percent: String
-                            )
-
-case class Place(
-                  year: String,
-                  season: String,
-                  place: Int
-                  )
-
-case class Shop(
-                 name: String,
-                 shopAddress: Address,
-                 invoiceAddress: Address,
-                 shipmentAddress: Address,
-                 status: Boolean
-                 )
-
-case class Group(
-                  name: String
-                  )
-
-case class CreditInformation(
-                              mandatoryCreditLimit: Boolean,
-                              creditRating: Int,
-                              creditLimit: Int,
-                              currency: String
-                              )
-
-case class Discount(
-                     multilineDiscount: String,
-                     totalDiscount: String,
-                     price: Price,
-                     lineDiscount: Int
-                     )
+object Customer {
+  implicit val format = Json.format[Customer]
+}
