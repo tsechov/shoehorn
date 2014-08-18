@@ -6,7 +6,7 @@ import models.{AssetUpdate, AssetCreate, AssetSupport}
 import play.api.libs.json.Json._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.AssetSupport.IdType
-import scala.util.Try
+import scala.util.{Success, Try}
 import reactivemongo.bson.BSONObjectID
 import org.joda.time.DateTime
 import play.api.libs.json.JsObject
@@ -26,11 +26,11 @@ trait ServiceComponent {
   type Query = JsObject
 
   trait Service {
-    def getById[A](id: IdType)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[Option[A]]]
+    def getById[A: CollectionName](id: IdType): Future[Try[Option[JsObject]]]
 
-    def find[A](query: Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
+    def find[A: CollectionName](query: Query): Future[Try[List[JsObject]]]
 
-    def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
+    def findAll[A: CollectionName]: Future[Try[List[JsObject]]]
 
     def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]): Future[Try[IdType]]
 
@@ -50,14 +50,16 @@ trait RealServiceComponent extends ServiceComponent {
 
   override val service = new Service {
 
-    override def getById[A](id: models.AssetSupport.IdType)(implicit r: Reads[A], ev: CollectionName[A]) = {
+    override def getById[A: CollectionName](id: models.AssetSupport.IdType) = {
       val query = obj(AssetSupport.idFieldName -> id)
-      repository.getById[A](query)
+      repository.getById[A](query) map {
+        Success(_)
+      }
     }
 
-    override def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]) = repository.find[A](query)
+    override def find[A: CollectionName](query: ServiceComponent#Query) = repository.find[A](query).map(Success(_))
 
-    override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]) = repository.findAll[A]
+    override def findAll[A: CollectionName] = repository.findAll[A].map(Success(_))
 
     override def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]) = {
       val id = BSONObjectID.generate.stringify

@@ -26,19 +26,19 @@ class ServicesTest extends Specification with Mockito {
 
       val expectedId = "blah"
       val query = Json.obj(AssetSupport.idFieldName -> expectedId)
-      val expectedResultList = List("foo")
+      val expectedResultList = List(Json.obj("foo" -> "bar"))
       implicit val colName = mock[CollectionName[Test]]
       implicit val reads = mock[Reads[Test]]
 
-      when(mockedMongo.find[Test](query)).thenReturn(Future.successful(Success(expectedResultList)))
+      when(mockedMongo.find[Test](query)).thenReturn(Future.successful(expectedResultList))
 
 
 
       val result = target.repository.getById[Test](query)
       val timeout: FiniteDuration = FiniteDuration(5, TimeUnit.SECONDS)
       Await.result(result, timeout) match {
-        case Success(Some(value)) => success //value must beEqualTo("foo")
-        case Failure(_) => failure
+        case Some(value) => success //value must beEqualTo("foo")
+        case _ => failure
       }
 
 

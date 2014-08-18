@@ -1,6 +1,6 @@
 package services
 
-import play.api.libs.json.{Json, Writes, Reads}
+import play.api.libs.json.{JsObject, Json, Writes, Reads}
 import scala.concurrent.Future
 import reactivemongo.core.commands.LastError
 import models.AssetSupport
@@ -15,11 +15,11 @@ trait RepositoryComponent {
   trait Repository {
 
 
-    def getById[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[Option[A]]]
+    def getById[A: CollectionName](query: ServiceComponent#Query): Future[Option[JsObject]]
 
-    def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
+    def find[A: CollectionName](query: ServiceComponent#Query): Future[List[JsObject]]
 
-    def findAll[A](implicit r: Reads[A], ev: CollectionName[A]): Future[Try[List[A]]]
+    def findAll[A: CollectionName]: Future[List[JsObject]]
 
     def insert[A](model: A)(implicit w: Writes[A], ev: CollectionName[A]): Future[Try[Unit]]
 
@@ -38,24 +38,24 @@ trait RealRepositoryComponent extends RepositoryComponent {
   import LastErrorWrapperImplicits._
 
   override val repository = new Repository {
-    override def getById[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]) = {
+    override def getById[A: CollectionName](query: ServiceComponent#Query) = {
 
       val result = mongo.find[A](query)
 
-      result.map(_.map {
+      result.map(
         _ match {
 
           case head :: _ => Some(head)
           case Nil => None
 
         }
-      })
+      )
 
     }
 
-    override def find[A](query: ServiceComponent#Query)(implicit r: Reads[A], ev: CollectionName[A]) = mongo.find[A](query)
+    override def find[A: CollectionName](query: ServiceComponent#Query) = mongo.find[A](query)
 
-    override def findAll[A](implicit r: Reads[A], ev: CollectionName[A]) = mongo.findAll[A]
+    override def findAll[A: CollectionName] = mongo.findAll[A]
 
     override def insert[A](model: A)(implicit w: Writes[A], ev: CollectionName[A]) = {
       val jsonToInsert = Json.toJson[A](model)

@@ -47,7 +47,7 @@ trait CrudController extends Results with ControllerUtils {
 
   def getById(id: AssetSupport.IdType)(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
     service.getById[MODEL](id).map {
-      internalServerError[Option[MODEL]]("[getById] error") orElse {
+      internalServerError[Option[JsObject]]("[getById] error") orElse {
         case Success(result) => result match {
           case Some(entity) => Ok(Json.toJson(entity))
           case None => NotFound
@@ -62,11 +62,11 @@ trait CrudController extends Results with ControllerUtils {
     q match {
       case Some(queryString) => {
         Try(Json.parse(queryString).as[JsObject]) match {
-          case Success(queryJson) => service.find[MODEL](queryJson).map(listResult[MODEL]("find"))
+          case Success(queryJson) => service.find[MODEL](queryJson).map(listResult[JsObject]("find"))
           case Failure(error) => badQuery(queryString, error)
         }
       }
-      case None => service.findAll[MODEL].map(listResult[MODEL]("find"))
+      case None => service.findAll[MODEL].map(listResult[JsObject]("find"))
     }
   }
 
