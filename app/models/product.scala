@@ -32,8 +32,8 @@ case class CatalogSw(
                       )
 
 object CatalogSw {
-  val reads: Reads[CatalogSw] = ((__ \ "catalogId").read[AssetSupport.IdType] and (__ \ "sizeGroups").read[List[SizeGroup]] and (__ \ "prices").read[Price])(CatalogSw.apply _)
-  val writes: Writes[CatalogSw] = ((__ \ "catalogId").write[AssetSupport.IdType] and (__ \ "sizeGroups").write[List[SizeGroup]] and (__ \ "prices").write[Price])(unlift(CatalogSw.unapply _))
+  val reads: Reads[CatalogSw] = ((__ \ "catalogId").read[AssetSupport.IdType] and (__ \ "sizeGroups").read[List[SizeGroup]] and (__ \ "price").read[Price])(CatalogSw.apply _)
+  val writes: Writes[CatalogSw] = ((__ \ "catalogId").write[AssetSupport.IdType] and (__ \ "sizeGroups").write[List[SizeGroup]] and (__ \ "price").write[Price])(unlift(CatalogSw.unapply _))
   implicit val format = Format(reads, writes)
 }
 
@@ -51,9 +51,7 @@ case class ProductCreate(
                           description: String,
                           name: String,
                           itemNumber: Product.ItemNumber,
-
                           image: Product.ImageUrl,
-
                           catalogs: List[CatalogSw]
                           ) extends AssetCreate[Product] {
   override def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = Product(id, createdAt, lastModifiedAt, active, description, name, itemNumber, image, catalogs)
