@@ -17,11 +17,11 @@ POST           /products/:id        controllers.Products.update(id)
 POST           /products            controllers.Products.create
 DELETE         /products/:id        controllers.Products.delete(id)
 
-GET            /products/:id        controllers.Warehouses.getById(id)
-GET            /products            controllers.Warehouses.find(q:Option[String])
-PUT            /products/:id        controllers.Warehouses.update(id)
-POST           /products/:id        controllers.Warehouses.update(id)
-POST           /products            controllers.Warehouses.create
-DELETE         /products/:id        controllers.Warehouses.delete(id)
+GET            /warehouses/:id        controllers.Warehouses.getById(id)
+GET            /warehouses            controllers.Warehouses.find(q:Option[String])
+PUT            /warehouses/:id        controllers.Warehouses.update(id)
+POST           /warehouses/:id        controllers.Warehouses.update(id)
+POST           /warehouses            controllers.Warehouses.create
+DELETE         /warehouses/:id        controllers.Warehouses.delete(id)
 
 GET            /assets/*file        controllers.Assets.at(path="/public", file)
