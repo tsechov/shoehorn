@@ -4,11 +4,11 @@ import play.api.mvc.Action
 import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
-import models.customer.{WarehouseCreate, WarehouseUpdate, Warehouse}
+import models.customer.{WarehouseCreate, WarehouseUpdate, WarehouseIn}
 
 
 object Warehouses extends CrudController {
-  override type MODEL = Warehouse
+  override type MODEL = WarehouseIn
   override type UPDATEMODEL = WarehouseUpdate
   override type CREATEMODEL = WarehouseCreate
 

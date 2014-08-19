@@ -8,8 +8,8 @@ import models.AssetSupport.IdType
 import org.joda.time.DateTime
 import models.{AssetCreate, AssetUpdate}
 
-case class Warehouse(
-                      id: IdType,
+case class WarehouseIn(
+                      _id: IdType,
                       createdAt: DateTime,
                       lastModifiedAt: DateTime,
                       active: Boolean,
@@ -22,9 +22,9 @@ case class Warehouse(
   override def fillup(lastModifiedAt: DateTime): WarehouseUpdate = WarehouseUpdate(lastModifiedAt, active, description, name, address, status, url)
 }
 
-object Warehouse {
-  implicit val format = Json.format[Warehouse]
-  implicit val collectionName = new CollectionName[Warehouse] {
+object WarehouseIn {
+  implicit val format = Json.format[WarehouseIn]
+  implicit val collectionName = new CollectionName[WarehouseIn] {
     override def get: String = "warehouses"
   }
 }
@@ -41,7 +41,7 @@ object WarehouseUpdate {
 
   implicit val format = Json.format[WarehouseUpdate]
   implicit val collectionName = new CollectionName[WarehouseUpdate] {
-    override def get: String = Warehouse.collectionName.get
+    override def get: String = WarehouseIn.collectionName.get
   }
 }
 
@@ -50,8 +50,8 @@ case class WarehouseCreate(active: Boolean,
                            name: String,
                            address: Address,
                            status: Boolean,
-                           url: UrlType) extends AssetCreate[Warehouse] {
-  override def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = Warehouse(id, createdAt, lastModifiedAt, active, description, name, address, status, url)
+                           url: UrlType) extends AssetCreate[WarehouseIn] {
+  override def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = WarehouseIn(id, createdAt, lastModifiedAt, active, description, name, address, status, url)
 }
 
 object WarehouseCreate {

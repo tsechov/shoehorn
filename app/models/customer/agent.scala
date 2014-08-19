@@ -4,7 +4,7 @@ import models.common.{District, Contact}
 import play.api.libs.json.Json
 
 case class Agent(
-                  warehouse: Warehouse,
+                  warehouse: WarehouseIn,
                   districts: List[District],
                   contact: Contact)
 
