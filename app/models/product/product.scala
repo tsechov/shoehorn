@@ -6,7 +6,7 @@ import play.api.libs.functional.syntax._
 import org.joda.time.DateTime
 import services.CollectionName
 import models.AssetSupport.{IdType, UrlType}
-import models.{AssetUpdate, DateFormatSupport, AssetCreate, AssetPaths}
+import models.{AssetUpdateBuilder, DateFormatSupport, AssetCreate, AssetPaths}
 import models.common._
 
 
@@ -108,7 +108,7 @@ case class Product(
 
                     image: UrlType,
 
-                    catalogs: List[CatalogSw]) extends AssetUpdate[ProductUpdate] {
+                    catalogs: List[CatalogSw]) extends AssetUpdateBuilder[ProductUpdate] {
   override def fillup(lastModifiedAt: DateTime) = ProductUpdate(lastModifiedAt, active, description, name, itemNumber, image, catalogs)
 }
 

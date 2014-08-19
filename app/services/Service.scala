@@ -2,7 +2,7 @@ package services
 
 import scala.concurrent.Future
 import play.api.libs.json._
-import models.{AssetUpdate, AssetCreate, AssetSupport}
+import models.{AssetUpdateBuilder, AssetCreate, AssetSupport}
 import play.api.libs.json.Json._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.AssetSupport.IdType
@@ -34,7 +34,7 @@ trait ServiceComponent {
 
     def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]): Future[Try[IdType]]
 
-    def update[A <: AssetUpdate[U], U](id: AssetSupport.IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]): Future[Try[Unit]]
+    def update[A <: AssetUpdateBuilder[U], U](id: AssetSupport.IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]): Future[Try[Unit]]
 
     def remove[A: CollectionName](id: AssetSupport.IdType): Future[Try[Unit]]
   }
@@ -72,7 +72,7 @@ trait RealServiceComponent extends ServiceComponent {
 
     }
 
-    override def update[A <: AssetUpdate[U], U](id: AssetSupport.IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]): Future[Try[Unit]] = {
+    override def update[A <: AssetUpdateBuilder[U], U](id: AssetSupport.IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]): Future[Try[Unit]] = {
       val now = new DateTime()
       val model = input.fillup(now)
 

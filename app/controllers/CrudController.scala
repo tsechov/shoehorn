@@ -36,7 +36,7 @@ import play.api.mvc.BodyParsers.parse
 
 trait CrudController extends Results with ControllerUtils {
 
-  type MODEL <: AssetUpdate[UPDATEMODEL]
+  type MODEL <: AssetUpdateBuilder[UPDATEMODEL]
 
 
   type UPDATEMODEL

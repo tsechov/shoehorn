@@ -85,7 +85,7 @@ case class Catalog(
                     season: String,
                     status: Boolean,
                     webStatus: Boolean
-                    ) extends AssetUpdate[CatalogUpdate] {
+                    ) extends AssetUpdateBuilder[CatalogUpdate] {
   override def fillup(lastModifiedAt: DateTime): CatalogUpdate = CatalogUpdate(lastModifiedAt, active, description, year, season, status, webStatus)
 }
 

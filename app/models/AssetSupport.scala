@@ -2,6 +2,7 @@ package models
 
 import play.api.libs.json._
 import org.joda.time.DateTime
+import models.AssetSupport.IdType
 
 object AssetSupport {
 
@@ -55,9 +56,32 @@ object AssetTransform extends AssetPaths {
 }
 
 trait AssetCreate[A] {
+
   def fillup(id: AssetSupport.IdType, createdAt: DateTime, lastModifiedAt: DateTime): A
 }
 
-trait AssetUpdate[U] {
+trait AssetUpdateBuilder[U] {
   def fillup(lastModifiedAt: DateTime): U
+}
+
+trait AssetIn {
+  self: DateFormatSupport =>
+  def _id: IdType
+
+  def createdAt: DateTime
+
+  def lastModifiedAt: DateTime
+
+  def active: Boolean
+
+  def description: String
+}
+
+trait AssetUpdate {
+  self: DateFormatSupport =>
+  def lastModifiedAt: DateTime
+
+  def active: Boolean
+
+  def description: String
 }

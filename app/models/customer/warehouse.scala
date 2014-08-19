@@ -6,20 +6,20 @@ import play.api.libs.json.Json
 import services.CollectionName
 import models.AssetSupport.IdType
 import org.joda.time.DateTime
-import models.{AssetCreate, AssetUpdate}
+import models._
 
 case class WarehouseIn(
-                      _id: IdType,
-                      createdAt: DateTime,
-                      lastModifiedAt: DateTime,
-                      active: Boolean,
-                      description: String,
-                      name: String,
-                      address: Address,
-                      status: Boolean,
-                      url: UrlType
-                      ) extends AssetUpdate[WarehouseUpdate] {
-  override def fillup(lastModifiedAt: DateTime): WarehouseUpdate = WarehouseUpdate(lastModifiedAt, active, description, name, address, status, url)
+                        _id: IdType,
+                        createdAt: DateTime,
+                        lastModifiedAt: DateTime,
+                        active: Boolean,
+                        description: String,
+                        name: String,
+                        address: Address,
+                        status: Boolean,
+                        url: UrlType
+                        ) extends AssetUpdateBuilder[WarehouseUpdate] with AssetIn with DateFormatSupport {
+  override def fillup(lastModifiedAt: DateTime) = WarehouseUpdate(lastModifiedAt, active, description, name, address, status, url)
 }
 
 object WarehouseIn {
@@ -35,7 +35,7 @@ case class WarehouseUpdate(lastModifiedAt: DateTime,
                            name: String,
                            address: Address,
                            status: Boolean,
-                           url: UrlType)
+                           url: UrlType) extends AssetUpdate with DateFormatSupport
 
 object WarehouseUpdate {
 
