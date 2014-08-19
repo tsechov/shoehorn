@@ -18,7 +18,7 @@ object SizeGroup {
 
 
 case class CatalogSw(
-                      catalogid: IdType,
+                      catalogId: IdType,
                       sizeGroupIds: List[IdType],
                       price: Price
                       )
