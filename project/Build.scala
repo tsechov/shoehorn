@@ -13,8 +13,8 @@ object ApplicationBuild extends Build {
   val appVersion = "NA"
 
   val appDependencies = Seq(
-//    "com.google.inject" % "guice" % "3.0",
-    //    "javax.inject" % "javax.inject" % "1",
+    "com.github.fge" % "json-schema-validator" % "2.2.5",
+
     "org.reactivemongo" %% "reactivemongo" % "0.10.0",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.2",
 

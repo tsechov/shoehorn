@@ -46,6 +46,7 @@ trait CrudController extends Results with ControllerUtils {
   private val service = production service
 
   def getById(id: AssetSupport.IdType)(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
+    request =>
     service.getById[MODEL](id).map {
       internalServerError[Option[JsObject]]("[getById] error") orElse {
         case Success(result) => result match {
