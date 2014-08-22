@@ -1,0 +1,64 @@
+#%RAML 0.8
+baseUri: http://{apiHost}
+title: shoehorn
+version: VERSION
+mediaType:  application/json
+baseUriParameters:
+  apiHost:
+    enum: ["dev-shoehorn.herokuapp.com","staging-shoehorn-backend.herokuapp.com"]
+resourceTypes:
+  - standardResource:
+      get:
+        description: retrieves all <<resourceName>>
+      post:
+        description: creates a new resource
+        body:
+          application/json:
+            example: <<postexample>>
+        responses:
+            201:
+              description: Created  
+              headers:
+                Location:
+                  description: the url of the newly created <<resourceName>>
+                  example: http://{apiHost}/<<resourceName>>s/53ecbedd1700004c00d115b1
+                Shoehorn-resource-id:
+                  description: the id of the newly created <<resourceName>>
+                        
+       
+  - resourceById:
+      get:
+        description: fetches the resource with the given id
+        responses: &standardResponses
+          200:
+            description: OK
+            body:
+              application/json:
+                example: <<getexample>>
+          404: 
+            description: NOTFOUND
+      put:
+        description: updates an existing resource by the given id
+        
+/catalogs:
+  type: 
+    standardResource: 
+      resourceName: catalog
+      postexample: !include catalog.json
+    
+  /{id}:
+    type: {resourceById: {getexample: !include catalog.json}}
+/products:
+  type: 
+    standardResource: 
+      resourceName: product
+      postexample: !include product.json
+  /{id}:
+    type: {resourceById: {getexample: !include product.json}}
+/warehouses:
+  type: 
+    standardResource: 
+      resourceName: warehouse
+      postexample: !include warehouse.json
+  /{id}:
+    type: {resourceById: {getexample: !include warehouse.json}}

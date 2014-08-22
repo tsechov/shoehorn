@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "lastModifiedAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "active": {
+            "type": "boolean"
+        },
+        "description": {
+            "type": "string"
+        },
+        "season": {
+            "type": "string"
+        },
+        "status": {
+            "type": "boolean"
+        },
+        "webStatus": {
+            "type": "boolean"
+        },
+        "year": {
+            "type": "number"
+        }
+    },
+    "required": ["_id", "createdAt", "lastModifiedAt", "active", "description", "season", "status", "webStatus", "year"]
+}
