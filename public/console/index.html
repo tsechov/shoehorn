@@ -50,6 +50,12 @@
     jQuery.get("/version", function (data) {
         jQuery("#raml-console-api-version").html(data);
     });
+    var errorElem = jQuery("#raml-error");
+    if (errorElem.length) {
+        var prettyError = JSON.stringify(JSON.parse(errorElem.html()), null, 2);
+        console.log(prettyError)
+        errorElem.html(prettyError);
+    }
 </script>
 </body>
 </html>

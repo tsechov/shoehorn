@@ -4,6 +4,7 @@ OPTIONS        /*path                 controllers.Application.preflight(path)
 GET            /                      controllers.Application.index
 GET            /version               controllers.Application.version
 
+
 GET            /catalogs/:id          controllers.Catalogs.getById(id)
 GET            /catalogs              controllers.Catalogs.find(q:Option[String])
 PUT            /catalogs/:id          controllers.Catalogs.update(id)

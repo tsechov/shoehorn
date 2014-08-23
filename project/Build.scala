@@ -26,40 +26,7 @@ object ApplicationBuild extends Build {
   )
 
 
-  lazy val versionReport = taskKey[String]("version-report")
-
-
-  lazy val versionSettings = versionReport <<= (externalDependencyClasspath in Compile, streams) map {
-    (cp: Seq[Attributed[File]], streams) =>
-      val report = cp.map {
-        attributed =>
-          attributed.get(Keys.moduleID.key) match {
-            case Some(moduleId) => "%40s %20s %10s %10s".format(
-              moduleId.organization,
-              moduleId.name,
-              moduleId.revision,
-              moduleId.configurations.getOrElse("")
-            )
-            case None =>
-              // unmanaged JAR, just
-              attributed.data.getAbsolutePath
-          }
-      }.mkString("\n")
-      streams.log.info(report)
-      report
-  }
-
-
-  lazy val helloTask = taskKey[Unit]("Prints 'Hello World'")
-
-  lazy val helloSettings = helloTask := {
-    println("Hello World")
-    val file = (resourceManaged in Compile).value / "public" / "api" / ".placeholder"
-    IO.write(file, "#here for placeholding")
-  }
-
-
-  val main = play.Project(appName, appVersion, appDependencies, settings = Defaults.defaultSettings ++ playScalaSettings ++ releaseSettings ).settings(
+  val main = play.Project(appName, appVersion, appDependencies, settings = Defaults.defaultSettings ++ playScalaSettings ++ releaseSettings).settings(
     sources in(Compile, doc) := Seq.empty,
     publishTo := Some(Resolver.file("file", new File(target.value.absolutePath + "/publish"))),
     version := (version in ThisBuild).value,
@@ -74,9 +41,7 @@ object ApplicationBuild extends Build {
       val file = (resourceManaged in Compile).value / "public" / "api" / "api.html"
       Seq(file)
     }
-//    ,
-//    source in Raml := new File((baseDirectory in Compile).value.absolutePath + "/public/api"),
-    //    target in Raml := (resourceManaged in Compile).value / "public" / "api"
+
   )
 
 
