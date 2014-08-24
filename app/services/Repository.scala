@@ -3,7 +3,7 @@ package services
 import play.api.libs.json.{JsObject, Json, Writes, Reads}
 import scala.concurrent.Future
 import reactivemongo.core.commands.LastError
-import models.AssetSupport
+import models.{DateFormatSupport, AssetSupport}
 import models.AssetSupport._
 import play.api.libs.json.Json._
 import scala.Some
@@ -64,6 +64,7 @@ trait RealRepositoryComponent extends RepositoryComponent {
     }
 
     override def update[A](id: IdType, model: A)(implicit w: Writes[A], ev: CollectionName[A]) = {
+
       val jsonToUpdate = Json.toJson[A](model)
       val selector = obj(AssetSupport.idFieldName -> id)
       mongo.update[A](selector, jsonToUpdate).map(_.orFail.map(_ => Unit))

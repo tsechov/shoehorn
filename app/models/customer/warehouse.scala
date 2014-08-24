@@ -18,11 +18,11 @@ case class WarehouseIn(
                         address: Address,
                         status: Boolean,
                         url: UrlType
-                        ) extends AssetUpdateBuilder[WarehouseUpdate] with AssetIn with DateFormatSupport {
+                        ) extends AssetIn with AssetUpdateBuilder[WarehouseUpdate] {
   override def fillup(lastModifiedAt: DateTime) = WarehouseUpdate(lastModifiedAt, active, description, name, address, status, url)
 }
 
-object WarehouseIn {
+object WarehouseIn extends DateFormatSupport {
   implicit val format = Json.format[WarehouseIn]
   implicit val collectionName = new CollectionName[WarehouseIn] {
     override def get: String = "warehouses"
@@ -35,9 +35,9 @@ case class WarehouseUpdate(lastModifiedAt: DateTime,
                            name: String,
                            address: Address,
                            status: Boolean,
-                           url: UrlType) extends AssetUpdate with DateFormatSupport
+                           url: UrlType) extends AssetUpdate
 
-object WarehouseUpdate {
+object WarehouseUpdate extends DateFormatSupport {
 
   implicit val format = Json.format[WarehouseUpdate]
   implicit val collectionName = new CollectionName[WarehouseUpdate] {

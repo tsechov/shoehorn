@@ -47,14 +47,14 @@ trait CrudController extends Results with ControllerUtils {
 
   def getById(id: AssetSupport.IdType)(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
     request =>
-    service.getById[MODEL](id).map {
-      internalServerError[Option[JsObject]]("[getById] error") orElse {
-        case Success(result) => result match {
-          case Some(entity) => Ok(Json.toJson(entity))
-          case None => NotFound
+      service.getById[MODEL](id).map {
+        internalServerError[Option[JsObject]]("[getById] error") orElse {
+          case Success(result) => result match {
+            case Some(entity) => Ok(Json.toJson(entity))
+            case None => NotFound
+          }
         }
       }
-    }
   }
 
   def find(q: Option[String])(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
@@ -90,6 +90,7 @@ trait CrudController extends Results with ControllerUtils {
 
   def update(id: AssetSupport.IdType, input: JsValue)(implicit r: Reads[MODEL], w: Writes[UPDATEMODEL], ev: CollectionName[UPDATEMODEL]) = {
     Logger.debug("input for update: \n" + Json.prettyPrint(input))
+
     def operation = service.update[MODEL, UPDATEMODEL](id) _
     def okResult(n: Unit, msg: String): SimpleResult = {
       Logger.debug(s"$msg with id: $id")

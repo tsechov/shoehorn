@@ -65,7 +65,7 @@ trait AssetUpdateBuilder[U] {
 }
 
 trait AssetIn {
-  self: DateFormatSupport =>
+
   def _id: IdType
 
   def createdAt: DateTime
@@ -77,8 +77,9 @@ trait AssetIn {
   def description: String
 }
 
+
 trait AssetUpdate {
-  self: DateFormatSupport =>
+
   def lastModifiedAt: DateTime
 
   def active: Boolean

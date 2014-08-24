@@ -1,10 +1,7 @@
 {
-    "_id": {
-        "$oid": "53f3721c5a1f4669ee635981"
-    },
-    "id": "53f3721c1a00001700bc66f9",
-    "createdAt": 1408463388498,
-    "lastModifiedAt": 1408463388498,
+    "_id": "53f3a7551800002c00b9de8a",
+    "createdAt": 1408477013329,
+    "lastModifiedAt": 1408477013329,
     "active": true,
     "description": "from runscope",
     "name": "warehouse name jool",

@@ -1,22 +1,24 @@
 {
-    "_id": "53ecbedd1700004c00d115b1",
+    "_id": "53f370551800001800201e5e",
+    "createdAt": "2014-08-19T15:42:13+0000",
+    "lastModifiedAt": "2014-08-19T15:42:13+0000",
     "active": true,
-    "catalogs": [
-        "53ecbdf0500000e102795d34"
-    ],
-    "createdAt": "2014-08-14T13:51:25+0000",
     "description": "from runscope",
-    "image": "imageurl",
-    "itemNumber": "itemnumber1234",
-    "lastModifiedAt": "2014-08-16T14:37:09+0000",
     "name": "name jool",
-    "price": {
-        "price": 123,
-        "unit": "db",
-        "quantity": 10
-    },
-    "sizeGroup": {
-        "from": 12,
-        "to": 23
-    }
+    "itemNumber": "itemnumber123",
+    "image": "imageurl",
+    "catalogs": [
+        {
+            "catalogId": "blah",
+            "sizeGroupIds": [
+                "foo",
+                "bar"
+            ],
+            "price": {
+                "price": 123,
+                "unit": "db",
+                "quantity": 10
+            }
+        }
+    ]
 }

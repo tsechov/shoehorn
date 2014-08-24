@@ -9,3 +9,5 @@ trait DateFormatSupport {
   implicit val dateFormat = Format[DateTime](Reads.jodaDateReads(pattern), Writes.jodaDateWrites(pattern))
 
 }
+
+
