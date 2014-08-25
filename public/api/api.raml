@@ -101,3 +101,14 @@ resourceTypes:
         getexample: !include warehouse.json
         postexample: !include warehouse.json
 
+ /agents:
+   type:
+     collection:
+       resourceName: agent
+       postexample: !include agent.json
+   /{id}:
+     type:
+       collection-item:
+         getexample: !include agent.json
+         postexample: !include agent.json
+
