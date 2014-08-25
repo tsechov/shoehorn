@@ -3,6 +3,7 @@ package models
 import org.specs2.mutable._
 import play.api.libs.json._
 import org.joda.time.DateTime
+import models.catalog.CatalogCreate
 
 
 class CatalogTest extends Specification {
