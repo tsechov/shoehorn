@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 import models.catalog.CatalogCreate
 
 
-class CatalogTest extends Specification {
+class CatalogInTest extends Specification {
 
   import CatalogTestSupport._
 

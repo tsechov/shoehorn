@@ -5,38 +5,21 @@ import services.{production, CollectionName}
 import models._
 import play.api.libs.json._
 import play.api.mvc._
-import play.api.{Play, Logger}
-import scala.util.{Failure, Success, Try}
+import play.api.Logger
+import scala.util.Try
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.Future
-import reactivemongo.bson.BSONObjectID
-import org.joda.time.DateTime
 import play.api.http.{HeaderNames, ContentTypes}
-import scala.util.Failure
-import scala.Some
-import scala.util.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.Json._
-import scala.util.Failure
-import scala.Some
-import scala.util.Success
-import play.api.libs.json.JsObject
-import scala.util.Failure
-import scala.Some
-import play.api.mvc.SimpleResult
-import scala.util.Success
-import play.api.libs.json.JsObject
 import scala.util.Failure
 import scala.Some
 import play.api.mvc.SimpleResult
 import play.api.mvc.Call
 import scala.util.Success
 import play.api.libs.json.JsObject
-import play.api.mvc.BodyParsers.parse
+
 
 trait CrudController extends Results with ControllerUtils {
 
-  type MODEL <: AssetUpdateBuilder[UPDATEMODEL]
+  type MODEL <: AssetIn with AssetUpdateBuilder[UPDATEMODEL]
 
 
   type UPDATEMODEL

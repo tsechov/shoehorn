@@ -5,7 +5,7 @@ import play.api.libs.json._
 import org.joda.time.DateTime
 import services.CollectionName
 import models.AssetSupport._
-import models.{AssetUpdateBuilder, DateFormatSupport, AssetPaths, AssetCreate}
+import models._
 
 
 case class CatalogCreate(
@@ -15,8 +15,8 @@ case class CatalogCreate(
                           season: String,
                           status: Boolean,
                           webStatus: Boolean
-                          ) extends AssetCreate[Catalog] {
-  def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = Catalog(id, createdAt, lastModifiedAt, active, description, year, season, status, webStatus)
+                          ) extends AssetCreate[CatalogIn] {
+  def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = CatalogIn(id, createdAt, lastModifiedAt, active, description, year, season, status, webStatus)
 }
 
 object CatalogCreate {
@@ -39,14 +39,14 @@ object CatalogUpdate extends DateFormatSupport {
 
   implicit val format = Json.format[CatalogUpdate]
   implicit val collectionName = new CollectionName[CatalogUpdate] {
-    override def get: String = Catalog.collectionName.get
+    override def get: String = CatalogIn.collectionName.get
   }
 
 
 }
 
-case class Catalog(
-                    id: IdType,
+case class CatalogIn(
+                    _id: IdType,
                     createdAt: DateTime,
                     lastModifiedAt: DateTime,
                     active: Boolean,
@@ -55,16 +55,16 @@ case class Catalog(
                     season: String,
                     status: Boolean,
                     webStatus: Boolean
-                    ) extends AssetUpdateBuilder[CatalogUpdate] {
+                    ) extends AssetIn with AssetUpdateBuilder[CatalogUpdate] {
   override def fillup(lastModifiedAt: DateTime): CatalogUpdate = CatalogUpdate(lastModifiedAt, active, description, year, season, status, webStatus)
 }
 
-object Catalog extends DateFormatSupport {
+object CatalogIn extends DateFormatSupport {
 
 
-  implicit val formats = Json.format[Catalog]
+  implicit val formats = Json.format[CatalogIn]
 
-  implicit val collectionName = new CollectionName[Catalog] {
+  implicit val collectionName = new CollectionName[CatalogIn] {
     override def get: String = "catalogs"
   }
 
