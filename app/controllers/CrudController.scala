@@ -22,7 +22,7 @@ trait CrudController extends Results with ControllerUtils {
   type MODEL <: AssetIn with AssetUpdateBuilder[UPDATEMODEL]
 
 
-  type UPDATEMODEL
+  type UPDATEMODEL <: AssetUpdate
   type CREATEMODEL <: AssetCreate[MODEL]
 
 

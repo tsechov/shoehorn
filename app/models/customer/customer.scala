@@ -97,7 +97,7 @@ case class Customer(
                      description: String,
 
                      name: String,
-                     agent: Agent,
+                     agent: AgentIn,
                      places: List[Place],
                      typeOfCompanyId: IdType,
                      taxExemptNumber: String,

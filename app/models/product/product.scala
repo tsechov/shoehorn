@@ -50,7 +50,7 @@ case class ProductUpdate(
                           itemNumber: ProductIn.ItemNumber,
                           image: UrlType,
                           catalogs: List[CatalogSw]
-                          )
+                          ) extends AssetUpdate
 
 object ProductUpdate extends DateFormatSupport {
 

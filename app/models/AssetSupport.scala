@@ -64,17 +64,13 @@ trait AssetUpdateBuilder[U] {
   def fillup(lastModifiedAt: DateTime): U
 }
 
-trait AssetIn {
+trait AssetIn extends AssetUpdate {
 
   def _id: IdType
 
   def createdAt: DateTime
 
-  def lastModifiedAt: DateTime
 
-  def active: Boolean
-
-  def description: String
 }
 
 

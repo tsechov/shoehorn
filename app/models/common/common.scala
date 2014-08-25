@@ -43,6 +43,22 @@ object Email {
   implicit val format = Json.format[Email]
 }
 
+trait ContactLike {
+  def typeOfContactId: IdType
+
+  def status: String
+
+  def title: String
+
+  def firstName: String
+
+  def lastName: String
+
+  def phonenumbers: List[PhoneNumber]
+
+  def emails: List[Email]
+}
+
 case class Contact(
                     typeOfContactId: IdType,
                     status: String,
@@ -51,7 +67,7 @@ case class Contact(
                     lastName: String,
                     phonenumbers: List[PhoneNumber],
                     emails: List[Email]
-                    )
+                    ) extends ContactLike
 
 object Contact {
   implicit val format = Json.format[Contact]

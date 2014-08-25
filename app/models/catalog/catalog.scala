@@ -32,7 +32,7 @@ case class CatalogUpdate(
                           season: String,
                           status: Boolean,
                           webStatus: Boolean
-                          )
+                          ) extends AssetUpdate
 
 object CatalogUpdate extends DateFormatSupport {
 
@@ -46,16 +46,16 @@ object CatalogUpdate extends DateFormatSupport {
 }
 
 case class CatalogIn(
-                    _id: IdType,
-                    createdAt: DateTime,
-                    lastModifiedAt: DateTime,
-                    active: Boolean,
-                    description: String,
-                    year: Int,
-                    season: String,
-                    status: Boolean,
-                    webStatus: Boolean
-                    ) extends AssetIn with AssetUpdateBuilder[CatalogUpdate] {
+                      _id: IdType,
+                      createdAt: DateTime,
+                      lastModifiedAt: DateTime,
+                      active: Boolean,
+                      description: String,
+                      year: Int,
+                      season: String,
+                      status: Boolean,
+                      webStatus: Boolean
+                      ) extends AssetIn with AssetUpdateBuilder[CatalogUpdate] {
   override def fillup(lastModifiedAt: DateTime): CatalogUpdate = CatalogUpdate(lastModifiedAt, active, description, year, season, status, webStatus)
 }
 

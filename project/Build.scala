@@ -1,12 +1,10 @@
 
 
-import java.io.File
 import sbt._
 import sbt.File
 import sbt.Keys._
 import play.Project._
 import sbtrelease.ReleasePlugin._
-import org.eigengo.sbtraml.RamlPlugin.Keys._
 import scala.Some
 
 object ApplicationBuild extends Build {
