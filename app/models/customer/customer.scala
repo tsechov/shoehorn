@@ -1,6 +1,6 @@
 package models.customer
 
-import models.AssetSupport.{IdType, UrlType}
+import models.AssetSupport.IdType
 import org.joda.time.DateTime
 import models.common._
 import play.api.libs.json.Json
@@ -101,7 +101,7 @@ case class Customer(
                      places: List[Place],
                      typeOfCompanyId: IdType,
                      taxExemptNumber: String,
-                     shops: List[Shop],
+                     shops: List[ShopIn],
                      addresses: List[Address],
                      customergroups: List[Group],
                      contacts: List[Contact],

@@ -82,3 +82,5 @@ trait AssetUpdate {
 
   def description: String
 }
+
+

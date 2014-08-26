@@ -26,11 +26,18 @@ POST           /warehouses/:id        controllers.Warehouses.update(id)
 POST           /warehouses            controllers.Warehouses.create
 DELETE         /warehouses/:id        controllers.Warehouses.delete(id)
 
-GET            /agents/:id        controllers.Agents.getById(id)
-GET            /agents            controllers.Agents.find(q:Option[String])
-PUT            /agents/:id        controllers.Agents.update(id)
-POST           /agents/:id        controllers.Agents.update(id)
-POST           /agents            controllers.Agents.create
-DELETE         /agents/:id        controllers.Agents.delete(id)
+GET            /agents/:id            controllers.Agents.getById(id)
+GET            /agents                controllers.Agents.find(q:Option[String])
+PUT            /agents/:id            controllers.Agents.update(id)
+POST           /agents/:id            controllers.Agents.update(id)
+POST           /agents                controllers.Agents.create
+DELETE         /agents/:id            controllers.Agents.delete(id)
+
+GET            /shops/:id        controllers.Shops.getById(id)
+GET            /shops            controllers.Shops.find(q:Option[String])
+PUT            /shops/:id        controllers.Shops.update(id)
+POST           /shops/:id        controllers.Shops.update(id)
+POST           /shops            controllers.Shops.create
+DELETE         /shops/:id        controllers.Shops.delete(id)
 
 GET            /assets/*file          controllers.Assets.at(path="/public", file)
