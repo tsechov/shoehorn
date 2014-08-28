@@ -91,7 +91,7 @@ resourceTypes:
         getexample: !include product.json
         postexample: !include product.json
 /warehouses:
-  type: 
+  type:
     collection:
       resourceName: warehouse
       postexample: !include warehouse.json
@@ -101,14 +101,14 @@ resourceTypes:
         getexample: !include warehouse.json
         postexample: !include warehouse.json
 
-  /agents:
+/agents:
   type:
-   collection:
-     resourceName: agent
-     postexample: !include agent.json
+    collection:
+      resourceName: agent
+      postexample: !include agent.json
   /{id}:
-   type:
-     collection-item:
-       getexample: !include agent.json
-       postexample: !include agent.json
+    type:
+      collection-item:
+        getexample: !include agent.json
+        postexample: !include agent.json
 
