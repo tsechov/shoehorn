@@ -1,0 +1,18 @@
+{
+    "_id": "53fcc8dd1c00001600b048eb",
+    "createdAt": "2014-08-26T17:50:21+0000",
+    "lastModifiedAt": "2014-08-26T17:50:21+0000",
+    "active": true,
+    "description": "from raml",
+    "name": "namejool",
+    "status": true,
+    "address": {
+        "typeOfAddressId": "foobar",
+        "country": "countryjool",
+        "district": "district eh",
+        "postalcode": "zipzip",
+        "city": "citi",
+        "address": "addressssssss",
+        "description": "address description"
+    }
+}

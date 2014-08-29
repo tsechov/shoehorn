@@ -9,12 +9,13 @@ baseUriParameters:
 resourceTypes:
   - collection:
       get:
-        description: retrieves a list of <<resourceName>>s (all of them if no 'q' is present as query param)
+        description: retrieves a list of **<<resourceName>>s** (all of them if no 'q' is present as query param)
         queryParameters:
           q: &q
             required: false
             description: optional query as a json expression
-            example: ../<<resourceName>>s?q={"foo":true, "bar":2014}
+            example: |
+              {"foo":true, "bar":2014}
 
       post:
         description: creates a new resource
@@ -26,10 +27,10 @@ resourceTypes:
               description: Created  
               headers:
                 Location:
-                  description: the url of the newly created <<resourceName>>
+                  description: the url of the newly created **<<resourceName>>**
                   example: http://{apiHost}/<<resourceName>>s/53ecbedd1700004c00d115b1
                 Shoehorn-resource-id:
-                  description: the id of the newly created <<resourceName>>
+                  description: the id of the newly created **<<resourceName>>**
                   example: 53ecbedd1700004c00d115b1
                         
        
@@ -78,12 +79,12 @@ resourceTypes:
   get:
     queryParameters:
       q: *q
-      catalogs:
-        description: |
-          json array of catalog ids.
-
-          will return those products that are part of any of the given catalogs
-        example: .../products?catalogs=["1","2","3"]
+#      catalogs:
+#        description: |
+#          json array of catalog ids.
+#
+#          will return those products that are part of any of the given catalogs
+#        example: ["1","2","3"]
 
   /{id}:
     type:
@@ -111,4 +112,15 @@ resourceTypes:
       collection-item:
         getexample: !include agent.json
         postexample: !include agent.json
+
+/shops:
+  type:
+    collection:
+      resourceName: shop
+      postexample: !include shop.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include shop.json
+        postexample: !include shop.json
 
