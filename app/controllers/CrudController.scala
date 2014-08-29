@@ -64,7 +64,7 @@ trait CrudController extends Results with ControllerUtils {
       Logger.debug(s"$msg with id: $id")
       Created.as(ContentTypes.JSON)
         .withHeaders(HeaderNames.LOCATION -> locationUrl(id, getByIdRoute))
-        .withHeaders(RESOURCE_ID_HEADER -> id)
+        .withHeaders(filters.RESOURCE_ID_HEADER -> id)
     }
 
     (performOperation[CREATEMODEL, AssetSupport.IdType]("create", operation, createdResult))(input.validate[CREATEMODEL])

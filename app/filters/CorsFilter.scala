@@ -1,15 +1,16 @@
-package controllers
+package filters
 
 import play.api.Logger
 import play.api.mvc.{SimpleResult, RequestHeader, Filter}
 import play.api.http.HeaderNames._
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit._
+import controllers.Default
 
 case class CorsFilter() extends Filter {
 
   import scala.concurrent._
-  import ExecutionContext.Implicits.global
+  import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
   lazy val allowedDomain = play.api.Play.current.configuration.getString("cors.allowed.domain")
   Logger.trace(s"[cors] default allowed domain is $allowedDomain")
@@ -41,7 +42,7 @@ case class CorsFilter() extends Filter {
         _.withHeaders(
           ACCESS_CONTROL_ALLOW_ORIGIN -> allowedDomain.orElse(request.headers.get(ORIGIN)).getOrElse(""),
           ACCESS_CONTROL_ALLOW_METHODS -> request.headers.get(ACCESS_CONTROL_REQUEST_METHOD).getOrElse("*"),
-          ACCESS_CONTROL_EXPOSE_HEADERS -> (request.headers.get(ACCESS_CONTROL_REQUEST_HEADERS).getOrElse("") + "," + LOCATION + "," + RESOURCE_ID_HEADER),
+          ACCESS_CONTROL_EXPOSE_HEADERS -> (request.headers.get(ACCESS_CONTROL_REQUEST_HEADERS).getOrElse("") + "," + LOCATION + "," + RESOURCE_ID_HEADER + "," + VERSION_HEADER),
           ACCESS_CONTROL_ALLOW_CREDENTIALS -> "true"
         )
       }

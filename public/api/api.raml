@@ -124,3 +124,14 @@ resourceTypes:
         getexample: !include shop.json
         postexample: !include shop.json
 
+/sizegroups:
+  type:
+    collection:
+      resourceName: sizegroup
+      postexample: !include sizegroup.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include sizegroup.json
+        postexample: !include sizegroup.json
+
