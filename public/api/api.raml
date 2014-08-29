@@ -135,3 +135,15 @@ resourceTypes:
         getexample: !include sizegroup.json
         postexample: !include sizegroup.json
 
+/deadlinetypes:
+  type:
+    collection:
+      resourceName: deadlinetype
+      postexample: !include deadlinetype.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include deadlinetype.json
+        postexample: !include deadlinetype.json
+
+

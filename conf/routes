@@ -41,5 +41,11 @@ PUT            /sizegroups/:id        controllers.SizeGroups.update(id)
 POST           /sizegroups            controllers.SizeGroups.create
 DELETE         /sizegroups/:id        controllers.SizeGroups.delete(id)
 
+GET            /deadlinetypes/:id     controllers.DeadlineTypes.getById(id)
+GET            /deadlinetypes         controllers.DeadlineTypes.find(q:Option[String])
+PUT            /deadlinetypes/:id     controllers.DeadlineTypes.update(id)
+POST           /deadlinetypes         controllers.DeadlineTypes.create
+DELETE         /deadlinetypes/:id     controllers.DeadlineTypes.delete(id)
+
 
 GET            /assets/*file          controllers.Assets.at(path="/public", file)
