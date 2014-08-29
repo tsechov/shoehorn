@@ -8,36 +8,38 @@ GET            /version               controllers.Application.version
 GET            /catalogs/:id          controllers.Catalogs.getById(id)
 GET            /catalogs              controllers.Catalogs.find(q:Option[String])
 PUT            /catalogs/:id          controllers.Catalogs.update(id)
-POST           /catalogs/:id          controllers.Catalogs.update(id)
 POST           /catalogs              controllers.Catalogs.create
 DELETE         /catalogs/:id          controllers.Catalogs.delete(id)
 
 GET            /products/:id          controllers.Products.getById(id)
 GET            /products              controllers.Products.find(q:Option[String])
 PUT            /products/:id          controllers.Products.update(id)
-POST           /products/:id          controllers.Products.update(id)
 POST           /products              controllers.Products.create
 DELETE         /products/:id          controllers.Products.delete(id)
 
 GET            /warehouses/:id        controllers.Warehouses.getById(id)
 GET            /warehouses            controllers.Warehouses.find(q:Option[String])
 PUT            /warehouses/:id        controllers.Warehouses.update(id)
-POST           /warehouses/:id        controllers.Warehouses.update(id)
 POST           /warehouses            controllers.Warehouses.create
 DELETE         /warehouses/:id        controllers.Warehouses.delete(id)
 
 GET            /agents/:id            controllers.Agents.getById(id)
 GET            /agents                controllers.Agents.find(q:Option[String])
 PUT            /agents/:id            controllers.Agents.update(id)
-POST           /agents/:id            controllers.Agents.update(id)
 POST           /agents                controllers.Agents.create
 DELETE         /agents/:id            controllers.Agents.delete(id)
 
-GET            /shops/:id        controllers.Shops.getById(id)
-GET            /shops            controllers.Shops.find(q:Option[String])
-PUT            /shops/:id        controllers.Shops.update(id)
-POST           /shops/:id        controllers.Shops.update(id)
-POST           /shops            controllers.Shops.create
-DELETE         /shops/:id        controllers.Shops.delete(id)
+GET            /shops/:id             controllers.Shops.getById(id)
+GET            /shops                 controllers.Shops.find(q:Option[String])
+PUT            /shops/:id             controllers.Shops.update(id)
+POST           /shops                 controllers.Shops.create
+DELETE         /shops/:id             controllers.Shops.delete(id)
+
+GET            /sizegroups/:id        controllers.SizeGroups.getById(id)
+GET            /sizegroups            controllers.SizeGroups.find(q:Option[String])
+PUT            /sizegroups/:id        controllers.SizeGroups.update(id)
+POST           /sizegroups            controllers.SizeGroups.create
+DELETE         /sizegroups/:id        controllers.SizeGroups.delete(id)
+
 
 GET            /assets/*file          controllers.Assets.at(path="/public", file)

@@ -8,13 +8,6 @@ import models._
 import models.common._
 
 
-case class SizeGroup(from: Int, to: Int)
-
-object SizeGroup {
-  implicit val format = Json.format[SizeGroup]
-}
-
-
 case class CatalogSw(
                       catalogId: IdType,
                       sizeGroupIds: List[IdType],
@@ -58,7 +51,7 @@ object ProductUpdate extends DateFormatSupport {
   implicit val format = Json.format[ProductUpdate]
 
   implicit val collectionName = new CollectionName[ProductUpdate] {
-    override def get: String = ProductIn.collectionName.get
+    override def get = ProductIn.collectionName.get
   }
 
 }
@@ -84,7 +77,7 @@ object ProductIn extends DateFormatSupport {
   implicit val format = Json.format[ProductIn]
 
   implicit val collectionName = new CollectionName[ProductIn] {
-    override def get: String = "products"
+    override def get = "products"
   }
 }
 

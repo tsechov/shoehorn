@@ -3,6 +3,7 @@ package models
 import play.api.libs.json._
 import org.joda.time.DateTime
 import models.AssetSupport.IdType
+import services.CollectionName
 
 object AssetSupport {
 
@@ -70,7 +71,17 @@ trait AssetIn extends AssetUpdate {
 
   def createdAt: DateTime
 
+}
 
+abstract class AssetInCompanion[A <: AssetIn] extends DateFormatSupport {
+
+  def collectionName: String
+
+  implicit def format: Format[A]
+
+  implicit def cn: CollectionName[A] = new CollectionName[A] {
+    override def get: String = collectionName
+  }
 }
 
 
