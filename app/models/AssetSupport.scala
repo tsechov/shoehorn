@@ -19,47 +19,13 @@ object AssetSupport {
 
 }
 
-trait AssetPaths {
-
-  import AssetSupport._
-
-  val idPath = __ \ idFieldName
-  val createdAtPath = __ \ createdAtFieldName
-  val lastModifiedAtPath = __ \ lastModifiedAtFieldName
-  val activePath = __ \ activeFieldName
-  val descriptionPath = __ \ descriptionFieldName
-}
-
-object AssetTransform extends AssetPaths {
-
-  def create(json: JsValue): (AssetSupport.IdType, DateTime) => Reads[JsObject] = {
-    (id, date) => {
-      import AssetSupport._
-      (__).json.update(__.read[JsObject].map {
-        root => root ++ Json.obj(idFieldName -> id, createdAtFieldName -> date, lastModifiedAtFieldName -> date)
-      })
-    }
-  }
-
-  def update(json: JsValue): (DateTime) => Reads[JsObject] = {
-    (date) => {
-      addDate(date) andThen createdAtPath.json.prune andThen idPath.json.prune
-    }
-
-
-  }
-
-  private def addDate(date: DateTime) = {
-    (__).json.update(__.read[JsObject].map {
-      root => root ++ Json.obj(AssetSupport.lastModifiedAtFieldName -> date)
-    })
-  }
-}
-
 trait AssetCreate[A] {
 
-  def fillup(id: AssetSupport.IdType, createdAt: DateTime, lastModifiedAt: DateTime): A
+  def fillup(b: AssetBase): A
 }
+
+case class AssetBase(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime)
+
 
 trait AssetUpdateBuilder[U] {
   def fillup(lastModifiedAt: DateTime): U
@@ -73,15 +39,8 @@ trait AssetIn extends AssetUpdate {
 
 }
 
-abstract class AssetInCompanion[A <: AssetIn] extends DateFormatSupport {
+abstract class AssetInCompanion[A <: AssetIn] extends AssetUpdateCompanion[A] {
 
-  def collectionName: String
-
-  implicit def format: Format[A]
-
-  implicit def cn: CollectionName[A] = new CollectionName[A] {
-    override def get: String = collectionName
-  }
 }
 
 
@@ -92,6 +51,18 @@ trait AssetUpdate {
   def active: Boolean
 
   def description: String
+}
+
+
+abstract class AssetUpdateCompanion[A <: AssetUpdate] extends DateFormatSupport {
+
+  def collectionName: String
+
+  implicit def format: Format[A]
+
+  implicit def cn: CollectionName[A] = new CollectionName[A] {
+    override def get: String = collectionName
+  }
 }
 
 

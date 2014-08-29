@@ -16,7 +16,7 @@ case class CatalogCreate(
                           status: Boolean,
                           webStatus: Boolean
                           ) extends AssetCreate[CatalogIn] {
-  def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = CatalogIn(id, createdAt, lastModifiedAt, active, description, year, season, status, webStatus)
+  def fillup(b: AssetBase) = CatalogIn(b.id, b.createdAt, b.lastModifiedAt, active, description, year, season, status, webStatus)
 }
 
 object CatalogCreate {

@@ -49,7 +49,7 @@ case class ShopCreate(active: Boolean,
                       name: String,
                       status: Boolean,
                       address: Address) extends AssetCreate[ShopIn] {
-  override def fillup(id: AssetSupport.IdType, createdAt: DateTime, lastModifiedAt: DateTime) = ShopIn(id, createdAt, lastModifiedAt, active, description, name, status, address)
+  override def fillup(b: AssetBase) = ShopIn(b.id, b.createdAt, b.lastModifiedAt, active, description, name, status, address)
 
 }
 

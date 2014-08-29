@@ -1,7 +1,7 @@
 package models.customer
 
 import models.common._
-import play.api.libs.json.{Reads, Json}
+import play.api.libs.json.Json
 import models._
 import models.AssetSupport.IdType
 import org.joda.time.DateTime
@@ -74,11 +74,11 @@ case class AgentCreate(active: Boolean,
                        phonenumbers: List[PhoneNumber],
                        emails: List[Email]) extends ContactLike with AssetCreate[AgentIn] {
   self =>
-  override def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = {
+  override def fillup(b: AssetBase) = {
     AgentIn(
-      id,
-      createdAt,
-      lastModifiedAt,
+      b.id,
+      b.createdAt,
+      b.lastModifiedAt,
       active,
       description,
       typeOfContactId,

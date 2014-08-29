@@ -26,7 +26,7 @@ case class ProductCreate(
                           image: UrlType,
                           catalogs: List[CatalogSw]
                           ) extends AssetCreate[ProductIn] {
-  override def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = ProductIn(id, createdAt, lastModifiedAt, active, description, name, itemNumber, image, catalogs)
+  override def fillup(b: AssetBase) = ProductIn(b.id, b.createdAt, b.lastModifiedAt, active, description, name, itemNumber, image, catalogs)
 }
 
 object ProductCreate {
@@ -40,7 +40,7 @@ case class ProductUpdate(
                           active: Boolean,
                           description: String,
                           name: String,
-                          itemNumber: ProductIn.ItemNumber,
+                          itemNumbeAssetSupport: ProductIn.ItemNumber,
                           image: UrlType,
                           catalogs: List[CatalogSw]
                           ) extends AssetUpdate

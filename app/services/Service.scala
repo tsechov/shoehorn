@@ -2,7 +2,7 @@ package services
 
 import scala.concurrent.Future
 import play.api.libs.json._
-import models.{AssetUpdateBuilder, AssetCreate, AssetSupport}
+import models.{AssetBase, AssetUpdateBuilder, AssetCreate, AssetSupport}
 import play.api.libs.json.Json._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.AssetSupport.IdType
@@ -10,13 +10,9 @@ import scala.util.{Success, Try}
 import reactivemongo.bson.BSONObjectID
 import org.joda.time.DateTime
 import play.api.libs.json.JsObject
-import scala.Some
-import reactivemongo.core.commands.LastError
-import controllers.LastErrorWrapperImplicits
 
 
 import play.api.Play.current
-import play.api.Play
 
 
 object production extends RealMongo with RealServiceComponent with RealRepositoryComponent
@@ -65,7 +61,7 @@ trait RealServiceComponent extends ServiceComponent {
       val id = BSONObjectID.generate.stringify
       val now = new DateTime()
 
-      val model = input.fillup(id, now, now)
+      val model: A = input.fillup(AssetBase(id, now, now))
 
       repository.insert[A](model).map(_.map(_ => id))
 

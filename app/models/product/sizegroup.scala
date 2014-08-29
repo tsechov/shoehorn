@@ -4,7 +4,6 @@ import play.api.libs.json.Json
 import models._
 import models.AssetSupport._
 import org.joda.time.DateTime
-import services.CollectionName
 
 case class SizeGroupIn(_id: IdType,
                        createdAt: DateTime,
@@ -28,18 +27,18 @@ case class SizeGroupUpdate(lastModifiedAt: DateTime,
                            from: Int,
                            to: Int) extends AssetUpdate
 
-object SizeGroupUpdate {
-  implicit val format = Json.format[SizeGroupUpdate]
-  implicit val collectionName = new CollectionName[SizeGroupUpdate] {
-    override def get = SizeGroupIn.cn.get
-  }
+object SizeGroupUpdate extends AssetUpdateCompanion[SizeGroupUpdate] {
+  val format = Json.format[SizeGroupUpdate]
+  val collectionName = SizeGroupIn.collectionName
+
+
 }
 
 case class SizeGroupCreate(active: Boolean,
                            description: String,
                            from: Int,
                            to: Int) extends AssetCreate[SizeGroupIn] {
-  override def fillup(id: AssetSupport.IdType, createdAt: DateTime, lastModifiedAt: DateTime) = SizeGroupIn(id, createdAt, lastModifiedAt, active, description, from, to)
+  override def fillup(b: AssetBase) = SizeGroupIn(b.id, b.createdAt, b.lastModifiedAt, active, description, from, to)
 }
 
 object SizeGroupCreate {

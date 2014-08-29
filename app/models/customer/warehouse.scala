@@ -51,7 +51,7 @@ case class WarehouseCreate(active: Boolean,
                            address: Address,
                            status: Boolean,
                            url: UrlType) extends AssetCreate[WarehouseIn] {
-  override def fillup(id: IdType, createdAt: DateTime, lastModifiedAt: DateTime) = WarehouseIn(id, createdAt, lastModifiedAt, active, description, name, address, status, url)
+  override def fillup(b: AssetBase) = WarehouseIn(b.id, b.createdAt, b.lastModifiedAt, active, description, name, address, status, url)
 }
 
 object WarehouseCreate {
