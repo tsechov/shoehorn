@@ -47,5 +47,11 @@ PUT            /deadlinetypes/:id     controllers.DeadlineTypes.update(id)
 POST           /deadlinetypes         controllers.DeadlineTypes.create
 DELETE         /deadlinetypes/:id     controllers.DeadlineTypes.delete(id)
 
+GET            /companytypes/:id      controllers.CompanyTypes.getById(id)
+GET            /companytypes          controllers.CompanyTypes.find(q:Option[String])
+PUT            /companytypes/:id      controllers.CompanyTypes.update(id)
+POST           /companytypes          controllers.CompanyTypes.create
+DELETE         /companytypes/:id      controllers.CompanyTypes.delete(id)
+
 
 GET            /assets/*file          controllers.Assets.at(path="/public", file)

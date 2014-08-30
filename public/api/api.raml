@@ -146,4 +146,14 @@ resourceTypes:
         getexample: !include deadlinetype.json
         postexample: !include deadlinetype.json
 
+/companytypes:
+  type:
+    collection:
+      resourceName: companytype
+      postexample: !include companytype.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include companytype.json
+        postexample: !include companytype.json
 

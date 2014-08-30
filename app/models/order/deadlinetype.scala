@@ -10,8 +10,8 @@ case class DeadlineTypeIn(_id: IdType,
                           lastModifiedAt: DateTime,
                           active: Boolean,
                           description: String,
-                          `type`: String) extends AssetIn with AssetUpdateBuilder[DeadlineTypeUpdate] {
-  override def fillup(lastModifiedAt: DateTime): DeadlineTypeUpdate = DeadlineTypeUpdate(lastModifiedAt, active, description, `type`)
+                          name: String) extends AssetIn with AssetUpdateBuilder[DeadlineTypeUpdate] {
+  override def fillup(lastModifiedAt: DateTime): DeadlineTypeUpdate = DeadlineTypeUpdate(lastModifiedAt, active, description, name)
 }
 
 object DeadlineTypeIn extends AssetInCompanion[DeadlineTypeIn] {
@@ -23,7 +23,7 @@ object DeadlineTypeIn extends AssetInCompanion[DeadlineTypeIn] {
 case class DeadlineTypeUpdate(lastModifiedAt: DateTime,
                               active: Boolean,
                               description: String,
-                              `type`: String) extends AssetUpdate
+                              name: String) extends AssetUpdate
 
 object DeadlineTypeUpdate extends AssetUpdateCompanion[DeadlineTypeUpdate] {
   val format = Json.format[DeadlineTypeUpdate]
@@ -34,8 +34,8 @@ object DeadlineTypeUpdate extends AssetUpdateCompanion[DeadlineTypeUpdate] {
 
 case class DeadlineTypeCreate(active: Boolean,
                               description: String,
-                              `type`: String) extends AssetCreate[DeadlineTypeIn] {
-  override def fillup(b: AssetBase) = DeadlineTypeIn(b.id, b.createdAt, b.lastModifiedAt, active, description, `type`)
+                              name: String) extends AssetCreate[DeadlineTypeIn] {
+  override def fillup(b: AssetBase) = DeadlineTypeIn(b.id, b.createdAt, b.lastModifiedAt, active, description, name)
 }
 
 object DeadlineTypeCreate {
