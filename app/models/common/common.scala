@@ -2,6 +2,7 @@ package models.common
 
 import models.AssetSupport._
 import play.api.libs.json._
+import models.AssetIn
 
 case class Price(price: Int, unit: String, quantity: Int)
 
@@ -78,3 +79,6 @@ case class District(name: String)
 object District {
   implicit val format = Json.format[District]
 }
+
+
+

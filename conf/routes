@@ -53,5 +53,11 @@ PUT            /companytypes/:id      controllers.CompanyTypes.update(id)
 POST           /companytypes          controllers.CompanyTypes.create
 DELETE         /companytypes/:id      controllers.CompanyTypes.delete(id)
 
+GET            /addresstypes/:id      controllers.AddressTypes.getById(id)
+GET            /addresstypes          controllers.AddressTypes.find(q:Option[String])
+PUT            /addresstypes/:id      controllers.AddressTypes.update(id)
+POST           /addresstypes          controllers.AddressTypes.create
+DELETE         /addresstypes/:id      controllers.AddressTypes.delete(id)
+
 
 GET            /assets/*file          controllers.Assets.at(path="/public", file)
