@@ -10,7 +10,7 @@ object Price {
 }
 
 case class Address(
-                    typeOfAddressId: IdType,
+                    addressTypeId: IdType,
                     country: String,
                     district: String,
                     postalcode: String,

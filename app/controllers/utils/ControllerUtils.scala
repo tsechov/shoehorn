@@ -1,18 +1,12 @@
-package controllers
+package controllers.utils
 
 import play.api.{Logger, Play}
 import play.api.libs.json._
 import play.api.http.ContentTypes
-import play.api.mvc.{SimpleResult, Call, Results, Controller}
+import play.api.mvc.Results
 import scala.concurrent.Future
 import scala.util._
 import play.api.libs.json.Json._
-import play.api.mvc.Call
-import play.api.mvc.SimpleResult
-import play.api.mvc.Call
-import play.api.libs.json.JsArray
-import play.api.mvc.SimpleResult
-import models.AssetSupport
 import play.api.mvc.Call
 import play.api.libs.json.JsArray
 import play.api.libs.json.JsSuccess

@@ -4,6 +4,7 @@ import play.api.mvc.Action
 import models.AssetSupport.IdType
 import play.api.mvc.BodyParsers.parse
 import models.product.{ProductIn, ProductUpdate, ProductCreate}
+import controllers.utils.CrudController
 
 
 object Products extends CrudController {

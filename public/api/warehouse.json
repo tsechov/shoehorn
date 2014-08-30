@@ -6,7 +6,7 @@
     "description": "from runscope",
     "name": "warehouse name jool",
     "address": {
-        "typeOfAddressId": "foobar",
+        "addressTypeId": "foobar",
         "country": "countryjool",
         "district": "district eh",
         "postalcode": "zipzip",

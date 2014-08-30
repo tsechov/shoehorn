@@ -5,6 +5,7 @@ import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
 import models.order.{DeadlineTypeIn, DeadlineTypeUpdate, DeadlineTypeCreate}
+import controllers.utils.CrudController
 
 
 object DeadlineTypes extends CrudController {

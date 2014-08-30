@@ -8,7 +8,7 @@ import models.AssetSupport._
 import play.api.libs.json.Json._
 import scala.Some
 import scala.util.{Success, Try}
-import controllers.LastErrorWrapperImplicits
+import controllers.utils.LastErrorWrapperImplicits
 
 trait RepositoryComponent {
 

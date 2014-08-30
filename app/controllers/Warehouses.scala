@@ -5,6 +5,7 @@ import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
 import models.customer.{WarehouseCreate, WarehouseUpdate, WarehouseIn}
+import controllers.utils.CrudController
 
 
 object Warehouses extends CrudController {

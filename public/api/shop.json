@@ -7,7 +7,7 @@
     "name": "namejool",
     "status": true,
     "address": {
-        "typeOfAddressId": "foobar",
+        "addressTypeId": "foobar",
         "country": "countryjool",
         "district": "district eh",
         "postalcode": "zipzip",

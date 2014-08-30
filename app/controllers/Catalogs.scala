@@ -4,6 +4,7 @@ import play.api.mvc.Action
 import models.AssetSupport.IdType
 import play.api.mvc.BodyParsers.parse
 import models.catalog.{CatalogIn, CatalogUpdate, CatalogCreate}
+import controllers.utils.CrudController
 
 
 object Catalogs extends CrudController {

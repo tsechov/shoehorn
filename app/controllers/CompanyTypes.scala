@@ -5,6 +5,7 @@ import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
 import models.customer.{CompanyTypeIn, CompanyTypeUpdate, CompanyTypeCreate}
+import controllers.utils.CrudController
 
 
 object CompanyTypes extends CrudController {

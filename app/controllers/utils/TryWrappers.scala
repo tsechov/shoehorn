@@ -1,4 +1,4 @@
-package controllers
+package controllers.utils
 
 import scala.util.{Failure, Success, Try}
 import reactivemongo.core.commands.LastError

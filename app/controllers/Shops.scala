@@ -5,6 +5,7 @@ import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
 import models.customer.{ShopCreate, ShopUpdate, ShopIn}
+import controllers.utils.CrudController
 
 
 object Shops extends CrudController {

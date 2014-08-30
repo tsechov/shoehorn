@@ -5,6 +5,7 @@ import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
 import models.customer.{AgentIn, AgentUpdate, AgentCreate}
+import controllers.utils.CrudController
 
 
 object Agents extends CrudController {

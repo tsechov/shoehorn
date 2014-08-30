@@ -5,6 +5,7 @@ import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
 import models.product.{SizeGroupCreate, SizeGroupUpdate, SizeGroupIn}
+import controllers.utils.CrudController
 
 
 object SizeGroups extends CrudController {
