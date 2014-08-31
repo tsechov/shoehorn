@@ -44,7 +44,9 @@ trait RealServiceComponent extends ServiceComponent {
 
   self: RepositoryComponent =>
 
+
   override val service = new Service {
+    val updateCommand = obj(AssetSupport.activeFieldName -> false)
 
     override def getById[A: CollectionName](id: models.AssetSupport.IdType) = {
       val query = obj(AssetSupport.idFieldName -> id)
@@ -77,7 +79,11 @@ trait RealServiceComponent extends ServiceComponent {
 
     override def remove[A: CollectionName](id: IdType): Future[Try[Unit]] = {
 
-      repository.remove(id)
+      val collectionName = implicitly[CollectionName[A]].get
+      implicit val cn = new CollectionName[JsObject] {
+        override def get: String = collectionName
+      }
+      repository.update[JsObject](id, updateCommand)
 
     }
   }

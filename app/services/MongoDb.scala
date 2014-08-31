@@ -6,14 +6,12 @@ import play.api.Application
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-import play.modules.reactivemongo.json.collection.JSONCollection
 import scala.concurrent.Future
 import reactivemongo.core.commands.LastError
 import play.api.libs.json.Json._
 import play.modules.reactivemongo.json.collection.JSONCollection
-import play.modules.reactivemongo.json.collection.JSONCollection
 import play.api.libs.json.JsObject
-import scala.util.Try
+import models.AssetSupport
 
 
 trait Mongo {
@@ -35,7 +33,7 @@ trait MongoDb {
 
 class RealMongo(implicit app: Application) extends Mongo {
 
-  private val emptyQuery = Json.obj()
+  private val activeQuery = Json.obj(AssetSupport.activeFieldName -> true)
 
   def collection(name: String): JSONCollection = ReactiveMongoPlugin.db.collection[JSONCollection](name)
 
@@ -43,17 +41,10 @@ class RealMongo(implicit app: Application) extends Mongo {
     def find[A: CollectionName](query: JsObject) = {
 
       collection(implicitly[CollectionName[A]].get).find(query).cursor[JsObject].collect[List]()
-      /*.map(
-      list => Try(list.map {
-        _.validate[A] match {
-          case JsSuccess(elem, _) => elem
-          case JsError(error) => throw new IllegalArgumentException(s"error reading collection [" + ev.get + "]: " + JsError.toFlatJson(error).toString)
-        }
-      })
-    )*/
+      
     }
 
-    override def findAll[A: CollectionName] = find(emptyQuery)
+    override def findAll[A: CollectionName] = find(activeQuery)
 
     override def insert[A: CollectionName](jsonToInsert: JsValue) = collection(implicitly[CollectionName[A]].get).insert(jsonToInsert)
 
