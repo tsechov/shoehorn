@@ -2,7 +2,6 @@ package models.common
 
 import models.AssetSupport._
 import play.api.libs.json._
-import models.AssetIn
 
 case class Price(price: Int, unit: String, quantity: Int)
 
@@ -25,7 +24,7 @@ object Address {
 }
 
 case class PhoneNumber(
-                        typeOfPhoneNumberId: IdType,
+                        phoneNumberTypeId: IdType,
                         country: String,
                         extension: Int,
                         number: Int
@@ -36,7 +35,7 @@ object PhoneNumber {
 }
 
 case class Email(
-                  typeOfEmailId: IdType,
+                  emailTypeId: IdType,
                   address: String
                   )
 
@@ -45,7 +44,7 @@ object Email {
 }
 
 trait ContactLike {
-  def typeOfContactId: IdType
+  def contactTypeId: IdType
 
   def status: String
 
@@ -60,25 +59,8 @@ trait ContactLike {
   def emails: List[Email]
 }
 
-case class Contact(
-                    typeOfContactId: IdType,
-                    status: String,
-                    title: String,
-                    firstName: String,
-                    lastName: String,
-                    phonenumbers: List[PhoneNumber],
-                    emails: List[Email]
-                    ) extends ContactLike
 
-object Contact {
-  implicit val format = Json.format[Contact]
-}
 
-case class District(name: String)
-
-object District {
-  implicit val format = Json.format[District]
-}
 
 
 

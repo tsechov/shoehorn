@@ -63,6 +63,8 @@ abstract class AssetUpdateCompanion[A <: AssetUpdate] extends DateFormatSupport 
   implicit def cn: CollectionName[A] = new CollectionName[A] {
     override def get: String = collectionName
   }
+
+
 }
 
 

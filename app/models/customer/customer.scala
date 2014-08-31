@@ -97,19 +97,17 @@ case class Customer(
                      description: String,
 
                      name: String,
-                     agent: AgentIn,
-                     places: List[Place],
-                     typeOfCompanyId: IdType,
+                     agentId: IdType,
+
+                     companyTypeId: IdType,
                      taxExemptNumber: String,
                      shops: List[ShopIn],
                      addresses: List[Address],
-                     customergroups: List[Group],
-                     contacts: List[Contact],
+                     groupIds: List[IdType],
+                     contactIds: List[IdType],
                      lineOfBusiness: String,
                      creditInformation: Option[CreditInformation],
-                     site: District,
-                     discount: Option[Discount],
-                     payment: Option[Payment])
+                     siteId: IdType)
 
 object Customer {
   implicit val format = Json.format[Customer]

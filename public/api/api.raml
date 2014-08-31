@@ -227,6 +227,17 @@ resourceTypes:
         getexample: !include lineofbusiness.json
         postexample: !include lineofbusiness.json
 
+/groups:
+  type:
+    collection:
+      resourceName: group
+      postexample: !include group.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include group.json
+        postexample: !include group.json
+
 /variables:
   type:
     collection:

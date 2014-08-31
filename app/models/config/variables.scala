@@ -18,7 +18,7 @@ case class VariableIn(_id: IdType,
 }
 
 object VariableIn extends AssetInCompanion[VariableIn] {
-  val collectionName = "Variables"
+  val collectionName = "variables"
   val format = Json.format[VariableIn]
 }
 

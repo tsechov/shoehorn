@@ -83,6 +83,25 @@ PUT            /variables/:id         controllers.Variables.update(id)
 POST           /variables             controllers.Variables.create
 DELETE         /variables/:id         controllers.Variables.delete(id)
 
+GET            /groups/:id            controllers.Groups.getById(id)
+GET            /groups                controllers.Groups.find(q:Option[String])
+PUT            /groups/:id            controllers.Groups.update(id)
+POST           /groups                controllers.Groups.create
+DELETE         /groups/:id            controllers.Groups.delete(id)
+
+GET            /contacttypes/:id      controllers.ContactTypes.getById(id)
+GET            /contacttypes          controllers.ContactTypes.find(q:Option[String])
+PUT            /contacttypes/:id      controllers.ContactTypes.update(id)
+POST           /contacttypes          controllers.ContactTypes.create
+DELETE         /contacttypes/:id      controllers.ContactTypes.delete(id)
+
+GET            /contacs/:id           controllers.Contacts.getById(id)
+GET            /contacs               controllers.Contacts.find(q:Option[String])
+PUT            /contacs/:id           controllers.Contacts.update(id)
+POST           /contacs               controllers.Contacts.create
+DELETE         /contacs/:id           controllers.Contacts.delete(id)
+
+
 
 
 GET            /assets/*file          controllers.Assets.at(path="/public", file)

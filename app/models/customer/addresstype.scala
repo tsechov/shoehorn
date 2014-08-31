@@ -17,6 +17,7 @@ case class AddressTypeIn(_id: IdType,
 object AddressTypeIn extends AssetInCompanion[AddressTypeIn] {
   val collectionName = "addresstypes"
   val format = Json.format[AddressTypeIn]
+  type Id=IdType
 }
 
 
