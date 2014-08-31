@@ -15,10 +15,6 @@ build:
             token: $SLACK_WEBHOOK_TOKEN
             channel: shoehorn-build
             username: ${WERCKER_GIT_BRANCH}-build@werckerbot
-        - script:
-            name: kato
-            code: |-
-                curl -X POST -d "{\"from\": \"Robot\", \"color\": \"green\", \"renderer\": \"markdown\", \"text\": \"Hello **world**\" }" https://api.kato.im/rooms/c13a90c357893ddb5fc9e07c2291f5c06aa64a617c899c6a4ca5f16ff03ecec2/simple
 
 deploy:
     steps:

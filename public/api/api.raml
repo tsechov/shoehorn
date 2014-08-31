@@ -178,3 +178,14 @@ resourceTypes:
       collection-item:
         getexample: !include district.json
         postexample: !include district.json
+
+/lineofbusinesses:
+  type:
+    collection:
+      resourceName: lineofbusiness
+      postexample: !include lineofbusiness.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include lineofbusiness.json
+        postexample: !include lineofbusiness.json

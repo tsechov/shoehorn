@@ -65,6 +65,11 @@ PUT            /districts/:id         controllers.Districts.update(id)
 POST           /districts             controllers.Districts.create
 DELETE         /districts/:id         controllers.Districts.delete(id)
 
+GET            /lineofbusinesses/:id  controllers.LineOfBusinesses.getById(id)
+GET            /lineofbusinesses      controllers.LineOfBusinesses.find(q:Option[String])
+PUT            /lineofbusinesses/:id  controllers.LineOfBusinesses.update(id)
+POST           /lineofbusinesses      controllers.LineOfBusinesses.create
+DELETE         /lineofbusinesses/:id  controllers.LineOfBusinesses.delete(id)
 
 
 
