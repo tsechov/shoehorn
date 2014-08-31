@@ -6,7 +6,7 @@ import scala.concurrent.Future
 import play.api.Logger
 import play.api.http.HeaderNames._
 
-case class BasicAuthFilter() extends Filter {
+object BasicAuthFilter extends Filter {
   private lazy val ajaxUnauthResult = Results.Unauthorized.withHeaders((AUTHENTICATION_REQUIRED_HEADER,
     "Basic realm=\"shoehorn basic authentication\"")
   )
@@ -50,6 +50,8 @@ case class BasicAuthFilter() extends Filter {
   }
 
   private def isOutsideSecurityRealm(requestHeader: RequestHeader): Boolean = {
+
+    Logger.debug(s"method: ${requestHeader.method}")
     val reqURI = requestHeader.uri
     if (reqURI.length() > 0) {
       //remove the first "/" in the uri

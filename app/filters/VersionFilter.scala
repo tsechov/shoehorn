@@ -7,7 +7,7 @@ import play.api.mvc.SimpleResult
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
-case class VersionFilter() extends Filter {
+object VersionFilter extends Filter {
   override def apply(f: (RequestHeader) => Future[SimpleResult])(rh: RequestHeader) = {
     f(rh).map(_.withHeaders(VERSION_HEADER -> release.CurrentVersion()))
   }

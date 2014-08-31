@@ -7,11 +7,12 @@ import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit._
 import controllers.Default
 
-case class CorsFilter() extends Filter {
+object CorsFilter extends Filter {
 
   import scala.concurrent._
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
+  //FIXME: do we need this?
   lazy val allowedDomain = play.api.Play.current.configuration.getString("cors.allowed.domain")
   Logger.trace(s"[cors] default allowed domain is $allowedDomain")
   val maxAge = Duration(30, DAYS).toSeconds.toString
