@@ -14,7 +14,7 @@ object Application extends Controller {
     val version = release.CurrentVersion()
 
     if (version.endsWith("SNAPSHOT")) {
-      Ok(views.html.index(scmUrl + "/commit/" + gitCommitId, version))
+      Ok(views.html.index(scmUrl + "/tree/" + gitCommitId, version))
     } else {
       Ok(views.html.index(scmUrl + "/tree/v" + version, version))
     }
