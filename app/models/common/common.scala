@@ -26,8 +26,8 @@ object Address {
 case class PhoneNumber(
                         phoneNumberTypeId: IdType,
                         country: String,
-                        extension: Int,
-                        number: Int
+                        extension: String,
+                        number: String
                         )
 
 object PhoneNumber {
