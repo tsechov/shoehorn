@@ -47,25 +47,6 @@ object Payment {
 }
 
 
-case class Place(
-                  year: String,
-                  season: String,
-                  place: Int
-                  )
-
-object Place {
-  implicit val format = Json.format[Place]
-}
-
-
-case class Group(
-                  name: String
-                  )
-
-object Group {
-  implicit val format = Json.format[Group]
-}
-
 case class CreditInformation(
                               mandatoryCreditLimit: Boolean,
                               creditRating: Int,
@@ -98,16 +79,18 @@ case class Customer(
 
                      name: String,
                      agentId: IdType,
-
-                     companyTypeId: IdType,
                      taxExemptNumber: String,
-                     shops: List[ShopIn],
+                     lineOfBusinessId: IdType,
+                     siteId: IdType,
+                     companyTypeId: IdType,
+
+                     shopIds: List[IdType],
                      addresses: List[Address],
                      groupIds: List[IdType],
-                     contactIds: List[IdType],
-                     lineOfBusiness: String,
-                     creditInformation: Option[CreditInformation],
-                     siteId: IdType)
+                     contactIds: List[IdType]
+
+
+                     )
 
 object Customer {
   implicit val format = Json.format[Customer]

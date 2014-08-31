@@ -101,6 +101,18 @@ PUT            /contacs/:id           controllers.Contacts.update(id)
 POST           /contacs               controllers.Contacts.create
 DELETE         /contacs/:id           controllers.Contacts.delete(id)
 
+GET            /emailtypes/:id         controllers.EmailTypes.getById(id)
+GET            /emailtypes             controllers.EmailTypes.find(q:Option[String])
+PUT            /emailtypes/:id         controllers.EmailTypes.update(id)
+POST           /emailtypes             controllers.EmailTypes.create
+DELETE         /emailtypes/:id         controllers.EmailTypes.delete(id)
+
+GET            /phonenumbertypes/:id   controllers.PhoneNumberTypes.getById(id)
+GET            /phonenumbertypes       controllers.PhoneNumberTypes.find(q:Option[String])
+PUT            /phonenumbertypes/:id   controllers.PhoneNumberTypes.update(id)
+POST           /phonenumbertypes       controllers.PhoneNumberTypes.create
+DELETE         /phonenumbertypes/:id   controllers.PhoneNumberTypes.delete(id)
+
 
 
 

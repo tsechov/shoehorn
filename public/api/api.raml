@@ -260,6 +260,28 @@ resourceTypes:
         getexample: !include contacttype.json
         postexample: !include contacttype.json
 
+/emailtypes:
+  type:
+    collection:
+      resourceName: emailtype
+      postexample: !include emailtype.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include emailtype.json
+        postexample: !include emailtype.json
+
+/phonenumbertypes:
+  type:
+    collection:
+      resourceName: phonenumbertype
+      postexample: !include phonenumbertype.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include phonenumbertype.json
+        postexample: !include phonenumbertype.json
+
 /variables:
   type:
     collection:
