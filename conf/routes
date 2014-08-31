@@ -17,6 +17,12 @@ PUT            /products/:id          controllers.Products.update(id)
 POST           /products              controllers.Products.create
 DELETE         /products/:id          controllers.Products.delete(id)
 
+GET            /customers/:id         controllers.Customers.getById(id)
+GET            /customers             controllers.Customers.find(q:Option[String])
+PUT            /customers/:id         controllers.Customers.update(id)
+POST           /customers             controllers.Customers.create
+DELETE         /customers/:id         controllers.Customers.delete(id)
+
 GET            /warehouses/:id        controllers.Warehouses.getById(id)
 GET            /warehouses            controllers.Warehouses.find(q:Option[String])
 PUT            /warehouses/:id        controllers.Warehouses.update(id)
