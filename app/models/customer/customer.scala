@@ -70,7 +70,7 @@ object Discount {
   implicit val format = Json.format[Discount]
 }
 
-case class Customer(
+case class CustomerIn(
                      id: IdType,
                      createdAt: DateTime,
                      lastModifiedAt: DateTime,
@@ -88,10 +88,8 @@ case class Customer(
                      addresses: List[Address],
                      groupIds: List[IdType],
                      contactIds: List[IdType]
-
-
                      )
 
-object Customer {
-  implicit val format = Json.format[Customer]
+object CustomerIn {
+  implicit val format = Json.format[CustomerIn]
 }
