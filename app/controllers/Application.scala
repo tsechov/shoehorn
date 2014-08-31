@@ -13,10 +13,10 @@ object Application extends Controller {
 
     val version = release.CurrentVersion()
 
-    if(version.endsWith("SNAPSHOT")){
+    if (version.endsWith("SNAPSHOT")) {
       Ok(views.html.index(scmUrl + "/commit/" + gitCommitId, version))
-    }else{
-      Ok(views.html.index(scmUrl + "/commit/" + gitCommitId, version))
+    } else {
+      Ok(views.html.index(scmUrl + "/tree/v" + version, version))
     }
 
   }
@@ -24,8 +24,6 @@ object Application extends Controller {
   def version = Action {
     Ok(release.CurrentVersion())
   }
-
-
 
 
   def preflight(path: String) = Action {
