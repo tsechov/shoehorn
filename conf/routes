@@ -77,6 +77,12 @@ PUT            /baskets/:id           controllers.Baskets.update(id)
 POST           /baskets               controllers.Baskets.create
 DELETE         /baskets/:id           controllers.Baskets.delete(id,itemNumber:Option[String],size:Option[Int])
 
+GET            /variables/:id         controllers.Variables.getById(id)
+GET            /variables             controllers.Variables.find(q:Option[String])
+PUT            /variables/:id         controllers.Variables.update(id)
+POST           /variables             controllers.Variables.create
+DELETE         /variables/:id         controllers.Variables.delete(id)
+
 
 
 GET            /assets/*file          controllers.Assets.at(path="/public", file)

@@ -227,3 +227,14 @@ resourceTypes:
         getexample: !include lineofbusiness.json
         postexample: !include lineofbusiness.json
 
+/variables:
+  type:
+    collection:
+      resourceName: variable
+      postexample: !include variable.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include variable.json
+        postexample: !include variable.json
+
