@@ -157,3 +157,24 @@ resourceTypes:
         getexample: !include companytype.json
         postexample: !include companytype.json
 
+/addresstypes:
+  type:
+    collection:
+      resourceName: addresstype
+      postexample: !include addresstype.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include addresstype.json
+        postexample: !include addresstype.json
+
+/districts:
+  type:
+    collection:
+      resourceName: district
+      postexample: !include district.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include district.json
+        postexample: !include district.json
