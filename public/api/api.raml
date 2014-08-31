@@ -249,6 +249,17 @@ resourceTypes:
         getexample: !include contact.json
         postexample: !include contact.json
 
+/contacttypes:
+  type:
+    collection:
+      resourceName: contacttype
+      postexample: !include contacttype.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include contacttype.json
+        postexample: !include contacttype.json
+
 /variables:
   type:
     collection:
