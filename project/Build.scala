@@ -9,8 +9,8 @@ import scala.Some
 
 object ApplicationBuild extends Build {
   releaseSettings
-  org.eigengo.sbtraml.RamlPlugin.settings
-  scalaVersion := "2.10.4"
+  
+
   val appName = "shoehorn"
   val appVersion = "NA"
 
