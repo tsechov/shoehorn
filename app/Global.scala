@@ -1,6 +1,6 @@
 
 
-import filters.{VersionFilter, CorsFilter}
+import filters.{BasicAuthFilter, VersionFilter, CorsFilter}
 import play.api.mvc._
 
 
