@@ -7,5 +7,7 @@
     "year": 2014,
     "season": "asdf",
     "status": false,
-    "webStatus": false
+    "webStatus": false,
+    "openingTime": "2014-08-14T13:47:28+0000",
+    "closingTime": "2014-08-14T14:36:49+0000"
 }

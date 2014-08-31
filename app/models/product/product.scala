@@ -5,13 +5,11 @@ import org.joda.time.DateTime
 import services.CollectionName
 import models.AssetSupport.{IdType, UrlType}
 import models._
-import models.common._
 
 
 case class CatalogSw(
                       catalogId: IdType,
-                      sizeGroupIds: List[IdType],
-                      price: Price
+                      sizeGroupIds: List[IdType]
                       )
 
 object CatalogSw {

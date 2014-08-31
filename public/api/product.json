@@ -13,12 +13,7 @@
             "sizeGroupIds": [
                 "foo",
                 "bar"
-            ],
-            "price": {
-                "price": 123,
-                "unit": "db",
-                "quantity": 10
-            }
+            ]
         }
     ]
 }

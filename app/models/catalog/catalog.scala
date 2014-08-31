@@ -14,12 +14,15 @@ case class CatalogCreate(
                           year: Int,
                           season: String,
                           status: Boolean,
-                          webStatus: Boolean
+                          webStatus: Boolean,
+                          openingTime: DateTime,
+                          closingTime: DateTime
                           ) extends AssetCreate[CatalogIn] {
-  def fillup(b: AssetBase) = CatalogIn(b.id, b.createdAt, b.lastModifiedAt, active, description, year, season, status, webStatus)
+  def fillup(b: AssetBase) = CatalogIn(b.id, b.createdAt, b.lastModifiedAt, active, description, year, season, status, webStatus, openingTime: DateTime,
+    closingTime: DateTime)
 }
 
-object CatalogCreate {
+object CatalogCreate extends DateFormatSupport {
   implicit val reads = Json.reads[CatalogCreate]
 }
 
@@ -31,7 +34,9 @@ case class CatalogUpdate(
                           year: Int,
                           season: String,
                           status: Boolean,
-                          webStatus: Boolean
+                          webStatus: Boolean,
+                          openingTime: DateTime,
+                          closingTime: DateTime
                           ) extends AssetUpdate
 
 object CatalogUpdate extends DateFormatSupport {
@@ -54,9 +59,12 @@ case class CatalogIn(
                       year: Int,
                       season: String,
                       status: Boolean,
-                      webStatus: Boolean
+                      webStatus: Boolean,
+                      openingTime: DateTime,
+                      closingTime: DateTime
                       ) extends AssetIn with AssetUpdateBuilder[CatalogUpdate] {
-  override def fillup(lastModifiedAt: DateTime): CatalogUpdate = CatalogUpdate(lastModifiedAt, active, description, year, season, status, webStatus)
+  override def fillup(lastModifiedAt: DateTime): CatalogUpdate = CatalogUpdate(lastModifiedAt, active, description, year, season, status, webStatus, openingTime: DateTime,
+    closingTime: DateTime)
 }
 
 object CatalogIn extends DateFormatSupport {

@@ -1,0 +1,32 @@
+{
+    "_id": "53f370551800001800201e5e",
+    "createdAt": "2014-08-19T15:42:13+0000",
+    "lastModifiedAt": "2014-08-19T15:42:13+0000",
+    "active": true,
+    "description": "basket yeah",
+    "items": [
+        {
+            "product": {
+                "_id": "53f370551800001800201e5e",
+                "createdAt": "2014-08-19T15:42:13+0000",
+                "lastModifiedAt": "2014-08-19T15:42:13+0000",
+                "active": true,
+                "description": "nested product in basket",
+                "name": "name jool",
+                "itemNumber": "itemnumber123",
+                "image": "imageurl",
+                "catalogs": [
+                    {
+                        "catalogId": "blah",
+                        "sizeGroupIds": [
+                            "foo",
+                            "bar"
+                        ]
+                    }
+                ]
+            },
+            "quantity": 2,
+            "size": 13
+        }
+    ]
+}

@@ -91,6 +91,31 @@ resourceTypes:
       collection-item:
         getexample: !include product.json
         postexample: !include product.json
+
+/baskets:
+  type:
+    collection:
+      resourceName: basket
+      postexample: !include basket.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include basket.json
+        postexample: !include basket.json
+    delete:
+      queryParameters:
+        itemNumber:
+          description: |
+            deletes an item from the given basket (identified by path variable :id)
+            with the given itemNumber
+          example: 1011-22401
+        size:
+          description: |
+            deletes an item from the given basket (identified by path variable :id)
+            with the given itemNumber and size
+            only allowed wen itemNumber is present as queryparam
+          example: 13
+
 /warehouses:
   type:
     collection:
@@ -189,3 +214,4 @@ resourceTypes:
       collection-item:
         getexample: !include lineofbusiness.json
         postexample: !include lineofbusiness.json
+
