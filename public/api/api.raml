@@ -1,11 +1,23 @@
 #%RAML 0.8
 baseUri: http://{apiHost}
+
 title: shoehorn
+
 version: VERSION
+
 mediaType:  application/json
+
 baseUriParameters:
   apiHost:
     enum: ["dev-shoehorn.herokuapp.com","staging-shoehorn.herokuapp.com","localhost:9000"]
+
+securitySchemes:
+  - basic:
+      description: http basic authentication
+      type: Basic Authentication
+
+securedBy: [basic]
+
 resourceTypes:
   - collection:
       get:
