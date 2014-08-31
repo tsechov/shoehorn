@@ -1,13 +1,13 @@
 {
     "_id": "53ecbdf0500000e102795d34",
-    "createdAt": "2014-08-14T13:47:28+0000",
-    "lastModifiedAt": "2014-08-14T14:36:49+0000",
+    "createdAt": "2014-09-01T00:03:32.469+02:00",
+    "lastModifiedAt": "2014-09-01T00:03:32.469+02:00",
     "active": false,
     "description": "asdf",
     "year": 2014,
     "season": "asdf",
     "status": false,
     "webStatus": false,
-    "openingTime": "2014-08-14T13:47:28+0000",
-    "closingTime": "2014-08-14T14:36:49+0000"
+    "openingTime": "2014-08-31T21:09:18.180Z",
+    "closingTime": "2014-08-31T21:09:18.180Z"
 }
