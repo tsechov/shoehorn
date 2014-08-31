@@ -13,7 +13,12 @@ object Application extends Controller {
 
     val version = release.CurrentVersion()
 
-    Ok(views.html.index(scmUrl + "/commit/" + gitCommitId, version))
+    if(version.endsWith("SNAPSHOT")){
+      Ok(views.html.index(scmUrl + "/commit/" + gitCommitId, version))
+    }else{
+      Ok(views.html.index(scmUrl + "/commit/" + gitCommitId, version))
+    }
+
   }
 
   def version = Action {
