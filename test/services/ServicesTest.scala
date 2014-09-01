@@ -19,7 +19,7 @@ class ServicesTest extends Specification with Mockito {
       type Test = String
       val mockedMongo = mock[MongoDb]
 
-      val target: RealRepositoryComponent = new RealRepositoryComponent with Mongo {
+      val target: CrudRepository = new CrudRepository with Mongo {
         override val mongo = mockedMongo
 
       }
@@ -34,7 +34,7 @@ class ServicesTest extends Specification with Mockito {
 
 
 
-      val result = target.repository.getById[Test](query)
+      val result = target.crudRepository.getById[Test](query)
       val timeout: FiniteDuration = FiniteDuration(5, TimeUnit.SECONDS)
       Await.result(result, timeout) match {
         case Some(value) => success //value must beEqualTo("foo")

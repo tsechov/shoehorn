@@ -3,6 +3,9 @@ package services
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.order.OrderIn
 import scala.concurrent.Future
+import models.AssetSupport.IdType
+import scala.util.Try
+import play.api.libs.json.JsObject
 
 trait OrderServiceComponent {
 
@@ -11,6 +14,8 @@ trait OrderServiceComponent {
 
     def ensureIndexOnOrderNumber: Future[Unit]
 
+    def createOrder(create: JsObject): Future[Try[IdType]]
+
   }
 
   val orderService: Service
@@ -18,7 +23,7 @@ trait OrderServiceComponent {
 }
 
 trait OrderService extends OrderServiceComponent {
-  this: OrderRepositoryComponent =>
+  this: OrderRepositoryComponent with CrudRepository =>
 
   override val orderService = new Service {
 
@@ -26,6 +31,11 @@ trait OrderService extends OrderServiceComponent {
     override def orderNumber = orderRepository.orderNumber
 
     override def ensureIndexOnOrderNumber = orderRepository.ensureIndexOnOrderNumber
+
+    override def createOrder(create: JsObject) = {
+      ???
+    }
+
   }
 
 

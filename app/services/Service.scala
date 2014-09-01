@@ -16,12 +16,12 @@ import play.api.Play.current
 
 
 object production
-  extends RealMongo with RealServiceComponent with RealRepositoryComponent
+  extends RealMongo with CrudService with CrudRepository
   with EnvVarUserRepository with UserService
   with MongoOrderRepository with OrderService
 
 
-trait ServiceComponent {
+trait CrudServiceComponent {
   type Query = JsObject
 
   trait Service {
@@ -42,10 +42,10 @@ trait ServiceComponent {
 }
 
 
-trait RealServiceComponent extends ServiceComponent {
+trait CrudService extends CrudServiceComponent {
 
 
-  self: RepositoryComponent =>
+  self: CrudRepositoryComponent =>
 
 
   override val service = new Service {
@@ -53,14 +53,14 @@ trait RealServiceComponent extends ServiceComponent {
 
     override def getById[A: CollectionName](id: models.AssetSupport.IdType) = {
       val query = obj(AssetSupport.idFieldName -> id)
-      repository.getById[A](query) map {
+      crudRepository.getById[A](query) map {
         Success(_)
       }
     }
 
-    override def find[A: CollectionName](query: ServiceComponent#Query) = repository.find[A](query).map(Success(_))
+    override def find[A: CollectionName](query: CrudServiceComponent#Query) = crudRepository.find[A](query).map(Success(_))
 
-    override def findAll[A: CollectionName] = repository.findAll[A].map(Success(_))
+    override def findAll[A: CollectionName] = crudRepository.findAll[A].map(Success(_))
 
     override def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]) = {
       val id = BSONObjectID.generate.stringify
@@ -68,7 +68,7 @@ trait RealServiceComponent extends ServiceComponent {
 
       val model: A = input.fillup(AssetBase(id, now, now))
 
-      repository.insert[A](model).map(_.map(_ => id))
+      crudRepository.insert[A](model).map(_.map(_ => id))
 
 
     }
@@ -77,7 +77,7 @@ trait RealServiceComponent extends ServiceComponent {
       val now = new DateTime()
       val model = input.fillup(now)
 
-      repository.update[U](id, model)
+      crudRepository.update[U](id, model)
     }
 
     override def remove[A: CollectionName](id: IdType): Future[Try[Unit]] = {
@@ -86,7 +86,7 @@ trait RealServiceComponent extends ServiceComponent {
       implicit val cn = new CollectionName[JsObject] {
         override def get: String = collectionName
       }
-      repository.update[JsObject](id, updateCommand)
+      crudRepository.update[JsObject](id, updateCommand)
 
     }
   }

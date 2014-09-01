@@ -1,23 +1,22 @@
 package services
 
-import play.api.libs.json.{JsObject, Json, Writes, Reads}
+import play.api.libs.json.{JsObject, Json, Writes}
 import scala.concurrent.Future
-import reactivemongo.core.commands.LastError
-import models.{DateFormatSupport, AssetSupport}
+import models.AssetSupport
 import models.AssetSupport._
 import play.api.libs.json.Json._
 import scala.Some
-import scala.util.{Success, Try}
+import scala.util.Try
 import controllers.utils.LastErrorWrapperImplicits
 
-trait RepositoryComponent {
+trait CrudRepositoryComponent {
 
   trait Repository {
 
 
-    def getById[A: CollectionName](query: ServiceComponent#Query): Future[Option[JsObject]]
+    def getById[A: CollectionName](query: CrudServiceComponent#Query): Future[Option[JsObject]]
 
-    def find[A: CollectionName](query: ServiceComponent#Query): Future[List[JsObject]]
+    def find[A: CollectionName](query: CrudServiceComponent#Query): Future[List[JsObject]]
 
     def findAll[A: CollectionName]: Future[List[JsObject]]
 
@@ -28,17 +27,17 @@ trait RepositoryComponent {
     def remove[A: CollectionName](idType: IdType): Future[Try[Unit]]
   }
 
-  val repository: Repository
+  val crudRepository: Repository
 }
 
-trait RealRepositoryComponent extends RepositoryComponent {
+trait CrudRepository extends CrudRepositoryComponent {
   self: Mongo =>
 
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
   import LastErrorWrapperImplicits._
 
-  override val repository = new Repository {
-    override def getById[A: CollectionName](query: ServiceComponent#Query) = {
+  override val crudRepository = new Repository {
+    override def getById[A: CollectionName](query: CrudServiceComponent#Query) = {
 
       val result = mongo.find[A](query)
 
@@ -53,7 +52,7 @@ trait RealRepositoryComponent extends RepositoryComponent {
 
     }
 
-    override def find[A: CollectionName](query: ServiceComponent#Query) = mongo.find[A](query)
+    override def find[A: CollectionName](query: CrudServiceComponent#Query) = mongo.find[A](query)
 
     override def findAll[A: CollectionName] = mongo.findAll[A]
 

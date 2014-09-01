@@ -101,11 +101,11 @@ PUT            /contacttypes/:id            controllers.ContactTypes.update(id)
 POST           /contacttypes                controllers.ContactTypes.create
 DELETE         /contacttypes/:id            controllers.ContactTypes.delete(id)
 
-GET            /contacs/:id                 controllers.Contacts.getById(id)
-GET            /contacs                     controllers.Contacts.find(q:Option[String])
-PUT            /contacs/:id                 controllers.Contacts.update(id)
-POST           /contacs                     controllers.Contacts.create
-DELETE         /contacs/:id                 controllers.Contacts.delete(id)
+GET            /contacts/:id                 controllers.Contacts.getById(id)
+GET            /contacts                     controllers.Contacts.find(q:Option[String])
+PUT            /contacts/:id                 controllers.Contacts.update(id)
+POST           /contacts                     controllers.Contacts.create
+DELETE         /contacts/:id                 controllers.Contacts.delete(id)
 
 GET            /emailtypes/:id              controllers.EmailTypes.getById(id)
 GET            /emailtypes                  controllers.EmailTypes.find(q:Option[String])

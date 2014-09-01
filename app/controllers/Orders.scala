@@ -26,7 +26,7 @@ object Orders extends CrudController {
 
   def create = Action.async(parse.json) {
     request =>
-      val orderNumber = orderService.orderNumber
+      val orderNumber = 1//orderService.orderNumber
 
       val transformer = (__).json.update(
         __.read[JsObject].map { o => o ++ Json.obj("orderNumber" -> orderNumber)}
