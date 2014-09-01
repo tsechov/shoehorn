@@ -10,7 +10,7 @@ class UserTest extends Specification {
 
     "should be transformable to and from json" in {
 
-      val user = User("username", ReferenceTo("123"), ReferenceTo("shopiddd"))
+      val user = User("username", Some(ReferenceTo("123")))
       val jsonString = Json.prettyPrint(Json.toJson(user))
       println(jsonString)
       val parsed = Json.parse(jsonString).validate[User].get
