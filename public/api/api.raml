@@ -139,6 +139,18 @@ resourceTypes:
         getexample: !include customer.json
         postexample: !include customer.json
 
+/orders:
+  type:
+    collection:
+      resourceName: order
+      postexample: !include order.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include order.json
+        postexample: !include order.json
+
+
 /warehouses:
   type:
     collection:

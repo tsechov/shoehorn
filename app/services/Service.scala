@@ -15,7 +15,10 @@ import play.api.libs.json.JsObject
 import play.api.Play.current
 
 
-object production extends RealMongo with RealServiceComponent with RealRepositoryComponent with EnvVarUserRepository with UserService
+object production
+  extends RealMongo with RealServiceComponent with RealRepositoryComponent
+  with EnvVarUserRepository with UserService
+  with MongoOrderRepository with OrderService
 
 
 trait ServiceComponent {

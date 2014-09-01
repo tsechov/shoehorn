@@ -12,6 +12,7 @@ import play.api.libs.json.Json._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import play.api.libs.json.JsObject
 import models.AssetSupport
+import reactivemongo.api.indexes.{IndexType, Index}
 
 
 trait Mongo {
@@ -28,6 +29,10 @@ trait MongoDb {
   def update[A: CollectionName](selector: JsObject, json: JsValue): Future[LastError]
 
   def remove[A: CollectionName](selector: JsObject): Future[LastError]
+
+  def nextValue[A: CollectionName](field: String): Future[Int]
+
+  def ensureIndex[A: CollectionName](onField: String): Future[Boolean]
 }
 
 
@@ -41,7 +46,8 @@ class RealMongo(implicit app: Application) extends Mongo {
     def find[A: CollectionName](query: JsObject) = {
 
       collection(implicitly[CollectionName[A]].get).find(query).cursor[JsObject].collect[List]()
-      
+
+
     }
 
     override def findAll[A: CollectionName] = find(activeQuery)
@@ -56,6 +62,20 @@ class RealMongo(implicit app: Application) extends Mongo {
 
     override def remove[A: CollectionName](selector: JsObject) = collection(implicitly[CollectionName[A]].get).remove(selector)
 
+    override def nextValue[A: CollectionName](field: String) = {
+      val sort = Json.obj(field -> -1)
+      val lastId: Future[List[JsObject]] = collection(implicitly[CollectionName[A]].get).find[JsObject, JsObject](activeQuery, Json.obj(field -> 1)).sort(sort).cursor[JsObject].collect[List](1)
+      val nextId = lastId.map {
+        docs => if (docs.isEmpty) 1
+        else {
+          docs.head.as[Int] + 1
+        }
+
+      }
+      nextId
+    }
+
+    override def ensureIndex[A: CollectionName](onField: String) = collection(implicitly[CollectionName[A]].get).indexesManager.ensure(Index(Seq(onField -> IndexType.Ascending)))
   }
 
 

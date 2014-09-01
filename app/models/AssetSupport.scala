@@ -17,6 +17,7 @@ object AssetSupport {
   type IdType = String
   type UrlType = String
   type RefType[A] = ReferenceTo[A]
+  type OrderNumber = Int
 
 
 }
