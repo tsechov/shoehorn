@@ -24,7 +24,7 @@ object production
 trait CrudServiceComponent {
   type Query = JsObject
 
-  trait Service {
+  trait CrudServiceInternal {
     def getById[A: CollectionName](id: IdType): Future[Try[Option[JsObject]]]
 
     def find[A: CollectionName](query: Query): Future[Try[List[JsObject]]]
@@ -38,7 +38,7 @@ trait CrudServiceComponent {
     def remove[A: CollectionName](id: AssetSupport.IdType): Future[Try[Unit]]
   }
 
-  val service: Service
+  val crudService: CrudServiceInternal
 }
 
 
@@ -48,7 +48,7 @@ trait CrudService extends CrudServiceComponent {
   self: CrudRepositoryComponent =>
 
 
-  override val service = new Service {
+  override val crudService = new CrudServiceInternal {
     val updateCommand = obj(AssetSupport.activeFieldName -> false)
 
     override def getById[A: CollectionName](id: models.AssetSupport.IdType) = {

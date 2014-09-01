@@ -26,7 +26,7 @@ trait CrudController extends Results with ControllerUtils {
   type CREATEMODEL <: AssetCreate[MODEL]
 
 
-  val service = production service
+  val service = production crudService
 
   def getById(id: AssetSupport.IdType)(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
     request =>

@@ -5,6 +5,7 @@ import models.order.OrderIn
 import scala.concurrent.Future
 import models.AssetSupport.IdType
 import scala.util.Try
+import play.api.libs.json._
 import play.api.libs.json.JsObject
 
 trait OrderServiceComponent {
@@ -23,7 +24,7 @@ trait OrderServiceComponent {
 }
 
 trait OrderService extends OrderServiceComponent {
-  this: OrderRepositoryComponent with CrudRepository =>
+  this: OrderRepositoryComponent with CrudServiceComponent =>
 
   override val orderService = new Service {
 
@@ -33,8 +34,23 @@ trait OrderService extends OrderServiceComponent {
     override def ensureIndexOnOrderNumber = orderRepository.ensureIndexOnOrderNumber
 
     override def createOrder(create: JsObject) = {
+//      for {
+      //        on<-orderNumber
+      //        transformed <- create.transform(addOrderNumber(create)(on))
+      //      }
+
       ???
     }
+
+    private def addOrderNumber(json: JsObject)(orderNumber: Int): Reads[JsObject] = {
+
+      (__).json.update(
+        __.read[JsObject].map {
+          o => o ++ Json.obj("orderNumber" -> orderNumber)
+        }
+      )
+    }
+
 
   }
 
