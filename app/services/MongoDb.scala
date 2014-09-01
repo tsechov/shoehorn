@@ -13,6 +13,7 @@ import play.modules.reactivemongo.json.collection.JSONCollection
 import play.api.libs.json.JsObject
 import models.AssetSupport
 import reactivemongo.api.indexes.{IndexType, Index}
+import scala.util.{Success, Try}
 
 
 trait Mongo {
@@ -30,7 +31,7 @@ trait MongoDb {
 
   def remove[A: CollectionName](selector: JsObject): Future[LastError]
 
-  def nextValue[A: CollectionName](field: String): Future[Int]
+  def nextValue[A: CollectionName](field: String): Future[Try[Int]]
 
   def ensureIndex[A: CollectionName](onField: String): Future[Boolean]
 }
@@ -66,10 +67,10 @@ class RealMongo(implicit app: Application) extends Mongo {
       val sort = Json.obj(field -> -1)
       val lastId: Future[List[JsObject]] = collection(implicitly[CollectionName[A]].get).find[JsObject, JsObject](activeQuery, Json.obj(field -> 1)).sort(sort).cursor[JsObject].collect[List](1)
       val nextId = lastId.map {
-        docs => if (docs.isEmpty) 1
+        docs => Success(if (docs.isEmpty) 1
         else {
           docs.head.as[Int] + 1
-        }
+        })
 
       }
       nextId

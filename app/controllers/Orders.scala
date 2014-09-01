@@ -7,11 +7,10 @@ import play.api.mvc.BodyParsers.parse
 import models.order.{OrderIn, OrderUpdate, OrderCreate}
 import controllers.utils.CrudController
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
-import java.util.UUID
-import scala.concurrent.Future
-import play.api.Logger
 import services.production
+import play.api.http.{HeaderNames, ContentTypes}
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.util.Success
 
 
 object Orders extends CrudController {
@@ -26,22 +25,19 @@ object Orders extends CrudController {
 
   def create = Action.async(parse.json) {
     request =>
-      val orderNumber = 1//orderService.orderNumber
 
-      val transformer = (__).json.update(
-        __.read[JsObject].map { o => o ++ Json.obj("orderNumber" -> orderNumber)}
-      )
+      orderService.createOrder(request.body.as[JsObject]).map {
+        internalServerError[IdType]("failed tp create order") orElse {
+          case Success(id) => Created.as(ContentTypes.JSON)
+            .withHeaders(HeaderNames.LOCATION -> locationUrl(id, id => controllers.routes.Orders.getById(id)))
+            .withHeaders(filters.RESOURCE_ID_HEADER -> id)
 
-      val res = request.body.transform(transformer).map {
-
-        super.create(_, id => controllers.routes.Orders.getById(id))
-      }.recoverTotal {
-        (e) => {
-          Logger.error(s"failed to inject orderNumber: $e")
-          Future.successful(InternalServerError)
         }
+
+
       }
-      res
+
+
   }
 
   def update(id: IdType) = Action.async(parse.json) {

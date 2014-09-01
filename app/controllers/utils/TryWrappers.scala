@@ -2,12 +2,11 @@ package controllers.utils
 
 import scala.util.{Failure, Success, Try}
 import reactivemongo.core.commands.LastError
-import reactivemongo.core.errors.ReactiveMongoException
+import reactivemongo.core.errors.GenericDatabaseException
 
 
-
-class Option2TryWrapper[A](option: Option[A])  {
-   def orFailWithMessage(msg: String): Try[A] = {
+class Option2TryWrapper[A](option: Option[A]) {
+  def orFailWithMessage(msg: String): Try[A] = {
     option match {
       case Some(a) => Success(a)
       case None => Failure(new IllegalArgumentException(msg))
@@ -21,12 +20,12 @@ object OptionWrapperImplicits {
 }
 
 
-class LastError2TryWrapper(lastError: LastError)  {
-   def orFail: Try[LastError] = {
+class LastError2TryWrapper(lastError: LastError) {
+  def orFail: Try[LastError] = {
     if (lastError.ok) {
       Success(lastError)
     } else {
-      Failure(ReactiveMongoException(lastError.stringify))
+      Failure(GenericDatabaseException(lastError.stringify, lastError.code))
     }
   }
 }

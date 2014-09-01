@@ -1,17 +1,18 @@
 package services
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import models.order.OrderIn
+import models.order.{OrderCreate, OrderIn}
 import scala.concurrent.Future
 import models.AssetSupport.IdType
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import play.api.libs.json._
 import play.api.libs.json.JsObject
+import reactivemongo.core.errors.GenericDatabaseException
 
 trait OrderServiceComponent {
 
   trait Service {
-    def orderNumber(): Future[Int]
+    def orderNumber(): Future[Try[Int]]
 
     def ensureIndexOnOrderNumber: Future[Unit]
 
@@ -34,12 +35,33 @@ trait OrderService extends OrderServiceComponent {
     override def ensureIndexOnOrderNumber = orderRepository.ensureIndexOnOrderNumber
 
     override def createOrder(create: JsObject) = {
-//      for {
-      //        on<-orderNumber
-      //        transformed <- create.transform(addOrderNumber(create)(on))
-      //      }
 
-      ???
+      val res = for {
+        onTried <- orderNumber
+        insertResult <- insert(for (onValue <- onTried; oc <- toCreateModel(create)(onValue)) yield oc)
+        result <- insertResult match {
+          case Success(_) => Future.successful(insertResult)
+          case Failure(GenericDatabaseException(errorString, code)) if (code == 11000) => createOrder(create)
+          case f: Failure[IdType] => Future.successful(f)
+        }
+      } yield result
+
+      res
+    }
+
+    private def toCreateModel(json: JsObject)(orderNumber: Int): Try[OrderCreate] = {
+      val res = for {
+        transformed <- json.transform(addOrderNumber(json)(orderNumber))
+        create <- transformed.validate[OrderCreate]
+      } yield create
+      res match {
+        case JsSuccess(value, _) => Success(value)
+        case e => {
+          Failure(new IllegalArgumentException(e.toString))
+        }
+      }
+
+
     }
 
     private def addOrderNumber(json: JsObject)(orderNumber: Int): Reads[JsObject] = {
@@ -51,6 +73,15 @@ trait OrderService extends OrderServiceComponent {
       )
     }
 
+    private def insert(create: Try[OrderCreate]): Future[Try[IdType]] = {
+      create match {
+        case Failure(t: Throwable) => Future.successful(Failure[IdType](t))
+        case Success(value) => crudService.insert[OrderCreate, OrderIn](value)
+      }
+
+
+    }
+
 
   }
 
@@ -60,7 +91,7 @@ trait OrderService extends OrderServiceComponent {
 trait OrderRepositoryComponent {
 
   trait Repository {
-    def orderNumber(): Future[Int]
+    def orderNumber(): Future[Try[Int]]
 
     def ensureIndexOnOrderNumber: Future[Unit]
   }
