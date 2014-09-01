@@ -4,6 +4,7 @@ import play.api.libs.json._
 import org.joda.time.DateTime
 import models.AssetSupport.IdType
 import services.CollectionName
+import models.common.{Referable, ReferenceTo}
 
 object AssetSupport {
 
@@ -15,6 +16,7 @@ object AssetSupport {
 
   type IdType = String
   type UrlType = String
+  type RefType[A] = ReferenceTo[A]
 
 
 }

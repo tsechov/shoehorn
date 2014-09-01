@@ -1,6 +1,6 @@
 package models.customer
 
-import models.common.Address
+import models.common.{Referable, Address}
 import play.api.libs.json.Json
 import models._
 import models.AssetSupport._
@@ -20,7 +20,7 @@ case class ShopIn(
   override def fillup(lastModifiedAt: DateTime) = ShopUpdate(lastModifiedAt, active, description, name, status, address)
 }
 
-object ShopIn extends DateFormatSupport {
+object ShopIn extends DateFormatSupport{
   implicit val format = Json.format[ShopIn]
   implicit val collectionName = new CollectionName[ShopIn] {
     override def get: String = "shops"

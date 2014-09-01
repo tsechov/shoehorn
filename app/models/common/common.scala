@@ -2,6 +2,10 @@ package models.common
 
 import models.AssetSupport._
 import play.api.libs.json._
+import controllers.AssetsBuilder
+import models.AssetSupport.RefType
+
+import models.customer.{EmailTypeIn, PhoneNumberTypeIn}
 
 case class Price(price: Int, unit: String, quantity: Int)
 
@@ -24,7 +28,7 @@ object Address {
 }
 
 case class PhoneNumber(
-                        phoneNumberTypeId: IdType,
+                        phoneNumberTypeId: RefType[PhoneNumberTypeIn],
                         country: String,
                         extension: String,
                         number: String
@@ -35,7 +39,7 @@ object PhoneNumber {
 }
 
 case class Email(
-                  emailTypeId: IdType,
+                  emailTypeId: RefType[EmailTypeIn],
                   address: String
                   )
 

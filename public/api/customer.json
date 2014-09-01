@@ -1,0 +1,27 @@
+{
+    "_id": "53f3a7551800002c00b9de8a",
+    "createdAt": "2014-09-01T00:03:32.469+02:00",
+    "lastModifiedAt": "2014-09-01T00:03:32.469+02:00",
+    "active": true,
+    "description": "from raml",
+    "name": "customer name jool",
+    "agentId": "53f3a7551800002c00b9de8a",
+    "taxExemptNumber": "foobar",
+    "lineOfBusinessId": "53f3a7551800002c00b9de8a",
+    "siteId": "53f3a7551800002c00b9de8a",
+    "companyTypeId": "53f3a7551800002c00b9de8a",
+    "shopIds": ["53f3a7551800002c00b9de8a", "53f3a7551800002c00b9de8a"],
+    "addresses": [
+        {
+            "addressTypeId": "53f3a7551800002c00b9de8a",
+            "country": "countryjool",
+            "district": "district eh",
+            "postalcode": "zipzip",
+            "city": "citi",
+            "address": "addressssssss",
+            "description": "address description"
+        }
+    ],
+    "groupIds": ["53f3a7551800002c00b9de8a", "53f3a7551800002c00b9de8a"],
+    "contactIds": ["53f3a7551800002c00b9de8a", "53f3a7551800002c00b9de8a"]
+}

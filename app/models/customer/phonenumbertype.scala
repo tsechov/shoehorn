@@ -4,6 +4,7 @@ import play.api.libs.json.Json
 import models._
 import models.AssetSupport._
 import org.joda.time.DateTime
+import models.common.Referable
 
 case class PhoneNumberTypeIn(_id: IdType,
                              createdAt: DateTime,
@@ -14,7 +15,7 @@ case class PhoneNumberTypeIn(_id: IdType,
   override def fillup(lastModifiedAt: DateTime): PhoneNumberTypeUpdate = PhoneNumberTypeUpdate(lastModifiedAt, active, description, name)
 }
 
-object PhoneNumberTypeIn extends AssetInCompanion[PhoneNumberTypeIn] {
+object PhoneNumberTypeIn extends AssetInCompanion[PhoneNumberTypeIn] with Referable[PhoneNumberTypeIn] {
   val collectionName = "phonenumbertypes"
   val format = Json.format[PhoneNumberTypeIn]
   type Id = IdType

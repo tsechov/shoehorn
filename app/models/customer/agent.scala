@@ -35,11 +35,12 @@ case class AgentIn(
       emails)
 }
 
-object AgentIn extends DateFormatSupport {
+object AgentIn extends DateFormatSupport with Referable[AgentIn] {
   implicit val format = Json.format[AgentIn]
   implicit val collectionName = new CollectionName[AgentIn] {
     override def get: String = "agents"
   }
+
 }
 
 case class AgentUpdate(lastModifiedAt: DateTime,

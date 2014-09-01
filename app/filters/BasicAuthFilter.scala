@@ -5,16 +5,18 @@ import play.api.mvc._
 import scala.concurrent.Future
 import play.api.Logger
 import play.api.http.HeaderNames._
+import services.production
 
 object BasicAuthFilter extends Filter {
+
+  lazy val userService = production userService
+
   private lazy val ajaxUnauthResult = Results.Unauthorized.withHeaders((AUTHENTICATION_REQUIRED_HEADER,
-    "Basic realm=\"shoehorn basic authentication\"")
+    """Basic realm="shoehorn basic authentication"""")
   )
   private lazy val browserUnauthResult = Results.Unauthorized.withHeaders((WWW_AUTHENTICATE,
-    "Basic realm=\"shoehorn basic authentication\""))
-  private lazy val passwordRequired = true
-  private lazy val username = "admin"
-  private lazy val password = "xxxx"
+    """Basic realm="shoehorn basic authentication""""))
+
   private lazy val outsidePages = List("assets", "version")
   //need the space at the end
   private lazy val basicSt = "basic "
@@ -24,8 +26,9 @@ object BasicAuthFilter extends Filter {
     return request.headers.get(X_FORWARDED_FOR).getOrElse(request.remoteAddress.toString)
   }
 
-  private def logFailedAttempt(requestHeader: RequestHeader) = {
-    Logger.warn(s"IP address ${getUserIPAddress(requestHeader)} failed to log in, requested uri: ${requestHeader.uri}")
+  private def logFailedAttempt(requestHeader: RequestHeader, username: Option[String]) = {
+    val user = username.getOrElse("not known")
+    Logger.warn(s"IP address [${getUserIPAddress(requestHeader)}], user: [$user] failed to log in, requested uri: ${requestHeader.uri}")
   }
 
   private def decodeBasicAuth(auth: String): Option[(String, String)] = {
@@ -51,7 +54,7 @@ object BasicAuthFilter extends Filter {
 
   private def isOutsideSecurityRealm(requestHeader: RequestHeader): Boolean = {
 
-    Logger.debug(s"method: ${requestHeader.method}")
+
     val reqURI = requestHeader.uri
     if (reqURI.length() > 0) {
       //remove the first "/" in the uri
@@ -64,35 +67,32 @@ object BasicAuthFilter extends Filter {
     }
   }
 
-  private def fail(requestHeader: RequestHeader) = {
-    logFailedAttempt(requestHeader)
-    requestHeader.headers.get("X-Requested-With").map(
-      _ => Future.successful(ajaxUnauthResult)
-    ).getOrElse {
-      Future.successful(browserUnauthResult)
-    }
-
+  private def fail(requestHeader: RequestHeader, username: Option[String] = None) = {
+    logFailedAttempt(requestHeader, username)
+    Future.successful(if (requestHeader.headers.keys.contains("X-Requested-With")) ajaxUnauthResult else browserUnauthResult)
   }
 
-  def apply(nextFilter: (RequestHeader) => Future[SimpleResult])(requestHeader: RequestHeader):
-  Future[SimpleResult] = {
-    if (!passwordRequired || isOutsideSecurityRealm(requestHeader)) {
+  def apply(nextFilter: (RequestHeader) => Future[SimpleResult])(requestHeader: RequestHeader) = {
+    if (isOutsideSecurityRealm(requestHeader)) {
       nextFilter(requestHeader)
     } else {
 
       requestHeader.headers.get(AUTHORIZATION).map {
         basicAuth =>
           decodeBasicAuth(basicAuth) match {
-            case Some((user, pass)) if (username == user && password == pass) => {
-              Logger.debug(s"logging in with $user : ***")
-              nextFilter(requestHeader)
+            case Some((user, pass)) => {
+              if (userService.authenticate(user, pass))
+                nextFilter(requestHeader.copy())
+              else
+                fail(requestHeader, Some(user))
             }
+
             case _ => fail(requestHeader)
           }
 
-      }.getOrElse({
+      }.getOrElse {
         fail(requestHeader)
-      })
+      }
     }
 
   }

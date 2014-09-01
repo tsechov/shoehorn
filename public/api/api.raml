@@ -128,6 +128,17 @@ resourceTypes:
             only allowed if itemNumber is present in the query
           example: 13
 
+/customers:
+  type:
+    collection:
+      resourceName: customer
+      postexample: !include customer.json
+  /{id}:
+    type:
+      collection-item:
+        getexample: !include customer.json
+        postexample: !include customer.json
+
 /warehouses:
   type:
     collection:

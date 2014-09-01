@@ -4,6 +4,7 @@ import play.api.libs.json.Json
 import models._
 import models.AssetSupport._
 import org.joda.time.DateTime
+import models.common.Referable
 
 case class EmailTypeIn(_id: IdType,
                        createdAt: DateTime,
@@ -14,7 +15,7 @@ case class EmailTypeIn(_id: IdType,
   override def fillup(lastModifiedAt: DateTime): EmailTypeUpdate = EmailTypeUpdate(lastModifiedAt, active, description, name)
 }
 
-object EmailTypeIn extends AssetInCompanion[EmailTypeIn] {
+object EmailTypeIn extends AssetInCompanion[EmailTypeIn] with Referable[EmailTypeIn] {
   val collectionName = "emailtypes"
   val format = Json.format[EmailTypeIn]
   type Id = IdType
