@@ -33,7 +33,7 @@ trait MongoDb {
 
   def nextValue[A: CollectionName](field: String): Future[Try[Int]]
 
-  def ensureIndex[A: CollectionName](onField: String): Future[Boolean]
+  def ensureUniqueIndex[A: CollectionName](onField: String): Future[Boolean]
 }
 
 
@@ -77,7 +77,7 @@ class RealMongo(implicit app: Application) extends Mongo {
       nextId
     }
 
-    override def ensureIndex[A: CollectionName](onField: String) = collection(implicitly[CollectionName[A]].get).indexesManager.ensure(Index(Seq(onField -> IndexType.Ascending)))
+    override def ensureUniqueIndex[A: CollectionName](onField: String) = collection(implicitly[CollectionName[A]].get).indexesManager.ensure(Index(key = Seq(onField -> IndexType.Ascending), unique = true))
   }
 
 

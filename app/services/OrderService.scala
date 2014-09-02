@@ -130,6 +130,6 @@ trait MongoOrderRepository extends OrderRepositoryComponent {
       mongo.nextValue[OrderIn]("orderId")
     }
 
-    override def ensureIndexOnOrderId = mongo.ensureIndex[OrderIn]("orderId").map((result) => ())
+    override def ensureIndexOnOrderId = mongo.ensureUniqueIndex[OrderIn]("orderId").map((result) => ())
   }
 }
