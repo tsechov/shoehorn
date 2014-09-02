@@ -14,7 +14,7 @@ POST           /catalogs                    controllers.Catalogs.create
 DELETE         /catalogs/:id                controllers.Catalogs.delete(id)
 
 GET            /products/:id                controllers.Products.getById(id)
-GET            /products                    controllers.Products.find(q:Option[String])
+GET            /products                    controllers.Products.find(q:Option[String],catalogs:Option[String])
 PUT            /products/:id                controllers.Products.update(id)
 POST           /products                    controllers.Products.create
 DELETE         /products/:id                controllers.Products.delete(id)

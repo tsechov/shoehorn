@@ -102,12 +102,12 @@ resourceTypes:
   get:
     queryParameters:
       q: *q
-#      catalogs:
-#        description: |
-#          json array of catalog ids.
-#
-#          will return those products that are part of any of the given catalogs
-#        example: ["1","2","3"]
+      catalogs:
+        description: |
+          json array of catalog ids.
+          will return those products that are part of any of the given catalogs
+        example: |
+          ["1","2","3"]
 
   /{id}:
     type:

@@ -42,16 +42,19 @@ trait CrudController extends Results with ControllerUtils {
 
   def find(q: Option[String])(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
     Logger.debug(s"find queryString: $q")
-
     q match {
-      case Some(queryString) => {
-        Try(Json.parse(queryString).as[JsObject]) match {
-          case Success(queryJson) => service.find[MODEL](queryJson).map(listResult[JsObject]("find"))
-          case Failure(error) => badQuery(queryString, error)
-        }
-      }
+      case Some(queryString) => findByQuery(queryString)
       case None => service.findAll[MODEL].map(listResult[JsObject]("find"))
     }
+  }
+
+  def findByQuery(queryString: String)(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = {
+
+    Try(Json.parse(queryString).as[JsObject]) match {
+      case Success(queryJson) => service.find[MODEL](queryJson).map(listResult[JsObject]("find"))
+      case Failure(error) => badQuery(queryString, error)
+    }
+
   }
 
 
