@@ -82,7 +82,8 @@ object BasicAuthFilter extends Filter {
           decodeBasicAuth(basicAuth) match {
             case Some((user, pass)) => {
               if (userService.authenticate(user, pass))
-                nextFilter(requestHeader.copy())
+
+                nextFilter(requestHeader.copy(tags = requestHeader.tags + (AUTHENTICATED_USER -> user)))
               else
                 fail(requestHeader, Some(user))
             }

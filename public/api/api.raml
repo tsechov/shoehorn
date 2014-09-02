@@ -70,7 +70,18 @@ resourceTypes:
       delete:
         description: deletes the resource with the given id
 
-
+/users:
+  /me:
+    get:
+      description: returns the details of the authenticated user
+      responses:
+        200:
+          description: OK
+          body:
+            application/json:
+              example: !include user.json
+        404:
+          description: the user not found. most probably not logged in...
         
 /catalogs:
   type: 

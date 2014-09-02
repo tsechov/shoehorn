@@ -8,11 +8,7 @@ import play.api.libs.functional.syntax._
 case class User(username: String, agentId: Option[ReferenceTo[AgentIn]])
 
 object User {
-
-
   implicit val format = Json.format[User]
-
-
 }
 
 case class UserCredential(username: String, password: String)

@@ -22,9 +22,10 @@ case class ProductCreate(
                           name: String,
                           itemNumber: ProductIn.ItemNumber,
                           image: UrlType,
+                          imageThumb: UrlType,
                           catalogs: List[CatalogSw]
                           ) extends AssetCreate[ProductIn] {
-  override def fillup(b: AssetBase) = ProductIn(b.id, b.createdAt, b.lastModifiedAt, active, description, name, itemNumber, image, catalogs)
+  override def fillup(b: AssetBase) = ProductIn(b.id, b.createdAt, b.lastModifiedAt, active, description, name, itemNumber, image, imageThumb, catalogs)
 }
 
 object ProductCreate {
@@ -40,6 +41,7 @@ case class ProductUpdate(
                           name: String,
                           itemNumbeAssetSupport: ProductIn.ItemNumber,
                           image: UrlType,
+                          imageThumb: UrlType,
                           catalogs: List[CatalogSw]
                           ) extends AssetUpdate
 
@@ -64,9 +66,10 @@ case class ProductIn(
                       itemNumber: ProductIn.ItemNumber,
 
                       image: UrlType,
+                      imageThumb: UrlType,
 
                       catalogs: List[CatalogSw]) extends AssetIn with AssetUpdateBuilder[ProductUpdate] {
-  override def fillup(lastModifiedAt: DateTime) = ProductUpdate(lastModifiedAt, active, description, name, itemNumber, image, catalogs)
+  override def fillup(lastModifiedAt: DateTime) = ProductUpdate(lastModifiedAt, active, description, name, itemNumber, image, imageThumb, catalogs)
 }
 
 object ProductIn extends DateFormatSupport {
