@@ -29,6 +29,7 @@ object Orders extends CrudController {
       val input = request.body.as[JsObject]
       Logger.debug("order in: " + Json.prettyPrint(input))
       orderService.createOrder(input).map {
+
         internalServerError[IdType]("failed to create order") orElse {
           case Success(id) => Created.as(ContentTypes.JSON)
             .withHeaders(HeaderNames.LOCATION -> locationUrl(id, id => controllers.routes.Orders.getById(id)))
@@ -37,6 +38,11 @@ object Orders extends CrudController {
         }
 
 
+      }.recover {
+        case error => {
+          Logger.error("cant create order", error)
+          InternalServerError
+        }
       }
 
 

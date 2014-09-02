@@ -14,6 +14,7 @@ class UserTest extends Specification {
       val jsonString = Json.prettyPrint(Json.toJson(user))
       println(jsonString)
       val parsed = Json.parse(jsonString).validate[User].get
+      println("2".reverse.padTo[Char, String](4, '0').reverse)
       success
     }
 

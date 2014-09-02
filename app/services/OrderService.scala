@@ -55,7 +55,7 @@ trait OrderService extends OrderServiceComponent {
     private def toCreateModel(json: JsObject)(orderId: Int): Try[OrderCreate] = {
       val res = for {
         orderIdAdded <- json.transform(addorderId(json)(orderId))
-        orderNumberAdded <- orderIdAdded.transform(addorderNumber(orderIdAdded)("on" + DateTimeFormat.forPattern("yyyyMMdd").print(new DateTime) + "/" + orderId.toString))
+        orderNumberAdded <- orderIdAdded.transform(addorderNumber(orderIdAdded)(orderNumberFormat(orderId)))
         create <- orderNumberAdded.validate[OrderCreate]
       } yield create
       res match {
@@ -66,6 +66,11 @@ trait OrderService extends OrderServiceComponent {
       }
 
 
+    }
+
+    private def orderNumberFormat(orderId: Int) = {
+      val padded = orderId.toString.reverse.padTo[Char, String](4, '0').reverse
+      DateTimeFormat.forPattern("yyyyMMdd").print(new DateTime) + "/" + padded
     }
 
     private def addorderId(json: JsObject)(orderId: Int): Reads[JsObject] = {
