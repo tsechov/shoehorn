@@ -4,7 +4,8 @@
     "lastModifiedAt": "2014-09-01T00:03:32.469+02:00",
     "active": true,
     "description": "from runscope",
-    "orderNumber": "1234",
+    "orderId": 1234,
+    "orderNumber": "on201409021234",
     "originatorId": "53f370551800001800201e5e",
     "customerId": "53f370551800001800201e5e",
     "billingAddress": {

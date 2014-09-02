@@ -1,7 +1,7 @@
 package services
 
 import play.modules.reactivemongo.ReactiveMongoPlugin
-import play.api.Application
+import play.api.{Logger, Application}
 
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -69,7 +69,8 @@ class RealMongo(implicit app: Application) extends Mongo {
       val nextId = lastId.map {
         docs => Success(if (docs.isEmpty) 1
         else {
-          docs.head.as[Int] + 1
+          Logger.debug(s"lastiddoc: ${docs.head}")
+          (docs.head \ field).as[Int] + 1
         })
 
       }

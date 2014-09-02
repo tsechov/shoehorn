@@ -3,6 +3,7 @@ package services
 import models.{UserCredential, User}
 import play.api.libs.json.{Reads, JsError, JsSuccess, Json}
 import play.api.Logger
+import scala.util.{Failure, Success, Try}
 
 trait UserServiceComponent {
 
@@ -47,10 +48,19 @@ trait EnvVarUserRepository extends UserRepositoryComponent {
 
     private def find[A](filter: (A) => Boolean)(implicit r: Reads[List[A]]): Option[A] = {
       val usersString = sys.env.get("SHOEHORN_USERS").getOrElse("[]")
-      Json.parse(usersString).validate[List[A]] match {
-        case JsSuccess(users, _) => users.find(filter)
-        case JsError(e) => {
-          Logger.error(s"cannot parse users from envvar['SHOEHORN_USERS']: $e")
+
+      Try(Json.parse(usersString)).map {
+        _.validate[List[A]] match {
+          case JsSuccess(users, _) => users.find(filter)
+          case JsError(error) => {
+            Logger.error(s"cannot parse users from envvar['SHOEHORN_USERS']: $error")
+            None
+          }
+        }
+      } match {
+        case Success(result) => result
+        case Failure(error) => {
+          Logger.error(s"cannot read users from envvar['SHOEHORN_USERS']: $error")
           None
         }
       }

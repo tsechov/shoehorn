@@ -8,37 +8,40 @@ import scala.util.{Failure, Success, Try}
 import play.api.libs.json._
 import play.api.libs.json.JsObject
 import reactivemongo.core.errors.GenericDatabaseException
+import play.api.Logger
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 
 trait OrderServiceComponent {
 
-  trait Service {
-    def orderNumber(): Future[Try[Int]]
+  trait OrderServiceInternal {
+    def orderId(): Future[Try[Int]]
 
-    def ensureIndexOnOrderNumber: Future[Unit]
+    def ensureIndexOnOrderId: Future[Unit]
 
     def createOrder(create: JsObject): Future[Try[IdType]]
 
   }
 
-  val orderService: Service
+  val orderService: OrderServiceInternal
 
 }
 
 trait OrderService extends OrderServiceComponent {
   this: OrderRepositoryComponent with CrudServiceComponent =>
 
-  override val orderService = new Service {
+  override val orderService = new OrderServiceInternal {
 
 
-    override def orderNumber = orderRepository.orderNumber
+    override def orderId = orderRepository.orderId
 
-    override def ensureIndexOnOrderNumber = orderRepository.ensureIndexOnOrderNumber
+    override def ensureIndexOnOrderId = orderRepository.ensureIndexOnOrderId
 
     override def createOrder(create: JsObject) = {
 
       val res = for {
-        onTried <- orderNumber
-        insertResult <- insert(for (onValue <- onTried; oc <- toCreateModel(create)(onValue)) yield oc)
+        oidTried <- orderId
+        insertResult <- insert(for (oidValue <- oidTried; oc <- toCreateModel(create)(oidValue)) yield oc)
         result <- insertResult match {
           case Success(_) => Future.successful(insertResult)
           case Failure(GenericDatabaseException(errorString, code)) if (code == 11000) => createOrder(create)
@@ -49,10 +52,11 @@ trait OrderService extends OrderServiceComponent {
       res
     }
 
-    private def toCreateModel(json: JsObject)(orderNumber: Int): Try[OrderCreate] = {
+    private def toCreateModel(json: JsObject)(orderId: Int): Try[OrderCreate] = {
       val res = for {
-        transformed <- json.transform(addOrderNumber(json)(orderNumber))
-        create <- transformed.validate[OrderCreate]
+        orderIdAdded <- json.transform(addorderId(json)(orderId))
+        orderNumberAdded <- orderIdAdded.transform(addorderNumber(orderIdAdded)("on" + DateTimeFormat.forPattern("yyyyMMdd").print(new DateTime) + "/" + orderId.toString))
+        create <- orderNumberAdded.validate[OrderCreate]
       } yield create
       res match {
         case JsSuccess(value, _) => Success(value)
@@ -64,7 +68,16 @@ trait OrderService extends OrderServiceComponent {
 
     }
 
-    private def addOrderNumber(json: JsObject)(orderNumber: Int): Reads[JsObject] = {
+    private def addorderId(json: JsObject)(orderId: Int): Reads[JsObject] = {
+
+      (__).json.update(
+        __.read[JsObject].map {
+          o => o ++ Json.obj("orderId" -> orderId)
+        }
+      )
+    }
+
+    private def addorderNumber(json: JsObject)(orderNumber: String): Reads[JsObject] = {
 
       (__).json.update(
         __.read[JsObject].map {
@@ -76,7 +89,10 @@ trait OrderService extends OrderServiceComponent {
     private def insert(create: Try[OrderCreate]): Future[Try[IdType]] = {
       create match {
         case Failure(t: Throwable) => Future.successful(Failure[IdType](t))
-        case Success(value) => crudService.insert[OrderCreate, OrderIn](value)
+        case Success(value) => {
+          Logger.debug(s"about to insert $value")
+          crudService.insert[OrderCreate, OrderIn](value)
+        }
       }
 
 
@@ -91,9 +107,9 @@ trait OrderService extends OrderServiceComponent {
 trait OrderRepositoryComponent {
 
   trait Repository {
-    def orderNumber(): Future[Try[Int]]
+    def orderId(): Future[Try[Int]]
 
-    def ensureIndexOnOrderNumber: Future[Unit]
+    def ensureIndexOnOrderId: Future[Unit]
   }
 
   val orderRepository: Repository
@@ -104,10 +120,10 @@ trait MongoOrderRepository extends OrderRepositoryComponent {
   this: Mongo =>
   override val orderRepository = new Repository {
 
-    override def orderNumber() = {
-      mongo.nextValue[OrderIn]("orderNumber")
+    override def orderId() = {
+      mongo.nextValue[OrderIn]("orderId")
     }
 
-    override def ensureIndexOnOrderNumber = mongo.ensureIndex[OrderIn]("orderNumber").map((result) => ())
+    override def ensureIndexOnOrderId = mongo.ensureIndex[OrderIn]("orderId").map((result) => ())
   }
 }

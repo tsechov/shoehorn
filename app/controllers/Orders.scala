@@ -11,13 +11,14 @@ import services.production
 import play.api.http.{HeaderNames, ContentTypes}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.util.Success
+import play.api.Logger
 
 
 object Orders extends CrudController {
 
   lazy val orderService = production orderService
 
-  orderService.ensureIndexOnOrderNumber
+  orderService.ensureIndexOnOrderId
 
   override type MODEL = OrderIn
   override type UPDATEMODEL = OrderUpdate
@@ -25,9 +26,10 @@ object Orders extends CrudController {
 
   def create = Action.async(parse.json) {
     request =>
-
-      orderService.createOrder(request.body.as[JsObject]).map {
-        internalServerError[IdType]("failed tp create order") orElse {
+      val input = request.body.as[JsObject]
+      Logger.debug("order in: " + Json.prettyPrint(input))
+      orderService.createOrder(input).map {
+        internalServerError[IdType]("failed to create order") orElse {
           case Success(id) => Created.as(ContentTypes.JSON)
             .withHeaders(HeaderNames.LOCATION -> locationUrl(id, id => controllers.routes.Orders.getById(id)))
             .withHeaders(filters.RESOURCE_ID_HEADER -> id)
