@@ -5,8 +5,7 @@ import models.AssetSupport.IdType
 import play.api.mvc.BodyParsers.parse
 import models.product.{ProductIn, ProductUpdate, ProductCreate}
 import controllers.utils.CrudController
-import play.api.libs.json.{JsArray, Json, JsObject, Format}
-import services.CollectionName
+import play.api.libs.json.{JsArray, Json, JsObject}
 import play.api.Logger
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext

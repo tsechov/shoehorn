@@ -11,8 +11,12 @@ import reactivemongo.core.errors.GenericDatabaseException
 import play.api.Logger
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import play.api.data.validation.ValidationError
+
+case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
 trait OrderServiceComponent {
+
 
   trait OrderServiceInternal {
     def orderId(): Future[Try[Int]]
@@ -29,6 +33,7 @@ trait OrderServiceComponent {
 
 trait OrderService extends OrderServiceComponent {
   this: OrderRepositoryComponent with CrudServiceComponent =>
+
 
   override val orderService = new OrderServiceInternal {
 
@@ -58,12 +63,8 @@ trait OrderService extends OrderServiceComponent {
         orderNumberAdded <- orderIdAdded.transform(addorderNumber(orderIdAdded)(orderNumberFormat(orderId)))
         create <- orderNumberAdded.validate[OrderCreate]
       } yield create
-      res match {
-        case JsSuccess(value, _) => Success(value)
-        case e => {
-          Failure(new IllegalArgumentException(e.toString))
-        }
-      }
+
+      res.fold(errors => Failure(JsonErrors(errors)), res => Success(res))
 
 
     }

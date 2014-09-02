@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.mvc.Action
+import play.api.mvc.{SimpleResult, Action}
 import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
@@ -10,8 +10,10 @@ import play.api.libs.json._
 import services.production
 import play.api.http.{HeaderNames, ContentTypes}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.util.Success
+import scala.util.{Try, Failure, Success}
 import play.api.Logger
+import services.JsonErrors
+import scala.concurrent.Future
 
 
 object Orders extends CrudController {
@@ -24,13 +26,20 @@ object Orders extends CrudController {
   override type UPDATEMODEL = OrderUpdate
   override type CREATEMODEL = OrderCreate
 
+  private def jsError: PartialFunction[Try[IdType], SimpleResult] = {
+    case Failure(error: JsonErrors) => {
+      val jsonError = JsError.toFlatJson(JsError(error.errors))
+      Logger.debug(s"invalid ordercreate: $jsonError")
+      BadRequest(jsonError)
+    }
+  }
+
   def create = Action.async(parse.json) {
     request =>
       val input = request.body.as[JsObject]
       Logger.debug("order in: " + Json.prettyPrint(input))
       orderService.createOrder(input).map {
-
-        internalServerError[IdType]("failed to create order") orElse {
+        jsError orElse internalServerError[IdType]("failed to create order") orElse {
           case Success(id) => Created.as(ContentTypes.JSON)
             .withHeaders(HeaderNames.LOCATION -> locationUrl(id, id => controllers.routes.Orders.getById(id)))
             .withHeaders(filters.RESOURCE_ID_HEADER -> id)
