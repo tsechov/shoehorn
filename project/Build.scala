@@ -6,6 +6,7 @@ import sbt.Keys._
 import play.Project._
 import sbtrelease.ReleasePlugin._
 import sbtrelease.ReleasePlugin.ReleaseKeys._
+import sbtrelease._
 import sbtrelease.Version.Bump
 import scala.Some
 
@@ -32,12 +33,21 @@ object ApplicationBuild extends Build {
     case _ => Bump.Next
   }
 
+  def versionBump(version: Version) = sys.props.get("versionBump") match {
+    case Some("major") => version.bumpMajor
+    case Some("minor") => version.bumpMinor
+    case _ => version.bumpBugfix
+  }
+
+
   val main = play.Project(appName, appVersion, appDependencies, settings = Defaults.defaultSettings ++ playScalaSettings ++ releaseSettings).settings(
     sources in(Compile, doc) := Seq.empty,
     publishTo := Some(Resolver.file("file", new File(target.value.absolutePath + "/publish"))),
     version := (version in ThisBuild).value,
 
-    versionBump := Bump.Major,
+    nextVersion := {
+      ver => Version(ver).map(versionBump(_).asSnapshot.string).getOrElse(versionFormatError)
+    },
 
     sourceGenerators in Compile <+= Def.task {
       val file = (sourceManaged in Compile).value / "release" / "CurrentVersion.scala"
