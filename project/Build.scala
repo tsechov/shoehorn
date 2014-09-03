@@ -37,7 +37,7 @@ object ApplicationBuild extends Build {
     publishTo := Some(Resolver.file("file", new File(target.value.absolutePath + "/publish"))),
     version := (version in ThisBuild).value,
 
-    versionBump := bumpType,
+    versionBump := Bump.Major,
 
     sourceGenerators in Compile <+= Def.task {
       val file = (sourceManaged in Compile).value / "release" / "CurrentVersion.scala"
