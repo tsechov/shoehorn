@@ -22,11 +22,13 @@ object ApplicationBuild extends Build {
 
     "org.reactivemongo" %% "reactivemongo" % "0.10.0",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.2",
+    "org.codehaus.jettison" % "jettison" % "1.3.5",
+    "com.thoughtworks.xstream" % "xstream" % "1.4.7",
 
     "org.mockito" % "mockito-core" % "1.9.5" % "test"
   )
 
-
+  //FIXME: sort out versionbumping
   def bumpType = sys.props.get("versionBump") match {
     case Some("major") => Bump.Major
     case Some("minor") => Bump.Minor
