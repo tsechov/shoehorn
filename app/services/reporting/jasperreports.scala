@@ -67,7 +67,7 @@ case class ProductParameterExpression[A <: Product](value: A, name: Option[Strin
  */
 case class ProductListParameterExpression[A <: Product](value: List[A], name: Option[String] = None) extends DataSourceExpression
 
-case class XmlParameterExpression(pathToXml: String, name: Option[String] = None) extends DataSourceExpression
+case class XmlParameterExpression(pathToXml: String, select: String, name: Option[String] = None) extends DataSourceExpression
 
 /**
  * Data source holding one instance of a Java Bean
@@ -106,7 +106,7 @@ private[reporting] case class ProductParameterExpressionValue[A <: Product](valu
 
 private[reporting] case class ProductListParameterExpressionValue[A <: Product](value: List[A], name: Option[String]) extends DataSourceExpressionValue
 
-private[reporting] case class XmlParameterExpressionValue(path: String, name: Option[String]) extends DataSourceExpressionValue
+private[reporting] case class XmlParameterExpressionValue(path: String, select: String, name: Option[String]) extends DataSourceExpressionValue
 
 private[reporting] case class JavaBeanParameterExpressionValue(value: AnyRef, name: Option[String]) extends DataSourceExpressionValue
 
@@ -235,7 +235,7 @@ trait ReportRunner {
       case ProductParameterExpressionValue(product, _) => new JRProductListDataSource(product :: Nil)
       case ProductListParameterExpressionValue(products, _) => new JRProductListDataSource(products)
       case JavaBeanParameterExpressionValue(bean, _) => new JRBeanArrayDataSource(Array(bean))
-      case XmlParameterExpressionValue(path, name) => new JRXmlDataSource(new File(path))
+      case XmlParameterExpressionValue(path, select, name) => new JRXmlDataSource(new File(path), select)
       case EmptyDataSourceExpressionValue => new JREmptyDataSource()
       case _ => sys.error("Bad match") // OK
     }
@@ -254,7 +254,9 @@ trait ReportRunner {
     }
     val map = toMap0(value)
     val result = new util.HashMap[String, AnyRef](map.size)
-    map.foreach { e => result.put(e._1, e._2)}
+    map.foreach {
+      e => result.put(e._1, e._2)
+    }
     result
   }
 
@@ -271,7 +273,10 @@ trait ReportRunner {
     def evalList(expressions: List[Expression]): ReportT[List[ExpressionValue]] = expressions match {
       case Nil => List.empty.point[ReportT]
       case h :: Nil => eval(h).map(toList)
-      case h :: t => val eh = eval(h).map(toList); t.foldLeft(eh) { (b, e) => for {bb <- b; ee <- eval(e)} yield ee +: bb}
+      case h :: t => val eh = eval(h).map(toList);
+        t.foldLeft(eh) {
+          (b, e) => for {bb <- b; ee <- eval(e)} yield ee +: bb
+        }
     }
 
     expression match {
@@ -286,7 +291,7 @@ trait ReportRunner {
         } yield ParametersExpressionValue(values)
       case ProductParameterExpression(value, name) => ProductParameterExpressionValue(value, name).point[ReportT]
       case ProductListParameterExpression(value, name) => ProductListParameterExpressionValue(value, name).point[ReportT]
-      case XmlParameterExpression(path, name) => XmlParameterExpressionValue(path, name).point[ReportT]
+      case XmlParameterExpression(path, select, name) => XmlParameterExpressionValue(path, select, name).point[ReportT]
       case JavaBeanParameterExpression(value, name) => JavaBeanParameterExpressionValue(value, name).point[ReportT]
       case EmptyExpression => EmptyExpressionValue.point[ReportT]
       case e => {

@@ -2,7 +2,6 @@ package models.common
 
 import models.AssetSupport._
 import play.api.libs.json._
-import controllers.AssetsBuilder
 import models.AssetSupport.RefType
 
 import models.customer.{EmailTypeIn, PhoneNumberTypeIn}
@@ -29,8 +28,8 @@ object Address {
 
 case class PhoneNumber(
                         phoneNumberTypeId: RefType[PhoneNumberTypeIn],
-                        country: String,
-                        extension: String,
+                        country: Option[String],
+                        extension: Option[String],
                         number: String
                         )
 

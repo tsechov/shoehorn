@@ -9,6 +9,24 @@
     "title": "foo",
     "firstName": "firstnamejool",
     "lastName": "lastname",
-    "phonenumbers": [ ],
-    "emails": [ ]
+    "phonenumbers": [
+        {
+            "phoneNumberTypeId": "53fcc8dd1c00001600b048eb",
+            "country": "bizbasz",
+            "extension": "123",
+            "number": "abc123"
+        },
+        {
+            "phoneNumberTypeId": "53fcc8dd1c00001600b048eb",
+            "country": "bizbasz",
+            "extension": "123",
+            "number": "abc123"
+        }
+    ],
+    "emails": [
+        {
+            "emailTypeId": "53fcc8dd1c00001600b048eb",
+            "address": "ejhaj"
+        }
+    ]
 }
