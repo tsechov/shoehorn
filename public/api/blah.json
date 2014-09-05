@@ -1,0 +1,57 @@
+{
+    "_id": "5405e3a6aa7500aa756725d6",
+    "createdAt": "2014-09-02T17:35:02.453+02:00",
+    "lastModifiedAt": "2014-09-02T17:35:02.453+02:00",
+    "active": true,
+    "description": "from runscope",
+    "orderNumber": "20140902/0013",
+    "orderId": 13.0,
+    "originatorId": "53f370551800001800201e5e",
+    "billingAddress": {
+        "addressTypeId": "foobar",
+        "country": "countryjool",
+        "district": "district eh",
+        "postalcode": "zipzip",
+        "city": "citi",
+        "address": "addressssssss",
+        "description": "address description"
+    }, "shippingAddress": {
+    "addressTypeId": "foobar",
+    "country": "countryjool",
+    "district": "district eh",
+    "postalcode": "zipzip",
+    "city": "citi",
+    "address": "addressssssss",
+    "description": "address description"
+}, "deadlines": [
+    {
+        "deadlineTypeId": "00ecbdf0500000e102795d34",
+        "date": "2014-09-01T00:03:32.469+02:00"
+    },
+    {
+        "deadlineTypeId": "01ecbdf0500000e102795d34",
+        "date": "2014-09-01T00:03:32.469+02:00"
+    }
+], "total": 36120.0, "items": [
+    {
+        "product": {
+            "_id": "53f370551800001800201e5e",
+            "createdAt": "2014-09-01T00:03:32.469+02:00",
+            "lastModifiedAt": "2014-09-01T00:03:32.469+02:00",
+            "active": true,
+            "description": "nested product in basket",
+            "name": "name jool",
+            "itemNumber": "itemnumber123",
+            "image": "imageurl",
+            "imageThumb": "thumburl",
+            "catalogs": [
+                {
+                    "catalogId": "blah",
+                    "sizeGroupIds": ["foo", "bar"]
+                }
+            ]
+        },
+        "quantity": 2.0,
+        "size": 13.0
+    }
+]}

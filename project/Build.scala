@@ -17,6 +17,14 @@ object ApplicationBuild extends Build {
   val appName = "shoehorn"
   val appVersion = "NA"
 
+
+  val bad = Seq(
+    ExclusionRule(name = "log4j"),
+    ExclusionRule(name = "commons-logging"),
+    ExclusionRule(name = "commons-collections"),
+    ExclusionRule(organization = "org.slf4j")
+  )
+
   val appDependencies = Seq(
 
 
@@ -24,7 +32,9 @@ object ApplicationBuild extends Build {
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.2",
     "org.codehaus.jettison" % "jettison" % "1.3.5",
     "com.thoughtworks.xstream" % "xstream" % "1.4.7",
-
+    "net.sf.jasperreports" % "jasperreports" % "5.2.0" excludeAll (bad: _*),
+    "org.scalaz" %% "scalaz-effect" % "7.0.0",
+    "org.apache.poi" % "poi" % "3.9",
     "org.mockito" % "mockito-core" % "1.9.5" % "test"
   )
 
@@ -43,6 +53,7 @@ object ApplicationBuild extends Build {
 
 
   val main = play.Project(appName, appVersion, appDependencies, settings = Defaults.defaultSettings ++ playScalaSettings ++ releaseSettings).settings(
+    resolvers ++= Seq("Jasper Community" at "http://jasperreports.sourceforge.net/maven2", "pentaho" at "http://repository.pentaho.org/artifactory/pentaho"),
     sources in(Compile, doc) := Seq.empty,
     publishTo := Some(Resolver.file("file", new File(target.value.absolutePath + "/publish"))),
     version := (version in ThisBuild).value,

@@ -13,31 +13,22 @@ case class CustomerReport(
                            bankAccountNumber: String
                            )
 
-object CustomerReport {
-  implicit val format = Json.format[CustomerReport]
-}
 
 case class AgentReport(
                         name: String,
                         payment: String,
-                        phone: Option[String],
-                        mobile: Option[String],
-                        fax: Option[String],
-                        email: Option[String]
+                        phone: String = "",
+                        mobile: String = "",
+                        fax: String = "",
+                        email: String
                         )
 
-object AgentReport {
-  implicit val format = Json.format[AgentReport]
-}
 
 case class SortimentItem(
                           size: Int,
                           count: Int
                           )
 
-object SortimentItem {
-  implicit val format = Json.format[SortimentItem]
-}
 
 case class ProductReport(
                           modelNumber: String,
@@ -46,10 +37,28 @@ case class ProductReport(
                           totalCount: Int,
                           netPrice: Int,
                           shippingDeadline: DateTime
-                          )
+                          ) {
+  println(sortiment)
+  if (sortiment.size != 23) throw new IllegalArgumentException("there has to be 22 sortiment items")
+}
+
 
 object ProductReport {
-  implicit val format = Json.format[ProductReport]
+
+  def apply(modelNumber: String, color: String, sortiment: List[SortimentItem], netPrice: Int, shippingDeadline: DateTime): ProductReport = {
+
+    val expandedSortiment = (18 to 40).foldLeft(List[SortimentItem]())((list, pos) => {
+      val item = sortiment.find(_.size == pos) match {
+        case Some(item) => item
+        case None => SortimentItem(pos, 0)
+      }
+      list :+ item
+    })
+
+
+    ProductReport(modelNumber, color, expandedSortiment, expandedSortiment.foldLeft(0)((sum, item) => sum + item.count), netPrice, shippingDeadline)
+
+  }
 }
 
 case class OrderReport(
@@ -58,9 +67,6 @@ case class OrderReport(
                         lastModifiedAt: DateTime,
                         customer: CustomerReport,
                         agent: AgentReport,
-                        items: ProductReport
-                        )
+                        items: List[ProductReport])
 
-object OrderReport {
-  implicit val format = Json.format[OrderReport]
-}
+

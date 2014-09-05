@@ -7,6 +7,8 @@ import com.thoughtworks.xstream.mapper._
 import com.thoughtworks.xstream.io._
 import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter
+import org.joda.time.DateTime
 
 class XStreamListConverter(_mapper: Mapper) extends AbstractCollectionConverter(_mapper) {
   def canConvert(clazz: Class[_]) = {
@@ -101,6 +103,18 @@ class XStreamSymbolConverter extends SingleValueConverter {
     classOf[Symbol] == clazz
 }
 
+class JodaTimeConverter extends AbstractSingleValueConverter {
+
+  def canConvert(clazz: Class[_]) = classOf[DateTime] == clazz
+
+
+  override def fromString(str: String) = models.DateFormatSupport.fmt.parseDateTime(str)
+
+
+  override def toString(value: Any) = value.asInstanceOf[DateTime].toString(models.DateFormatSupport.fmt)
+
+}
+
 object XStreamConversions {
   private lazy val jsonConverter = XStreamConversions(new XStream(new com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver()))
 
@@ -113,10 +127,14 @@ object XStreamConversions {
   def apply(stream: XStream): XStream = {
     implicit val mapper = stream.getMapper
 
+    stream.alias("order", classOf[models.order.OrderReport])
+    stream.alias("sortimentitem", classOf[models.order.SortimentItem])
+    stream.alias("product", classOf[models.order.ProductReport])
     //list
     stream.alias("list", classOf[::[_]])
     stream.alias("list", Nil.getClass)
     stream.registerConverter(new XStreamListConverter(stream.getMapper))
+    stream.registerConverter(new JodaTimeConverter)
 
     //tuples
     for (i <- 1 to 22) stream.alias("tuple", Class.forName("scala.Tuple" + i))
