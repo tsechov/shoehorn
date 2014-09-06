@@ -1,7 +1,7 @@
 package services
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import models.order.{OrderCreate, OrderIn}
+import models.order.{DeadlineTypeIn, OrderCreate, OrderIn}
 import scala.concurrent.Future
 import models.AssetSupport.IdType
 import scala.util.{Failure, Success, Try}
@@ -27,7 +27,12 @@ trait OrderServiceComponent {
 
   }
 
+  trait OrderPrintServiceInternal {
+    def getPdf(orderId: IdType): Future[Try[Array[Byte]]]
+  }
+
   val orderService: OrderServiceInternal
+  val orderPrintService: OrderPrintServiceInternal
 
 }
 
@@ -102,6 +107,46 @@ trait OrderService extends OrderServiceComponent {
       }
 
 
+    }
+
+
+  }
+
+  override val orderPrintService = new OrderPrintServiceInternal {
+    override def getPdf(orderId: IdType): Future[Try[Array[Byte]]] = {
+      val order = crudService.getById[OrderIn](orderId)
+      val res = order.map {
+        _.map {
+          aa =>
+            aa match {
+              case Some(json) => Array.fill[Byte](5)(0)
+              case None => Array.fill[Byte](0)(0)
+            }
+          //          _.map {
+          //            json => {
+          //              val deadlines = (json \ "deadlines").as[JsArray].value
+          //            }
+          //}
+        }
+      }
+
+      res
+
+
+    }
+
+    private def getDeadlines(ids: List[IdType]): Future[Try[Map[IdType, String]]] = {
+      val exprs = ids.foldLeft(JsArray())((array, id) => array :+ Json.obj("_id" -> id))
+      val query = Json.obj("$or" -> exprs)
+      Logger.debug(s"query: $query")
+      val ds = crudService.find[DeadlineTypeIn](query)
+      ds.map {
+        _.map {
+          jsonList => jsonList.foldLeft(Map[IdType, String]()) {
+            (map, json) => map ++ Map((json \ "_id").as[IdType] -> (json \ "name").as[String])
+          }
+        }
+      }
     }
 
 
