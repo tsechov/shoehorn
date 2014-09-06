@@ -24,6 +24,7 @@ import models.order.CustomerReport
 import reactivemongo.core.errors.GenericDatabaseException
 import services.reporting.XmlParameterExpression
 import play.api.libs.json.JsObject
+import models.DateFormatSupport
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
@@ -124,7 +125,7 @@ trait OrderService extends OrderServiceComponent {
 
   }
 
-  override val orderPrintService = new OrderPrintServiceInternal with ReportFormats {
+  override val orderPrintService = new OrderPrintServiceInternal with ReportFormats with DateFormatSupport {
     override def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]] = {
       val order = crudService.getById[OrderIn](orderId)
 
@@ -138,7 +139,7 @@ trait OrderService extends OrderServiceComponent {
               val deadlineNames = getDeadlines(deadlinesIds)
 
               val agentId = (orderJson \ "originatorId").as[IdType]
-              println(agentId)
+
               val agent = crudService.getById[AgentIn](agentId)
               val customerId = (orderJson \ "customerId").as[IdType]
               val customer = crudService.getById[CustomerIn](customerId)
@@ -173,18 +174,78 @@ trait OrderService extends OrderServiceComponent {
     }
 
     private def mapOrderPrint(deadlineTypes: Map[IdType, String], agent: JsObject, customer: JsObject, order: JsObject): OrderReport = {
-      val address = (order \ "billingAddress" \ "country").as[String]
-      val shippingName = "shipping name"
-      val shippingAddress = "shipping address"
-      val customer = CustomerReport("name", address, shippingName, shippingAddress, "adoszam123", "bankszamlaszamjool")
-      val agent = AgentReport("neve", "payment", "phonenumber123", email = "foo@bar.com")
-      val sortiment1 = List(SortimentItem(18, 2), SortimentItem(24, 1), SortimentItem(34, 5))
-      val items1 = ProductReport("1011-22432", "https://dl.dropboxusercontent.com/u/14779005/szamos/szamos-frontend/shoes/1011-22432-full.jpg", sortiment1)
-      val sortiment2 = List(SortimentItem(19, 2), SortimentItem(24, 1), SortimentItem(34, 5))
-      val items2 = ProductReport("1127-22182", "https://dl.dropboxusercontent.com/u/14779005/szamos/szamos-frontend/shoes/1127-22182-full.jpg", sortiment2)
-      OrderReport("idjool", "ordernumber", new DateTime, Some(new DateTime), Some(new DateTime), None, None, None, customer, agent, List(items1, items2), 16)
+      def address(order: JsObject)(mode: String) = {
+
+        val postalcode = (order \ mode \ "postalcode").asOpt[String].getOrElse("")
+        val city = (order \ mode \ "city").asOpt[String].getOrElse("")
+        val addressLine = (order \ mode \ "address").asOpt[String].getOrElse("")
+
+        s"$postalcode $city $addressLine"
+      }
+
+      val addressFn = address(order) _
+      val shippingName = (order \ "shippingAddress" \ "description").asOpt[String].getOrElse("")
+
+      val customerName = (customer \ "name").asOpt[String].getOrElse("")
+      val taxExemptNumber = (customer \ "taxExemptNumber").asOpt[String].getOrElse("")
+      val bankAccount = (customer \ "bankAccountNumber").asOpt[String].getOrElse("")
+
+      val customerReport = CustomerReport(customerName, addressFn("billingAddress"), shippingName, addressFn("shippingAddress"), taxExemptNumber, bankAccount)
+
+      val agentLastName = (agent \ "lastName").asOpt[String].getOrElse("")
+      val agentFirstName = (agent \ "firstName").asOpt[String].getOrElse("")
+      val agentName = s"$agentFirstName $agentLastName"
+
+      val phonenumber = (agent \ "phonenumbers").as[JsArray].value.map(v => (v \ "number").asOpt[String].getOrElse("")).headOption.getOrElse("")
+
+
+      val email = (agent \ "emails").as[JsArray].value.map(v => (v \ "address").asOpt[String].getOrElse("")).headOption.getOrElse("")
+
+      val agentReport = AgentReport(agentName, "", phonenumber, email = email)
+
+      val sortimentTriples = (order \ "items").as[JsArray].value.map(p => {
+        val itemNumber = (p \ "product" \ "itemNumber").as[String]
+        val imageUrl = (p \ "product" \ "image").asOpt[String].getOrElse("")
+        (itemNumber, imageUrl, SortimentItem((p \ "size").as[Int], (p \ "quantity").as[Int]))
+      })
+
+      val products = sortimentTriples.foldLeft(Map[String, (String, List[SortimentItem])]())((map, triple) => {
+        map.get(triple._1) match {
+          case Some(p) => {
+            map ++ Map(triple._1 ->(triple._2, (triple._3 :: p._2)))
+          }
+          case None => map ++ Map(triple._1 ->(triple._2, List(triple._3)))
+        }
+
+      })
+
+      val productlist = products.map(triple => ProductReport(triple._1, triple._2._1, triple._2._2)).toList
+
+      val orderId = (order \ "_id").as[IdType]
+
+      val orderNumber = (order \ "orderNumber").as[String]
+
+      val deadlines = (order \ "deadlines").as[JsArray].value.map(json => {
+        val deadline = (json \ "date").as[DateTime]
+        val deadlinetypeid = (json \ "deadlineTypeId").as[String]
+        val deadlineName = deadlineTypes(deadlinetypeid)
+        (deadlineName, deadline)
+      })
+
+      val deadline1 = deadlines.lift(0)
+      val deadline2 = deadlines.lift(1)
+      val deadline3 = deadlines.lift(2)
+      val deadline4 = deadlines.lift(3)
+      val deadline5 = deadlines.lift(4)
+   
+      val total = (order \ "total").as[Int]
+
+      val lastModified = (order \ "lastModifiedAt").as[DateTime]
+
+      OrderReport(orderId, orderNumber, lastModified, deadline1, deadline2, deadline3, deadline4, deadline5, customerReport, agentReport, productlist, total)
 
     }
+
 
     private def binReport(report: OrderReport): Array[Byte] = {
       def writeReport(report: OrderReport): String = {
@@ -212,15 +273,15 @@ trait OrderService extends OrderServiceComponent {
       ds.map {
         _.map {
           jsonList => {
-            println(jsonList)
-            val res = jsonList.foldLeft(Map[IdType, String]())(
+
+            jsonList.foldLeft(Map[IdType, String]())(
               (map, json) => {
                 Logger.debug(s"deadlines: $json")
                 map ++ Map((json \ "_id").as[IdType] -> (json \ "name").as[String])
               }
             )
-            println(res)
-            res
+
+
           }
         }
       }

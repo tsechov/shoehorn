@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 5.6.1.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-09-06T16:18:25 -->
+<!-- 2014-09-07T01:47:33 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="667d2897-2080-48ea-b922-6e743da723d2">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="order2"/>
 	<queryString language="XPath">
@@ -123,24 +123,48 @@
 	<field name="orderNumber" class="java.lang.String">
 		<fieldDescription><![CDATA[/order/orderNumber]]></fieldDescription>
 	</field>
-	<field name="deadlineOpen" class="java.lang.String">
-		<fieldDescription><![CDATA[/order/deadlineOpen]]></fieldDescription>
-	</field>
-	<field name="deadlineClosed" class="java.lang.String">
-		<fieldDescription><![CDATA[/order/deadlineClosed]]></fieldDescription>
-	</field>
 	<field name="sumPrice" class="java.lang.String">
 		<fieldDescription><![CDATA[/order/sumPrice]]></fieldDescription>
+	</field>
+	<field name="deadlineName1" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineName1]]></fieldDescription>
+	</field>
+	<field name="deadlineDate1" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineDate1]]></fieldDescription>
+	</field>
+	<field name="deadlineName2" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineName2]]></fieldDescription>
+	</field>
+	<field name="deadlineDate2" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineDate2]]></fieldDescription>
+	</field>
+	<field name="deadlineName3" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineName3]]></fieldDescription>
+	</field>
+	<field name="deadlineDate3" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineDate3]]></fieldDescription>
+	</field>
+	<field name="deadlineName4" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineName4]]></fieldDescription>
+	</field>
+	<field name="deadlineDate4" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineDate4]]></fieldDescription>
+	</field>
+	<field name="deadlineName5" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineName5]]></fieldDescription>
+	</field>
+	<field name="deadlineDate5" class="java.lang.String">
+		<fieldDescription><![CDATA[/order/deadlineDate5]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="175" splitType="Stretch">
+		<band height="195" splitType="Stretch">
 			<property name="local_mesure_unitheight" value="pixel"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<frame>
-				<reportElement x="0" y="31" width="277" height="144" uuid="28e16d0f-ad9e-4a19-bac9-49054f14fde2">
+				<reportElement x="0" y="31" width="277" height="90" uuid="28e16d0f-ad9e-4a19-bac9-49054f14fde2">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitheight" value="pixel"/>
@@ -201,16 +225,6 @@
 					</textElement>
 					<text><![CDATA[Szállítási cím:]]></text>
 				</staticText>
-				<staticText>
-					<reportElement x="4" y="90" width="92" height="18" uuid="1b5f35a3-f451-425c-a20f-89768430227f">
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle" markup="none">
-						<font isBold="false" isUnderline="false"/>
-					</textElement>
-					<text><![CDATA[Bankszámlaszám:]]></text>
-				</staticText>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement x="78" y="18" width="199" height="18" uuid="e0d84563-3228-48de-a3a9-b22c2d93a46d">
 						<property name="local_mesure_unitheight" value="pixel"/>
@@ -232,17 +246,7 @@
 					<textFieldExpression><![CDATA[$F{taxExemptNumber}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="78" y="54" width="199" height="18" uuid="f88f4a27-86d8-49b3-8335-76a7e592266d">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$F{shippingName}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="78" y="72" width="199" height="18" uuid="2c15c7e7-be11-43f2-b8cc-68cb03dfc8dd">
+					<reportElement x="78" y="54" width="199" height="18" uuid="2c15c7e7-be11-43f2-b8cc-68cb03dfc8dd">
 						<property name="local_mesure_unitheight" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="local_mesure_unitwidth" value="pixel"/>
@@ -251,19 +255,9 @@
 					<textElement verticalAlignment="Middle"/>
 					<textFieldExpression><![CDATA[$F{shippingAddress}]]></textFieldExpression>
 				</textField>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="96" y="90" width="181" height="18" uuid="17e46537-dc6d-4037-9e6f-4fc1dd2c5dda">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$F{bankAccountNumber}]]></textFieldExpression>
-				</textField>
 			</frame>
 			<frame>
-				<reportElement x="277" y="31" width="277" height="144" uuid="c054bb45-0d9e-4b88-8350-cb3f7a558c8c">
+				<reportElement x="277" y="31" width="277" height="90" uuid="c054bb45-0d9e-4b88-8350-cb3f7a558c8c">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitheight" value="pixel"/>
@@ -286,27 +280,7 @@
 					<text><![CDATA[Kapcsolattartó:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="4" y="18" width="90" height="18" uuid="e52e5e94-cf0c-4af8-83ae-45df611808ce">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle" markup="none">
-						<font isBold="false" isUnderline="false"/>
-					</textElement>
-					<text><![CDATA[Fizetés:]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="4" y="36" width="90" height="18" uuid="eb0f6753-aa41-45f9-9881-675f1cbafa86">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle" markup="none">
-						<font isBold="false" isUnderline="false"/>
-					</textElement>
-					<text><![CDATA[Telefon:]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="4" y="54" width="90" height="18" uuid="93093e63-8492-4480-b123-3f05e3835f69">
-						<property name="local_mesure_unitwidth" value="pixel"/>
+					<reportElement x="4" y="18" width="90" height="18" uuid="eb0f6753-aa41-45f9-9881-675f1cbafa86">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle" markup="none">
@@ -315,17 +289,7 @@
 					<text><![CDATA[Mobil:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="4" y="72" width="90" height="18" uuid="1dc2bd2d-b925-46f1-a6ca-6914b046a1d3">
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle" markup="none">
-						<font isBold="false" isUnderline="false"/>
-					</textElement>
-					<text><![CDATA[Fax:]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="4" y="90" width="90" height="18" uuid="6b7f7f23-a3e6-4436-ac04-e7114e009065">
+					<reportElement x="4" y="36" width="90" height="18" uuid="93093e63-8492-4480-b123-3f05e3835f69">
 						<property name="local_mesure_unitwidth" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
@@ -333,6 +297,26 @@
 						<font isBold="false" isUnderline="false"/>
 					</textElement>
 					<text><![CDATA[Email:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="4" y="54" width="90" height="18" uuid="1dc2bd2d-b925-46f1-a6ca-6914b046a1d3">
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="none">
+						<font isBold="false" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[Telefon:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="4" y="72" width="90" height="18" uuid="6b7f7f23-a3e6-4436-ac04-e7114e009065">
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="none">
+						<font isBold="false" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[Fax:]]></text>
 				</staticText>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement x="94" y="0" width="183" height="18" uuid="77ec9dcb-64ff-4b22-9e55-5afae5ad1655">
@@ -345,17 +329,7 @@
 					<textFieldExpression><![CDATA[$F{agentName}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="94" y="18" width="183" height="18" uuid="4c5ba81d-0f2f-41e7-9692-882d3f322534">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$F{payment}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="94" y="36" width="183" height="18" uuid="3a958132-b9b0-4149-a689-5335c31e3a5e">
+					<reportElement x="94" y="18" width="183" height="18" uuid="3a958132-b9b0-4149-a689-5335c31e3a5e">
 						<property name="local_mesure_unitheight" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="local_mesure_unitwidth" value="pixel"/>
@@ -365,27 +339,7 @@
 					<textFieldExpression><![CDATA[$F{phone}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="94" y="54" width="183" height="18" uuid="248702a3-6881-426a-af1c-f51fae3d8f7d">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$F{mobile}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="94" y="72" width="183" height="18" uuid="2b4dc281-e3d6-4eec-92d7-473b94a02884">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$F{fax}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="94" y="90" width="183" height="18" uuid="6250438a-9a84-48d7-9d35-81c8b62617d5">
+					<reportElement x="94" y="36" width="183" height="18" uuid="6250438a-9a84-48d7-9d35-81c8b62617d5">
 						<property name="local_mesure_unitheight" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="local_mesure_unitwidth" value="pixel"/>
@@ -395,44 +349,24 @@
 					<textFieldExpression><![CDATA[$F{email}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="4" y="108" width="170" height="18" uuid="5088e525-f24a-41cb-a1c7-aa43a59d2aec">
+					<reportElement x="94" y="54" width="183" height="18" uuid="4e9a2d46-84c7-4401-a3ac-194e48a40e6f">
 						<property name="local_mesure_unitwidth" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
-					<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
-						<font size="10" isBold="false" isUnderline="false"/>
+					<textElement verticalAlignment="Middle" markup="none">
+						<font isBold="false" isUnderline="false"/>
 					</textElement>
-					<text><![CDATA[Szállítási határidő nyitott cipőkre:]]></text>
+					<text><![CDATA[+36 (44) 520-142]]></text>
 				</staticText>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="173" y="108" width="104" height="18" uuid="0695497f-f826-4086-b1cc-3e180bf1d3f3">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Left" verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$F{deadlineOpen}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="173" y="126" width="104" height="18" uuid="2efb742c-752d-45b5-a67f-1d31aff5263b">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					</reportElement>
-					<textElement textAlignment="Left" verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$F{deadlineClosed}]]></textFieldExpression>
-				</textField>
 				<staticText>
-					<reportElement x="4" y="126" width="170" height="18" uuid="d82533c4-42b1-477e-b0a7-4a8764a5004b">
+					<reportElement x="94" y="72" width="183" height="18" uuid="f803ac45-9560-4a3f-8560-5c49f168ae23">
 						<property name="local_mesure_unitwidth" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</reportElement>
-					<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
-						<font size="10" isBold="false" isUnderline="false"/>
+					<textElement verticalAlignment="Middle" markup="none">
+						<font isBold="false" isUnderline="false"/>
 					</textElement>
-					<text><![CDATA[Szállítási határidő zárt cipőkre:]]></text>
+					<text><![CDATA[+36 (44) 341-803]]></text>
 				</staticText>
 			</frame>
 			<staticText>
@@ -455,6 +389,82 @@
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orderNumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="281" y="139" width="154" height="18" uuid="0695497f-f826-4086-b1cc-3e180bf1d3f3">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<printWhenExpression><![CDATA[$F{deadlineName1}!=null && $F{deadlineName1}.length() > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{deadlineName1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="281" y="157" width="154" height="18" uuid="2efb742c-752d-45b5-a67f-1d31aff5263b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<printWhenExpression><![CDATA[$F{deadlineName2}!=null && $F{deadlineName2}.length() > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{deadlineName2}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="281" y="175" width="154" height="18" uuid="e4931dc2-e2f8-4633-bbce-297154e4661b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<printWhenExpression><![CDATA[$F{deadlineName3}!=null && $F{deadlineName3}.length() > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{deadlineName3}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="281" y="121" width="90" height="18" uuid="652a8162-5b25-4257-b518-77905a97a855">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Határidők:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="435" y="139" width="120" height="18" uuid="728618f6-c555-4547-904a-af05df8bb6ef">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<printWhenExpression><![CDATA[$F{deadlineName1}!=null && $F{deadlineName1}.length() > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{deadlineDate1}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="435" y="157" width="120" height="18" uuid="b78044f6-317e-4675-a139-4324b4e7988b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<printWhenExpression><![CDATA[$F{deadlineName2}!=null && $F{deadlineName2}.length() > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{deadlineDate2}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="435" y="175" width="120" height="18" uuid="da0c4cd1-1932-422b-8a16-2cbd64c5810a">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<printWhenExpression><![CDATA[$F{deadlineName2}!=null && $F{deadlineName2}.length() > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{deadlineDate3}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

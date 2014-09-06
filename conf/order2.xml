@@ -3,8 +3,14 @@
     <orderId>idjool</orderId>
     <orderNumber>20140906/0063</orderNumber>
     <lastModifiedAt>2014. 09. 06.</lastModifiedAt>
-    <deadlineOpen>2014. 09. 06.</deadlineOpen>
-    <deadlineClosed>2014. 09. 06.</deadlineClosed>
+
+    <deadlineName1>dead line 1</deadlineName1>
+    <deadlineDate1>2014. 09. 06.</deadlineDate1>
+
+    <deadlineName2>dead line 2</deadlineName2>
+    <deadlineDate2>2014. 09. 07.</deadlineDate2>
+
+
     <customer>
         <name>name</name>
         <address>address jool</address>

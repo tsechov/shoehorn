@@ -24,15 +24,17 @@ object Reports extends CrudController {
               val targetFile = FileSystem.default.createTempFile(suffix = ".shoehorn-order.pdf")
               println(s"path: ${targetFile.toAbsolute.path}")
               targetFile.outputStream().write(pdfBytes)
-              Ok.sendFile(targetFile.jfile, true).as("application/pdf")
+              Ok.sendFile(targetFile.jfile, true, onClose = () => {
+                targetFile.delete()
+              }).as("application/pdf")
             }
-            case None => NotFound(s"no order with the given id: ${id}")
+            case None => NotFound(s"some data is missing for the order with the given id: ${id}")
           }
         }
         case Failure(e) => {
           val logId = UUID.randomUUID().toString
-          Logger.error(s"${logId}cannot generate report", e)
-          InternalServerError(s"cannot generate report [${logId}]")
+          Logger.error(s"${logId} cannot generate report", e)
+          InternalServerError(s"cannot generate report! logId: [${logId}]")
         }
       }
 
