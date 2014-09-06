@@ -61,8 +61,11 @@ case class OrderReport(
                         orderId: AssetSupport.IdType,
                         orderNumber: String,
                         lastModifiedAt: String,
-                        deadlineOpen: String,
-                        deadlineClosed: String,
+                        deadline1: String,
+                        deadline2: String,
+                        deadline3: String,
+                        deadline4: String,
+                        deadline5: String,
                         customer: CustomerReport,
                         agent: AgentReport,
                         items: List[ProductReport],
@@ -74,13 +77,24 @@ object OrderReport {
   def apply(orderId: AssetSupport.IdType,
             orderNumber: String,
             lastModifiedAt: DateTime,
-            deadlineOpen: DateTime,
-            deadlineClosed: DateTime,
+            deadline1: Option[DateTime],
+            deadline2: Option[DateTime],
+            deadline3: Option[DateTime],
+            deadline4: Option[DateTime],
+            deadline5: Option[DateTime],
             customer: CustomerReport,
             agent: AgentReport,
             items: List[ProductReport],
             sumPrice: Int): OrderReport = {
-    OrderReport(orderId, orderNumber, lastModifiedAt.toString(fmt), deadlineOpen.toString(fmt), deadlineClosed.toString(fmt), customer, agent, items, sumPrice)
+    OrderReport(orderId,
+      orderNumber,
+      lastModifiedAt.toString(fmt),
+      deadline1.map(_.toString(fmt)).getOrElse(""),
+      deadline2.map(_.toString(fmt)).getOrElse(""),
+      deadline3.map(_.toString(fmt)).getOrElse(""),
+      deadline4.map(_.toString(fmt)).getOrElse(""),
+      deadline5.map(_.toString(fmt)).getOrElse(""),
+      customer, agent, items, sumPrice)
   }
 }
 
