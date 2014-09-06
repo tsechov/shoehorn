@@ -18,8 +18,9 @@ case class BasketIn(_id: IdType,
                     lastModifiedAt: DateTime,
                     active: Boolean,
                     description: String,
+                    originatorId: IdType,
                     items: List[BasketItem]) extends AssetIn with AssetUpdateBuilder[BasketUpdate] {
-  override def fillup(lastModifiedAt: DateTime): BasketUpdate = BasketUpdate(lastModifiedAt, active, description, items)
+  override def fillup(lastModifiedAt: DateTime): BasketUpdate = BasketUpdate(lastModifiedAt, active, description, originatorId, items)
 }
 
 object BasketIn extends AssetInCompanion[BasketIn] {
@@ -31,6 +32,7 @@ object BasketIn extends AssetInCompanion[BasketIn] {
 case class BasketUpdate(lastModifiedAt: DateTime,
                         active: Boolean,
                         description: String,
+                        originatorId: IdType,
                         items: List[BasketItem]) extends AssetUpdate
 
 object BasketUpdate extends AssetUpdateCompanion[BasketUpdate] {
@@ -42,8 +44,9 @@ object BasketUpdate extends AssetUpdateCompanion[BasketUpdate] {
 
 case class BasketCreate(active: Boolean,
                         description: String,
+                        originatorId: IdType,
                         items: List[BasketItem]) extends AssetCreate[BasketIn] {
-  override def fillup(b: AssetBase) = BasketIn(b.id, b.createdAt, b.lastModifiedAt, active, description, items)
+  override def fillup(b: AssetBase) = BasketIn(b.id, b.createdAt, b.lastModifiedAt, active, description, originatorId, items)
 }
 
 object BasketCreate {
