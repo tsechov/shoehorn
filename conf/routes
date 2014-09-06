@@ -127,7 +127,7 @@ PUT            /orders/:id                  controllers.Orders.update(id)
 POST           /orders                      controllers.Orders.create
 DELETE         /orders/:id                  controllers.Orders.delete(id)
 
-
+GET            /reports/orders/:id          controllers.Reports.order(id)
 
 
 GET            /assets/*file                controllers.Assets.at(path="/public", file)

@@ -11,9 +11,15 @@
     "catalogs": [
         {
             "catalogId": "blah",
-            "sizeGroupIds": [
-                "foo",
-                "bar"
+            "sizeGroups": [
+                {
+                    "sizeGroupId": "53f370551800001800201e5e",
+                    "unitPrice": 12
+                },
+                {
+                    "sizeGroupId": "53f370551800001800201e5b",
+                    "unitPrice": 13
+                }
             ]
         }
     ]

@@ -7,9 +7,15 @@ import models.AssetSupport.{IdType, UrlType}
 import models._
 
 
+case class PricedSizeGroup(sizeGroupId: IdType, unitPrice: Int)
+
+object PricedSizeGroup {
+  implicit val format = Json.format[PricedSizeGroup]
+}
+
 case class CatalogSw(
                       catalogId: IdType,
-                      sizeGroupIds: List[IdType]
+                      sizeGroups: List[PricedSizeGroup]
                       )
 
 object CatalogSw {

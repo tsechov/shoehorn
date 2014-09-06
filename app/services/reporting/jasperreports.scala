@@ -385,6 +385,7 @@ trait PdfReportFormat {
     val exporter = new JRPdfExporter()
     exporter.setParameter(JRExporterParameter.JASPER_PRINT, print)
     exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, output)
+    exporter.setParameter(JRExporterParameter.CHARACTER_ENCODING, "UTF-8")
     exporter.exportReport()
 
     output.toByteArray

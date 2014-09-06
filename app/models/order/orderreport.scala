@@ -1,13 +1,13 @@
 package models.order
 
-import models.common.Address
-import org.joda.time.DateTime
 import models.AssetSupport
+import org.joda.time.DateTime
 
 case class CustomerReport(
                            name: String,
-                           address: Address,
-                           shippingAddress: Address,
+                           address: String,
+                           shippingName: String,
+                           shippingAddress: String,
                            taxExemptNumber: String,
                            bankAccountNumber: String
                            )
@@ -60,12 +60,29 @@ object ProductReport {
 case class OrderReport(
                         orderId: AssetSupport.IdType,
                         orderNumber: String,
-                        lastModifiedAt: DateTime,
-                        deadline1: DateTime,
-                        deadline2: DateTime,
+                        lastModifiedAt: String,
+                        deadlineOpen: String,
+                        deadlineClosed: String,
                         customer: CustomerReport,
                         agent: AgentReport,
                         items: List[ProductReport],
                         sumPrice: Int)
+
+object OrderReport {
+  val fmt = "yyyy. MM. dd."
+
+  def apply(orderId: AssetSupport.IdType,
+            orderNumber: String,
+            lastModifiedAt: DateTime,
+            deadlineOpen: DateTime,
+            deadlineClosed: DateTime,
+            customer: CustomerReport,
+            agent: AgentReport,
+            items: List[ProductReport],
+            sumPrice: Int): OrderReport = {
+    OrderReport(orderId, orderNumber, lastModifiedAt.toString(fmt), deadlineOpen.toString(fmt), deadlineClosed.toString(fmt), customer, agent, items, sumPrice)
+  }
+}
+
 
 
