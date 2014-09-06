@@ -33,6 +33,8 @@ object ApplicationBuild extends Build {
     "org.codehaus.jettison" % "jettison" % "1.3.5",
     "com.thoughtworks.xstream" % "xstream" % "1.4.7",
     "net.sf.jasperreports" % "jasperreports" % "5.2.0" excludeAll (bad: _*),
+    "commons-collections" % "commons-collections" % "2.1",
+    "xalan" % "xalan" % "2.7.1",
     "org.scalaz" %% "scalaz-effect" % "7.0.0",
     "org.apache.poi" % "poi" % "3.9",
     "org.mockito" % "mockito-core" % "1.9.5" % "test"

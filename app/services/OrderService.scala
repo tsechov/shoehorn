@@ -1,17 +1,29 @@
 package services
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import models.order.{DeadlineTypeIn, OrderCreate, OrderIn}
-import scala.concurrent.Future
+import models.order._
+import scala.concurrent.{Await, Future}
 import models.AssetSupport.IdType
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 import play.api.libs.json._
-import play.api.libs.json.JsObject
-import reactivemongo.core.errors.GenericDatabaseException
 import play.api.Logger
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
+import models.customer.{CustomerIn, AgentIn}
+import scala.concurrent.duration._
+import services.reporting._
+import scalax.file.FileSystem
+import play.api.libs.json.JsArray
+import scala.util.Failure
+import scala.Some
 import play.api.data.validation.ValidationError
+import models.order.SortimentItem
+import scala.util.Success
+import models.order.AgentReport
+import models.order.CustomerReport
+import reactivemongo.core.errors.GenericDatabaseException
+import services.reporting.XmlParameterExpression
+import play.api.libs.json.JsObject
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
@@ -28,7 +40,7 @@ trait OrderServiceComponent {
   }
 
   trait OrderPrintServiceInternal {
-    def getPdf(orderId: IdType): Future[Try[Array[Byte]]]
+    def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]]
   }
 
   val orderService: OrderServiceInternal
@@ -112,38 +124,103 @@ trait OrderService extends OrderServiceComponent {
 
   }
 
-  override val orderPrintService = new OrderPrintServiceInternal {
-    override def getPdf(orderId: IdType): Future[Try[Array[Byte]]] = {
+  override val orderPrintService = new OrderPrintServiceInternal with ReportFormats {
+    override def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]] = {
       val order = crudService.getById[OrderIn](orderId)
-      val res = order.map {
+
+
+
+      order.map {
         _.map {
-          aa =>
-            aa match {
-              case Some(json) => Array.fill[Byte](5)(0)
-              case None => Array.fill[Byte](0)(0)
+          _.flatMap {
+            orderJson => {
+              val deadlinesIds = (orderJson \ "deadlines").as[JsArray].value.map(v => (v \ "deadlineTypeId").as[String])
+              val deadlineNames = getDeadlines(deadlinesIds)
+
+              val agentId = (orderJson \ "originatorId").as[IdType]
+              println(agentId)
+              val agent = crudService.getById[AgentIn](agentId)
+              val customerId = (orderJson \ "customerId").as[IdType]
+              val customer = crudService.getById[CustomerIn](customerId)
+
+
+              val ff = for {
+                d <- deadlineNames
+                a <- agent
+                c <- customer
+              } yield for {
+                  dd <- d
+                  aa <- a
+                  cc <- c
+                } yield for {
+                    aaa <- aa
+                    ccc <- cc
+                  } yield binReport(mapOrderPrint(dd, aaa, ccc, orderJson))
+
+
+              Await.result(ff, 20 seconds) match {
+                case Success(pdf) => pdf
+                case Failure(e) => throw e
+              }
+
+
             }
-          //          _.map {
-          //            json => {
-          //              val deadlines = (json \ "deadlines").as[JsArray].value
-          //            }
-          //}
+
+          }
+
         }
       }
+    }
 
-      res
-
+    private def mapOrderPrint(deadlineTypes: Map[IdType, String], agent: JsObject, customer: JsObject, order: JsObject): OrderReport = {
+      val address = (order \ "billingAddress" \ "country").as[String]
+      val shippingName = "shipping name"
+      val shippingAddress = "shipping address"
+      val customer = CustomerReport("name", address, shippingName, shippingAddress, "adoszam123", "bankszamlaszamjool")
+      val agent = AgentReport("neve", "payment", "phonenumber123", email = "foo@bar.com")
+      val sortiment1 = List(SortimentItem(18, 2), SortimentItem(24, 1), SortimentItem(34, 5))
+      val items1 = ProductReport("1011-22432", "https://dl.dropboxusercontent.com/u/14779005/szamos/szamos-frontend/shoes/1011-22432-full.jpg", sortiment1)
+      val sortiment2 = List(SortimentItem(19, 2), SortimentItem(24, 1), SortimentItem(34, 5))
+      val items2 = ProductReport("1127-22182", "https://dl.dropboxusercontent.com/u/14779005/szamos/szamos-frontend/shoes/1127-22182-full.jpg", sortiment2)
+      OrderReport("idjool", "ordernumber", new DateTime, Some(new DateTime), Some(new DateTime), None, None, None, customer, agent, List(items1, items2), 16)
 
     }
 
-    private def getDeadlines(ids: List[IdType]): Future[Try[Map[IdType, String]]] = {
+    private def binReport(report: OrderReport): Array[Byte] = {
+      def writeReport(report: OrderReport): String = {
+
+        val tmpFile = FileSystem.default.createTempFile(suffix = ".shoehorn-order.xml")
+        val xml = ToXml.get(report)
+        tmpFile.outputStream().write(xml)
+        tmpFile.toAbsolute.path
+      }
+
+      val datasourcefile = writeReport(report)
+
+      val runner = new ReportRunner with JRXmlReportCompiler with ClasspathResourceReportLoader
+      runner.runReportT("/order2.jrxml")(PdfDS, EmptyExpression, XmlParameterExpression(datasourcefile, "/order/items/product")).run.toEither match {
+        case Left(e) => throw new RuntimeException("cannot generate report", e)
+        case Right(pdf) => pdf
+      }
+    }
+
+    private def getDeadlines(ids: Seq[IdType]): Future[Try[Map[IdType, String]]] = {
       val exprs = ids.foldLeft(JsArray())((array, id) => array :+ Json.obj("_id" -> id))
       val query = Json.obj("$or" -> exprs)
-      Logger.debug(s"query: $query")
+      Logger.debug(s"deadlines query: $query")
       val ds = crudService.find[DeadlineTypeIn](query)
       ds.map {
         _.map {
-          jsonList => jsonList.foldLeft(Map[IdType, String]()) {
-            (map, json) => map ++ Map((json \ "_id").as[IdType] -> (json \ "name").as[String])
+          jsonList => {
+            println(jsonList)
+            val res = jsonList.foldLeft(Map[IdType, String]())(
+              (map, json) => {
+                Logger.debug(s"deadlines: $json")
+                map ++ Map((json \ "_id").as[IdType] -> (json \ "name").as[String])
+              }
+            )
+            println(res)
+            res
           }
         }
       }
