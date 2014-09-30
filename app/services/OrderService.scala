@@ -159,7 +159,7 @@ trait OrderService extends OrderServiceComponent {
                   } yield binReport(mapOrderPrint(dd, aaa, ccc, orderJson))
 
 
-              Await.result(ff, 20 seconds) match {
+              Await.result(ff, 120 seconds) match {
                 case Success(pdf) => pdf
                 case Failure(e) => throw e
               }
