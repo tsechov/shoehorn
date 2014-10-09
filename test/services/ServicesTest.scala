@@ -34,7 +34,7 @@ class ServicesTest extends Specification with Mockito {
 
 
 
-      val result = target.crudRepository.getById[Test](query)
+      val result = target.crudRepository.getById[Test](DbQuery(query))
       val timeout: FiniteDuration = FiniteDuration(5, TimeUnit.SECONDS)
       Await.result(result, timeout) match {
         case Some(value) => success //value must beEqualTo("foo")
