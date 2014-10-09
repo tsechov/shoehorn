@@ -126,6 +126,7 @@ GET            /orders                      controllers.Orders.find(q:Option[Str
 PUT            /orders/:id                  controllers.Orders.update(id)
 POST           /orders                      controllers.Orders.create
 DELETE         /orders/:id                  controllers.Orders.delete(id)
+GET            /orderlist                   controllers.Orders.list
 
 GET            /reports/orders/:id          controllers.Reports.order(id)
 

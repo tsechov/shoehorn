@@ -14,6 +14,7 @@ import play.api.libs.json.JsObject
 import models.AssetSupport
 import reactivemongo.api.indexes.{IndexType, Index}
 import scala.util.{Success, Try}
+import reactivemongo.api.collections.GenericQueryBuilder
 
 
 trait Mongo {
@@ -21,7 +22,8 @@ trait Mongo {
 }
 
 trait MongoDb {
-  def find[A: CollectionName](query: JsObject): Future[List[JsObject]]
+
+  def find[A: CollectionName](query: JsObject, projection: Option[JsObject] = None): Future[List[JsObject]]
 
   def findAll[A: CollectionName]: Future[List[JsObject]]
 
@@ -43,11 +45,16 @@ class RealMongo(implicit app: Application) extends Mongo {
 
   def collection(name: String): JSONCollection = ReactiveMongoPlugin.db.collection[JSONCollection](name)
 
+
   override val mongo = new MongoDb {
-    def find[A: CollectionName](query: JsObject) = {
+    def find[A: CollectionName](query: JsObject, projection: Option[JsObject] = None) = {
 
-      collection(implicitly[CollectionName[A]].get).find(query).cursor[JsObject].collect[List]()
+      val col = collection(implicitly[CollectionName[A]].get)
 
+      (projection match {
+        case None => col.find(query)
+        case Some(p) => col.find(query, p)
+      }).cursor[JsObject].collect[List]()
 
     }
 

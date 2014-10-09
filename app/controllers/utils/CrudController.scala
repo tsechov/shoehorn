@@ -1,6 +1,6 @@
 package controllers.utils
 
-import services.{production, CollectionName}
+import services.{DbQuery, production, CollectionName}
 
 import models._
 import play.api.libs.json._
@@ -51,7 +51,7 @@ trait CrudController extends Results with ControllerUtils {
   def findByQuery(queryString: String)(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = {
 
     Try(Json.parse(queryString).as[JsObject]) match {
-      case Success(queryJson) => service.find[MODEL](queryJson).map(listResult[JsObject]("find"))
+      case Success(queryJson) => service.find[MODEL](DbQuery(queryJson)).map(listResult[JsObject]("find"))
       case Failure(error) => badQuery(queryString, error)
     }
 

@@ -39,7 +39,7 @@ trait CrudRepository extends CrudRepositoryComponent {
   override val crudRepository = new Repository {
     override def getById[A: CollectionName](query: CrudServiceComponent#Query) = {
 
-      val result = mongo.find[A](query)
+      val result = mongo.find[A](query.query)
 
       result.map(
         _ match {
@@ -52,7 +52,8 @@ trait CrudRepository extends CrudRepositoryComponent {
 
     }
 
-    override def find[A: CollectionName](query: CrudServiceComponent#Query) = mongo.find[A](query)
+    override def find[A: CollectionName](query: CrudServiceComponent#Query) = mongo.find[A](query.query, query.projection)
+
 
     override def findAll[A: CollectionName] = mongo.findAll[A]
 
@@ -74,4 +75,5 @@ trait CrudRepository extends CrudRepositoryComponent {
       mongo.remove[A](selector).map(_.orFail.map(_ => Unit))
     }
   }
+
 }

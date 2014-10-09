@@ -237,7 +237,7 @@ trait OrderService extends OrderServiceComponent {
       val deadline3 = deadlines.lift(2)
       val deadline4 = deadlines.lift(3)
       val deadline5 = deadlines.lift(4)
-   
+
       val total = (order \ "total").as[Int]
 
       val lastModified = (order \ "lastModifiedAt").as[DateTime]
@@ -267,7 +267,7 @@ trait OrderService extends OrderServiceComponent {
 
     private def getDeadlines(ids: Seq[IdType]): Future[Try[Map[IdType, String]]] = {
       val exprs = ids.foldLeft(JsArray())((array, id) => array :+ Json.obj("_id" -> id))
-      val query = Json.obj("$or" -> exprs)
+      val query = DbQuery(Json.obj("$or" -> exprs))
       Logger.debug(s"deadlines query: $query")
       val ds = crudService.find[DeadlineTypeIn](query)
       ds.map {

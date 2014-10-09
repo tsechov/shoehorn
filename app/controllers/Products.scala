@@ -10,6 +10,7 @@ import play.api.Logger
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.util.{Failure, Success, Try}
+import services.DbQuery
 
 
 object Products extends CrudController {
@@ -34,7 +35,7 @@ object Products extends CrudController {
             service.findAll[MODEL].map(listResult[JsObject]("find"))
           else {
             val exprs = ids.foldLeft(JsArray())((array, id) => array :+ Json.obj("catalogs.catalogId" -> id))
-            val query = Json.obj("$or" -> exprs)
+            val query = DbQuery(Json.obj("$or" -> exprs))
             Logger.debug(s"query: $query")
 
             service.find[MODEL](query).map(listResult[JsObject]("find by catalogIds"))

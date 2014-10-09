@@ -22,7 +22,7 @@ object production
 
 
 trait CrudServiceComponent {
-  type Query = JsObject
+  type Query = DbQuery
 
   trait CrudServiceInternal {
     def getById[A: CollectionName](id: IdType): Future[Try[Option[JsObject]]]
@@ -52,7 +52,7 @@ trait CrudService extends CrudServiceComponent {
     val updateCommand = obj(AssetSupport.activeFieldName -> false)
 
     override def getById[A: CollectionName](id: models.AssetSupport.IdType) = {
-      val query = obj(AssetSupport.idFieldName -> id)
+      val query = DbQuery(obj(AssetSupport.idFieldName -> id))
       crudRepository.getById[A](query) map {
         Success(_)
       }

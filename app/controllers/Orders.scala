@@ -7,12 +7,11 @@ import play.api.mvc.BodyParsers.parse
 import models.order.{OrderIn, OrderUpdate, OrderCreate}
 import controllers.utils.CrudController
 import play.api.libs.json._
-import services.production
+import services.{DbQuery, production, JsonErrors}
 import play.api.http.{HeaderNames, ContentTypes}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.util.{Try, Failure, Success}
 import play.api.Logger
-import services.JsonErrors
 import scala.concurrent.Future
 
 
@@ -64,6 +63,12 @@ object Orders extends CrudController {
 
   def delete(id: String) = Action.async {
     super.delete(id)
+  }
+
+
+  def list = Action.async {
+    val queryJson = Json.obj()
+    service.find[MODEL](DbQuery(queryJson, Some(Json.obj("items" -> 0)))).map(listResult[JsObject]("find"))
   }
 
 }
