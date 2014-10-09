@@ -68,7 +68,7 @@ object Orders extends CrudController {
 
   def list = Action.async {
     val queryJson = Json.obj()
-    service.find[MODEL](DbQuery(queryJson, Some(Json.obj("items" -> 0)))).map(listResult[JsObject]("find"))
+    service.find[MODEL](DbQuery(queryJson, Some(Json.obj("items" -> 0)))).map(listResult[JsObject]("orderlist"))
   }
 
 }

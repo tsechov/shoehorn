@@ -37,6 +37,7 @@
         }
     ],
     "total": 36120,
+    "numerOfPairs": 12,
     "items": [
         {
             "product": {
@@ -66,7 +67,37 @@
                 ]
             },
             "quantity": 2,
-            "size": 13
+            "size": 17
+        },
+        {
+            "product": {
+                "_id": "53f370551800001800201e5e",
+                "createdAt": "2014-09-01T00:03:32.469+02:00",
+                "lastModifiedAt": "2014-09-01T00:03:32.469+02:00",
+                "active": true,
+                "description": "nested product in basket",
+                "name": "name jool",
+                "itemNumber": "itemnumber123",
+                "image": "imageurl",
+                "imageThumb": "thumburl",
+                "catalogs": [
+                    {
+                        "catalogId": "blah",
+                        "sizeGroups": [
+                            {
+                                "sizeGroupId": "53f370551800001800201e5e",
+                                "unitPrice": 120
+                            },
+                            {
+                                "sizeGroupId": "53f370551800001800201e5b",
+                                "unitPrice": 130
+                            }
+                        ]
+                    }
+                ]
+            },
+            "quantity": 3,
+            "size": 30
         }
     ]
 }

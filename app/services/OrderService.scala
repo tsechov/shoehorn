@@ -25,6 +25,7 @@ import reactivemongo.core.errors.GenericDatabaseException
 import services.reporting.XmlParameterExpression
 import play.api.libs.json.JsObject
 import models.DateFormatSupport
+import models.product.SizeGroupIn
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
@@ -64,7 +65,8 @@ trait OrderService extends OrderServiceComponent {
 
       val res = for {
         oidTried <- orderId
-        insertResult <- insert(for (oidValue <- oidTried; oc <- toCreateModel(create)(oidValue)) yield oc)
+        totalTried <- calculateTotal(create)
+        insertResult <- insert(for (total <- totalTried; numberOfPairs <- calculateNumberOfPairs(create); oidValue <- oidTried; oc <- toCreateModel(create)(oidValue, total, numberOfPairs)) yield oc)
         result <- insertResult match {
           case Success(_) => Future.successful(insertResult)
           case Failure(GenericDatabaseException(errorString, code)) if (code == 11000) => createOrder(create)
@@ -75,11 +77,15 @@ trait OrderService extends OrderServiceComponent {
       res
     }
 
-    private def toCreateModel(json: JsObject)(orderId: Int): Try[OrderCreate] = {
+    private def toCreateModel(json: JsObject)(orderId: Int, total: Int, numberOfPairs: Int): Try[OrderCreate] = {
+
       val res = for {
-        orderIdAdded <- json.transform(addorderId(json)(orderId))
-        orderNumberAdded <- orderIdAdded.transform(addorderNumber(orderIdAdded)(orderNumberFormat(orderId)))
-        create <- orderNumberAdded.validate[OrderCreate]
+
+        orderIdAdded <- json.transform(addToRoot(json)("orderId", orderId))
+        orderNumberAdded <- orderIdAdded.transform(addToRoot(orderIdAdded)("orderNumber", orderNumberFormat(orderId)))
+        totalAdded <- orderNumberAdded.transform(addToRoot(orderNumberAdded)("total", total))
+        nubmerOfPairsAdded <- totalAdded.transform(addToRoot(totalAdded)("numberOfPairs", numberOfPairs))
+        create <- nubmerOfPairsAdded.validate[OrderCreate]
       } yield create
 
       res.fold(errors => Failure(JsonErrors(errors)), res => Success(res))
@@ -92,20 +98,11 @@ trait OrderService extends OrderServiceComponent {
       DateTimeFormat.forPattern("yyyyMMdd").print(new DateTime) + "/" + padded
     }
 
-    private def addorderId(json: JsObject)(orderId: Int): Reads[JsObject] = {
 
+    private def addToRoot[A](json: JsObject)(fieldName: String, value: A)(implicit w: Writes[A]) = {
       (__).json.update(
         __.read[JsObject].map {
-          o => o ++ Json.obj("orderId" -> orderId)
-        }
-      )
-    }
-
-    private def addorderNumber(json: JsObject)(orderNumber: String): Reads[JsObject] = {
-
-      (__).json.update(
-        __.read[JsObject].map {
-          o => o ++ Json.obj("orderNumber" -> orderNumber)
+          o => o ++ Json.obj(fieldName -> value)
         }
       )
     }
@@ -120,6 +117,57 @@ trait OrderService extends OrderServiceComponent {
       }
 
 
+    }
+
+    def calculateTotal(order: JsObject): Future[Try[Int]] = {
+
+      val sgs = crudService.findAll[SizeGroupIn]
+      val result = sgs.map {
+        _.flatMap {
+          (sizeGroups) => {
+            val itemSizesAndCatalogs = (order \ "items").as[JsArray].value.map { (item) =>
+              val size = (item \ "size").as[Int]
+              val quantity = (item \ "quantity").as[Int]
+              ((size, quantity), (item \ "product" \\ "catalogs"))
+            }
+
+
+            val totalTried = itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalogs) => {
+              val targetSizeGroupOpt = findSizeGroupIdBySize(sizeGroups, sizeAndCatalogs._1._1)
+              targetSizeGroupOpt match {
+                case Some(targetSizeGroup) => {
+                  println(sizeAndCatalogs._2)
+                  val unitPriceOpt = sizeAndCatalogs._2.collectFirst({ case g: JsObject if ((g \ "sizeGroups").as[IdType] == targetSizeGroup) => (g \ "unitPrice").asOpt[Int]}).flatten
+                  unitPriceOpt match {
+                    case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + unitPrice * sizeAndCatalogs._1._2)
+                    case _ => Failure(new RuntimeException("cannot calculate total for order"))
+                  }
+                }
+                case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalogs._1._1}"))
+              }
+
+
+            })
+            totalTried
+          }
+
+        }
+      }
+      result
+    }
+
+    private def calculateNumberOfPairs(order: JsObject): Try[Int] = {
+      val qs = (order \ "items" \\ "quantity")
+      Success(qs.map(_.as[Int]).sum)
+    }
+
+    def findSizeGroupIdBySize(sizeGroups: List[JsObject], size: Int): Option[IdType] = {
+      def sizeMatch(obj: JsObject, size: Int) = {
+        val above = (obj \ "from").asOpt[Int].map(_ < size).getOrElse(false)
+        val below = (obj \ "to").asOpt[Int].map(_ >= size).getOrElse(false)
+        above & below
+      }
+      sizeGroups.collectFirst({ case g: JsObject if (sizeMatch(g, size)) => (g \ "_id").as[IdType]})
     }
 
 
@@ -316,3 +364,6 @@ trait MongoOrderRepository extends OrderRepositoryComponent {
     override def ensureIndexOnOrderId = mongo.ensureUniqueIndex[OrderIn]("orderId").map((result) => ())
   }
 }
+
+
+

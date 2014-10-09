@@ -34,10 +34,11 @@ case class OrderIn(_id: IdType,
                    shippingAddress: Address,
                    deadlines: List[Deadline],
                    total: Int,
+                   numberOfPairs: Int,
                    items: List[OrderItem],
                    agentNotifiedAt: Option[DateTime],
                    customerNotifiedAt: Option[DateTime]) extends AssetIn with AssetUpdateBuilder[OrderUpdate] {
-  override def fillup(lastModifiedAt: DateTime): OrderUpdate = OrderUpdate(lastModifiedAt, active, description, orderNumber, orderId, originatorId, customerId, billingAddress, shippingAddress, deadlines, total, items, agentNotifiedAt, customerNotifiedAt)
+  override def fillup(lastModifiedAt: DateTime): OrderUpdate = OrderUpdate(lastModifiedAt, active, description, orderNumber, orderId, originatorId, customerId, billingAddress, shippingAddress, deadlines, total, numberOfPairs, items, agentNotifiedAt, customerNotifiedAt)
 }
 
 object OrderIn extends AssetInCompanion[OrderIn] {
@@ -59,6 +60,7 @@ case class OrderUpdate(lastModifiedAt: DateTime,
                        shippingAddress: Address,
                        deadlines: List[Deadline],
                        total: Int,
+                       numberOfPairs: Int,
                        items: List[OrderItem],
                        agentNotifiedAt: Option[DateTime],
                        customerNotifiedAt: Option[DateTime]) extends AssetUpdate
@@ -78,10 +80,11 @@ case class OrderCreate(active: Boolean,
                        shippingAddress: Address,
                        deadlines: List[Deadline],
                        total: Int,
+                       numberOfPairs: Int,
                        items: List[OrderItem],
                        agentNotifiedAt: Option[DateTime],
                        customerNotifiedAt: Option[DateTime]) extends AssetCreate[OrderIn] {
-  override def fillup(b: AssetBase) = OrderIn(b.id, b.createdAt, b.lastModifiedAt, active, description, orderNumber, orderId, originatorId, customerId, billingAddress, shippingAddress, deadlines, total, items, agentNotifiedAt, customerNotifiedAt)
+  override def fillup(b: AssetBase) = OrderIn(b.id, b.createdAt, b.lastModifiedAt, active, description, orderNumber, orderId, originatorId, customerId, billingAddress, shippingAddress, deadlines, total, numberOfPairs, items, agentNotifiedAt, customerNotifiedAt)
 
 }
 
