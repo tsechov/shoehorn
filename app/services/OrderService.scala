@@ -340,22 +340,18 @@ trait OrderService extends OrderServiceComponent {
 
 
 }
+trait OrderRepositoryInternal {
+  def orderId(): Future[Try[Int]]
+  def ensureIndexOnOrderId: Future[Unit]
+}
 
 trait OrderRepositoryComponent {
-
-  trait Repository {
-    def orderId(): Future[Try[Int]]
-
-    def ensureIndexOnOrderId: Future[Unit]
-  }
-
-  val orderRepository: Repository
-
+  val orderRepository: OrderRepositoryInternal
 }
 
 trait MongoOrderRepository extends OrderRepositoryComponent {
   this: Mongo =>
-  override val orderRepository = new Repository {
+  override val orderRepository = new OrderRepositoryInternal {
 
     override def orderId() = {
       mongo.nextValue[OrderIn]("orderId")

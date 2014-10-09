@@ -14,9 +14,9 @@ trait CrudRepositoryComponent {
   trait Repository {
 
 
-    def getById[A: CollectionName](query: CrudServiceComponent#Query): Future[Option[JsObject]]
+    def getById[A: CollectionName](query: DbQuery): Future[Option[JsObject]]
 
-    def find[A: CollectionName](query: CrudServiceComponent#Query): Future[List[JsObject]]
+    def find[A: CollectionName](query: DbQuery): Future[List[JsObject]]
 
     def findAll[A: CollectionName]: Future[List[JsObject]]
 
@@ -37,7 +37,7 @@ trait CrudRepository extends CrudRepositoryComponent {
   import LastErrorWrapperImplicits._
 
   override val crudRepository = new Repository {
-    override def getById[A: CollectionName](query: CrudServiceComponent#Query) = {
+    override def getById[A: CollectionName](query: DbQuery) = {
 
       val result = mongo.find[A](query.query)
 
@@ -52,7 +52,7 @@ trait CrudRepository extends CrudRepositoryComponent {
 
     }
 
-    override def find[A: CollectionName](query: CrudServiceComponent#Query) = mongo.find[A](query.query, query.projection)
+    override def find[A: CollectionName](query: DbQuery) = mongo.find[A](query.query, query.projection)
 
 
     override def findAll[A: CollectionName] = mongo.findAll[A]

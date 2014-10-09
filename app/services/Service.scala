@@ -21,24 +21,25 @@ object production
   with MongoOrderRepository with OrderService
 
 
+
+
 trait CrudServiceComponent {
-  type Query = DbQuery
-
-  trait CrudServiceInternal {
-    def getById[A: CollectionName](id: IdType): Future[Try[Option[JsObject]]]
-
-    def find[A: CollectionName](query: Query): Future[Try[List[JsObject]]]
-
-    def findAll[A: CollectionName]: Future[Try[List[JsObject]]]
-
-    def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]): Future[Try[IdType]]
-
-    def update[A <: AssetUpdateBuilder[U], U](id: AssetSupport.IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]): Future[Try[Unit]]
-
-    def remove[A: CollectionName](id: AssetSupport.IdType): Future[Try[Unit]]
-  }
 
   val crudService: CrudServiceInternal
+}
+
+trait CrudServiceInternal {
+  def getById[A: CollectionName](id: IdType): Future[Try[Option[JsObject]]]
+
+  def find[A: CollectionName](query: DbQuery): Future[Try[List[JsObject]]]
+
+  def findAll[A: CollectionName]: Future[Try[List[JsObject]]]
+
+  def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]): Future[Try[IdType]]
+
+  def update[A <: AssetUpdateBuilder[U], U](id: AssetSupport.IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]): Future[Try[Unit]]
+
+  def remove[A: CollectionName](id: AssetSupport.IdType): Future[Try[Unit]]
 }
 
 
@@ -58,7 +59,7 @@ trait CrudService extends CrudServiceComponent {
       }
     }
 
-    override def find[A: CollectionName](query: CrudServiceComponent#Query) = crudRepository.find[A](query).map(Success(_))
+    override def find[A: CollectionName](query: DbQuery) = crudRepository.find[A](query).map(Success(_))
 
     override def findAll[A: CollectionName] = crudRepository.findAll[A].map(Success(_))
 
