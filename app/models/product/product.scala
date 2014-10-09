@@ -45,7 +45,7 @@ case class ProductUpdate(
                           active: Boolean,
                           description: String,
                           name: String,
-                          itemNumbeAssetSupport: ProductIn.ItemNumber,
+                          itemNumber: ProductIn.ItemNumber,
                           image: UrlType,
                           imageThumb: UrlType,
                           catalogs: List[CatalogSw]

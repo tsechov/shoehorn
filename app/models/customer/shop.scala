@@ -40,7 +40,7 @@ object ShopUpdate extends DateFormatSupport {
 
   implicit val format = Json.format[ShopUpdate]
   implicit val collectionName = new CollectionName[ShopUpdate] {
-    override def get: String = WarehouseIn.collectionName.get
+    override def get: String = ShopIn.collectionName.get
   }
 }
 
