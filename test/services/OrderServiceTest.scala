@@ -29,19 +29,20 @@ class OrderServiceTest extends Specification with Mockito {
       val crudServiceMock = mock[CrudServiceInternal]
       val target = new OrderService with OrderRepositoryComponent with CrudServiceComponent {
         override val orderRepository: OrderRepositoryInternal = orderRepo
-        override val crudService: CrudServiceInternal = new CrudServiceInternal {
-          override def update[A <: AssetUpdateBuilder[U], U](id: IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]) = ???
-
-          override def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]) = ???
-
-          override def findAll[A: CollectionName] = Future.successful(Try(List(sizeGroupsJson.as[JsObject])))
-
-          override def remove[A: CollectionName](id: IdType) = ???
-
-          override def getById[A: CollectionName](id: IdType) = ???
-
-          override def find[A: CollectionName](query: DbQuery) = ???
-        }
+        override val crudService: CrudServiceInternal = crudServiceMock
+        //        override val crudService: CrudServiceInternal = new CrudServiceInternal {
+        //          override def update[A <: AssetUpdateBuilder[U], U](id: IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]) = ???
+        //
+        //          override def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]) = ???
+        //
+        //          override def findAll[A: CollectionName] = Future.successful(Try(List(sizeGroupsJson.as[JsObject])))
+        //
+        //          override def remove[A: CollectionName](id: IdType) = ???
+        //
+        //          override def getById[A: CollectionName](id: IdType) = ???
+        //
+        //          override def find[A: CollectionName](query: DbQuery) = ???
+        //        }
       }
 
 

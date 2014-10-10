@@ -39,6 +39,8 @@ trait OrderServiceComponent {
 
     def createOrder(create: JsObject): Future[Try[IdType]]
 
+    def updateOrder(id: IdType, update: JsObject): Future[Try[Unit]]
+
   }
 
   trait OrderPrintServiceInternal {
@@ -63,7 +65,7 @@ trait OrderService extends OrderServiceComponent {
 
     override def createOrder(create: JsObject) = {
 
-      val res = for {
+      for {
         oidTried <- orderId
         totalTried <- calculateTotal(create)
         insertResult <- insert(for (total <- totalTried; numberOfPairs <- calculateNumberOfPairs(create); oidValue <- oidTried; oc <- toCreateModel(create)(oidValue, total, numberOfPairs)) yield oc)
@@ -74,8 +76,45 @@ trait OrderService extends OrderServiceComponent {
         }
       } yield result
 
-      res
+
     }
+
+
+    override def updateOrder(id: IdType, update: JsObject) = {
+
+      for {
+        totalTried <- calculateTotal(update)
+        updateResult <- updateInternal(id, for (total <- totalTried; numberOfPairs <- calculateNumberOfPairs(update); op <- toUpdateModel(update, total, numberOfPairs)) yield op)
+        result <- updateResult match {
+          case Success(_) => Future.successful(updateResult)
+        }
+      } yield result
+
+
+    }
+
+    private def toUpdateModel(json: JsObject, total: Int, numberOfPairs: Int): Try[OrderIn] = {
+      val res = for {
+        totalAdded <- addTotal(json, total)
+        numberOfPairsAdded <- addNumberOfPairs(totalAdded, numberOfPairs)
+        update <- numberOfPairsAdded.validate[OrderIn]
+      } yield update
+
+      res.fold(errors => Failure(JsonErrors(errors)), res => Success(res))
+
+    }
+
+    private def updateInternal(id: IdType, update: Try[OrderIn]): Future[Try[Unit]] = {
+      update match {
+        case Failure(t: Throwable) => Future.successful(Failure[Unit](t))
+        case Success(value) => {
+          Logger.debug(s"about to update $value")
+          crudService.update[OrderIn, OrderUpdate](id)(value)
+        }
+
+      }
+    }
+
 
     private def toCreateModel(json: JsObject)(orderId: Int, total: Int, numberOfPairs: Int): Try[OrderCreate] = {
 
@@ -83,14 +122,22 @@ trait OrderService extends OrderServiceComponent {
 
         orderIdAdded <- json.transform(addToRoot(json)("orderId", orderId))
         orderNumberAdded <- orderIdAdded.transform(addToRoot(orderIdAdded)("orderNumber", orderNumberFormat(orderId)))
-        totalAdded <- orderNumberAdded.transform(addToRoot(orderNumberAdded)("total", total))
-        nubmerOfPairsAdded <- totalAdded.transform(addToRoot(totalAdded)("numberOfPairs", numberOfPairs))
-        create <- nubmerOfPairsAdded.validate[OrderCreate]
+        totalAdded <- addTotal(orderNumberAdded, total)
+        numberOfPairsAdded <- addNumberOfPairs(totalAdded, numberOfPairs)
+        create <- numberOfPairsAdded.validate[OrderCreate]
       } yield create
 
       res.fold(errors => Failure(JsonErrors(errors)), res => Success(res))
 
 
+    }
+
+    private def addTotal(order: JsObject, total: Int) = {
+      order.transform(addToRoot(order)("total", total))
+    }
+
+    private def addNumberOfPairs(order: JsObject, numberOfPairs: Int) = {
+      order.transform(addToRoot(order)("numberOfPairs", numberOfPairs))
     }
 
     private def orderNumberFormat(orderId: Int) = {
@@ -134,24 +181,19 @@ trait OrderService extends OrderServiceComponent {
               SizeAndCatalog((item \ "product" \ "_id").as[IdType], size, quantity, firstCatalog)
             }
 
-            println(itemSizesAndCatalogs)
 
 
-            val totalTried = itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalog) => {
-              println(acc)
+
+            itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalog) => {
+
               val targetSizeGroupOpt = findSizeGroupIdBySize(sizeGroups, sizeAndCatalog.size)
               targetSizeGroupOpt match {
                 case Some(targetSizeGroup) => {
-
-
                   val unitPriceOpt = (sizeAndCatalog.firstCatalog \ "sizeGroups").as[JsArray].value.collectFirst {
                     case g: JsObject if ((g \ "sizeGroupId").as[IdType] == targetSizeGroup) => {
-                      println(s"found: $g")
                       (g \ "unitPrice").asOpt[Int]
                     }
                   }
-
-
 
                   unitPriceOpt.flatten match {
                     case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + (unitPrice * sizeAndCatalog.quantity))
@@ -161,12 +203,8 @@ trait OrderService extends OrderServiceComponent {
                 }
                 case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
               }
-
-
             })
-            totalTried
           }
-
         }
       }
       result

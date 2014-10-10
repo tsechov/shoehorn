@@ -25,7 +25,7 @@ object Orders extends CrudController {
   override type UPDATEMODEL = OrderUpdate
   override type CREATEMODEL = OrderCreate
 
-  private def jsError: PartialFunction[Try[IdType], SimpleResult] = {
+  private def jsError[A]: PartialFunction[Try[A], SimpleResult] = {
     case Failure(error: JsonErrors) => {
       val jsonError = JsError.toFlatJson(JsError(error.errors))
       Logger.debug(s"invalid ordercreate: $jsonError")
@@ -36,29 +36,37 @@ object Orders extends CrudController {
   def create = Action.async(parse.json) {
     request =>
       val input = request.body.as[JsObject]
-      Logger.debug("order in: " + Json.prettyPrint(input))
+      Logger.debug("order in for create: " + Json.prettyPrint(input))
       orderService.createOrder(input).map {
-        jsError orElse internalServerError[IdType]("failed to create order") orElse {
+        jsError[IdType] orElse internalServerError[IdType]("failed to create order") orElse {
           case Success(id) => Created.as(ContentTypes.JSON)
             .withHeaders(HeaderNames.LOCATION -> locationUrl(id, id => controllers.routes.Orders.getById(id)))
             .withHeaders(filters.RESOURCE_ID_HEADER -> id)
-
         }
-
-
       }.recover {
         case error => {
           Logger.error("cant create order", error)
           InternalServerError
         }
       }
-
-
   }
 
   def update(id: IdType) = Action.async(parse.json) {
-    request =>
-      super.update(id, request.body)
+    request => {
+      val input = request.body.as[JsObject]
+      Logger.debug("order in for update: " + Json.prettyPrint(input))
+      orderService.updateOrder(id, input).map {
+        jsError[Unit] orElse internalServerError[Unit]("failed to update order") orElse {
+          case Success(_) => Ok
+        }
+      }.recover {
+        case error => {
+          Logger.error("cant update order", error)
+          InternalServerError
+        }
+      }
+    }
+
   }
 
   def delete(id: String) = Action.async {
