@@ -45,24 +45,24 @@ class OrderServiceTest extends Specification with Mockito {
 
 
     }
-    "be able to create order" in {
-      val orderRepo = mock[OrderRepositoryInternal]
-
-      val target = new OrderService with OrderRepositoryComponent with CrudServiceComponent {
-        override val orderRepository: OrderRepositoryInternal = orderRepo
-        override val crudService: CrudServiceInternal = crudServiceStub(Future.successful(Success(List(sizeGroupsJson.as[JsObject]))))
-      }
-
-
-
-      val result = target.orderService.createOrder(orderJson.as[JsObject])
-
-      Await.result(result, timeout) match {
-        case Success(value) => success
-        case _ => failure
-      }
-
-    }
+//    "be able to create order" in {
+//      val orderRepo = mock[OrderRepositoryInternal]
+//
+//      val target = new OrderService with OrderRepositoryComponent with CrudServiceComponent {
+//        override val orderRepository: OrderRepositoryInternal = orderRepo
+//        override val crudService: CrudServiceInternal = crudServiceStub(Future.successful(Success(List(sizeGroupsJson.as[JsObject]))))
+//      }
+//
+//
+//
+//      val result = target.orderService.createOrder(orderJson.as[JsObject])
+//
+//      Await.result(result, timeout) match {
+//        case Success(value) => success
+//        case _ => failure
+//      }
+//
+//    }
 
   }
 

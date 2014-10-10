@@ -87,6 +87,7 @@ trait OrderService extends OrderServiceComponent {
         updateResult <- updateInternal(id, for (total <- calculateTotal(update, sgs); numberOfPairs <- calculateNumberOfPairs(update); op <- toUpdateModel(update, total, numberOfPairs)) yield op)
         result <- updateResult match {
           case Success(_) => Future.successful(updateResult)
+          case f:Failure[Unit] => Future.successful(f)
         }
       } yield result
 
