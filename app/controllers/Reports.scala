@@ -33,7 +33,7 @@ object Reports extends CrudController {
         }
         case Failure(e) => {
           val logId = UUID.randomUUID().toString
-          Logger.error(s"${logId} cannot generate report", e)
+          Logger.error(s"[$logId] - cannot generate report", e)
           InternalServerError(s"cannot generate report! logId: [${logId}]")
         }
       }

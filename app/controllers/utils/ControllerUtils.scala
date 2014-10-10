@@ -12,6 +12,7 @@ import play.api.libs.json.JsArray
 import play.api.libs.json.JsSuccess
 import scala.util.Failure
 import play.api.mvc.SimpleResult
+import java.util.UUID
 
 
 trait ControllerUtils {
@@ -32,8 +33,9 @@ trait ControllerUtils {
 
   def internalServerError[A](msg: String): PartialFunction[Try[A], SimpleResult] = {
     case Failure(error) => {
-      Logger.error(s"$msg: $error")
-      InternalServerError
+      val uuid = UUID.randomUUID().toString
+      Logger.error(s"[$uuid] - $msg: $error", error)
+      InternalServerError(s"logId: [$uuid]")
     }
   }
 

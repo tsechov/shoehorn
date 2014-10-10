@@ -40,8 +40,9 @@
     "numerOfPairs": 12,
     "items": [
         {
+            "productId": "23f370551800001800201e5e",
             "product": {
-                "_id": "53f370551800001800201e5e",
+                "_id": "13f370551800001800201e5e",
                 "createdAt": "2014-09-01T00:03:32.469+02:00",
                 "lastModifiedAt": "2014-09-01T00:03:32.469+02:00",
                 "active": true,
@@ -55,7 +56,7 @@
                         "catalogId": "blah",
                         "sizeGroups": [
                             {
-                                "sizeGroupId": "53f370551800001800201e5e",
+                                "sizeGroupId": "53fcc8dd1c00001600b048eb",
                                 "unitPrice": 12
                             },
                             {
@@ -70,8 +71,9 @@
             "size": 17
         },
         {
+            "productId": "23f370551800001800201e5e",
             "product": {
-                "_id": "53f370551800001800201e5e",
+                "_id": "23f370551800001800201e5e",
                 "createdAt": "2014-09-01T00:03:32.469+02:00",
                 "lastModifiedAt": "2014-09-01T00:03:32.469+02:00",
                 "active": true,
@@ -89,7 +91,7 @@
                                 "unitPrice": 120
                             },
                             {
-                                "sizeGroupId": "53f370551800001800201e5b",
+                                "sizeGroupId": "53fcc8dd1c00001600b048eb",
                                 "unitPrice": 130
                             }
                         ]

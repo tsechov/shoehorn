@@ -9,7 +9,7 @@ import models.AssetBase
 import models.common.Address
 
 
-case class OrderItem(product: ProductIn, quantity: Int, size: Int)
+case class OrderItem(productId: Option[IdType], product: ProductIn, quantity: Int, size: Int)
 
 object OrderItem {
   implicit val format = Json.format[OrderItem]

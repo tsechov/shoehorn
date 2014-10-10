@@ -123,27 +123,43 @@ trait OrderService extends OrderServiceComponent {
 
       val sgs = crudService.findAll[SizeGroupIn]
       val result = sgs.map {
+        case class SizeAndCatalog(productId: IdType, size: Int, quantity: Int, firstCatalog: JsValue)
         _.flatMap {
           (sizeGroups) => {
+
             val itemSizesAndCatalogs = (order \ "items").as[JsArray].value.map { (item) =>
               val size = (item \ "size").as[Int]
               val quantity = (item \ "quantity").as[Int]
-              ((size, quantity), (item \ "product" \\ "catalogs"))
+              val firstCatalog = (item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj())
+              SizeAndCatalog((item \ "product" \ "_id").as[IdType], size, quantity, firstCatalog)
             }
 
+            println(itemSizesAndCatalogs)
 
-            val totalTried = itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalogs) => {
-              val targetSizeGroupOpt = findSizeGroupIdBySize(sizeGroups, sizeAndCatalogs._1._1)
+
+            val totalTried = itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalog) => {
+              println(acc)
+              val targetSizeGroupOpt = findSizeGroupIdBySize(sizeGroups, sizeAndCatalog.size)
               targetSizeGroupOpt match {
                 case Some(targetSizeGroup) => {
-                  println(sizeAndCatalogs._2)
-                  val unitPriceOpt = sizeAndCatalogs._2.collectFirst({ case g: JsObject if ((g \ "sizeGroups").as[IdType] == targetSizeGroup) => (g \ "unitPrice").asOpt[Int]}).flatten
-                  unitPriceOpt match {
-                    case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + unitPrice * sizeAndCatalogs._1._2)
-                    case _ => Failure(new RuntimeException("cannot calculate total for order"))
+
+
+                  val unitPriceOpt = (sizeAndCatalog.firstCatalog \ "sizeGroups").as[JsArray].value.collectFirst {
+                    case g: JsObject if ((g \ "sizeGroupId").as[IdType] == targetSizeGroup) => {
+                      println(s"found: $g")
+                      (g \ "unitPrice").asOpt[Int]
+                    }
+                  }
+
+
+
+                  unitPriceOpt.flatten match {
+                    case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + (unitPrice * sizeAndCatalog.quantity))
+                    case _ if (acc.isFailure) => acc
+                    case _ => Failure(new RuntimeException(s"cannot calculate total for order. sizegroup[$targetSizeGroup] found by size[${sizeAndCatalog.size}] is not present in [${sizeAndCatalog}]"))
                   }
                 }
-                case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalogs._1._1}"))
+                case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
               }
 
 
@@ -163,7 +179,7 @@ trait OrderService extends OrderServiceComponent {
 
     def findSizeGroupIdBySize(sizeGroups: List[JsObject], size: Int): Option[IdType] = {
       def sizeMatch(obj: JsObject, size: Int) = {
-        val above = (obj \ "from").asOpt[Int].map(_ < size).getOrElse(false)
+        val above = (obj \ "from").asOpt[Int].map(_ <= size).getOrElse(false)
         val below = (obj \ "to").asOpt[Int].map(_ >= size).getOrElse(false)
         above & below
       }
@@ -340,8 +356,10 @@ trait OrderService extends OrderServiceComponent {
 
 
 }
+
 trait OrderRepositoryInternal {
   def orderId(): Future[Try[Int]]
+
   def ensureIndexOnOrderId: Future[Unit]
 }
 
