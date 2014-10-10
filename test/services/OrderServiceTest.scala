@@ -16,14 +16,17 @@ import models.{AssetUpdateBuilder, AssetCreate}
 import scala.util.Success
 import scala.util.Failure
 import play.api.libs.json.JsObject
+import scala.concurrent.duration.FiniteDuration
 
 class OrderServiceTest extends Specification with Mockito {
 
+  val orderJson = readJson("public/api/order.json")
+  val sizeGroupsJson = readJson("public/api/sizegroup.json")
 
-  "adding total to order item" should {
-    "should not be a problem" in {
-      val orderJson = readJson("public/api/order.json")
-      val sizeGroupsJson = readJson("public/api/sizegroup.json")
+  val timeout = FiniteDuration(5, TimeUnit.SECONDS)
+
+  "OrderService" should {
+    "be able to calculate total for order" in {
 
       val orderRepo = mock[OrderRepositoryInternal]
       val crudServiceMock = mock[CrudServiceInternal]
@@ -42,6 +45,24 @@ class OrderServiceTest extends Specification with Mockito {
 
 
     }
+    "be able to create order" in {
+      val orderRepo = mock[OrderRepositoryInternal]
+
+      val target = new OrderService with OrderRepositoryComponent with CrudServiceComponent {
+        override val orderRepository: OrderRepositoryInternal = orderRepo
+        override val crudService: CrudServiceInternal = crudServiceStub(Future.successful(Success(List(sizeGroupsJson.as[JsObject]))))
+      }
+
+
+
+      val result = target.orderService.createOrder(orderJson.as[JsObject])
+
+      Await.result(result, timeout) match {
+        case Success(value) => success
+        case _ => failure
+      }
+
+    }
 
   }
 
@@ -50,5 +71,19 @@ class OrderServiceTest extends Specification with Mockito {
     val jsonString = jsonSource.mkString
     jsonSource.close
     Json.parse(jsonString)
+  }
+
+  def crudServiceStub(findAll: Future[Try[List[JsObject]]]) = new CrudServiceInternal {
+    override def update[A <: AssetUpdateBuilder[U], U](id: IdType)(input: A)(implicit w: Writes[U], ev: CollectionName[U]) = ???
+
+    override def insert[C <: AssetCreate[A], A](input: C)(implicit w: Writes[A], ev: CollectionName[A]) = ???
+
+    override def findAll[A: CollectionName] = findAll
+
+    override def remove[A: CollectionName](id: IdType) = ???
+
+    override def getById[A: CollectionName](id: IdType) = ???
+
+    override def find[A: CollectionName](query: DbQuery) = ???
   }
 }
