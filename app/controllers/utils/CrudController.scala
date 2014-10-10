@@ -1,6 +1,6 @@
 package controllers.utils
 
-import services.{DbQuery, production, CollectionName}
+import services.{CrudServiceInternal, DbQuery, production, CollectionName}
 
 import models._
 import play.api.libs.json._
@@ -26,7 +26,7 @@ trait CrudController extends Results with ControllerUtils {
   type CREATEMODEL <: AssetCreate[MODEL]
 
 
-  val service = production crudService
+  val service: CrudServiceInternal = production crudService
 
   def getById(id: AssetSupport.IdType)(implicit f: Format[MODEL], ev: CollectionName[MODEL]) = Action.async {
     request =>
