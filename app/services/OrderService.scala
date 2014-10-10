@@ -66,9 +66,9 @@ trait OrderService extends OrderServiceComponent {
     override def createOrder(create: JsObject) = {
 
       for {
+        sgs <- crudService.findAll[SizeGroupIn]
         oidTried <- orderId
-        totalTried <- calculateTotal(create)
-        insertResult <- insert(for (total <- totalTried; numberOfPairs <- calculateNumberOfPairs(create); oidValue <- oidTried; oc <- toCreateModel(create)(oidValue, total, numberOfPairs)) yield oc)
+        insertResult <- insert(for (total <- calculateTotal(create, sgs); numberOfPairs <- calculateNumberOfPairs(create); oidValue <- oidTried; oc <- toCreateModel(create)(oidValue, total, numberOfPairs)) yield oc)
         result <- insertResult match {
           case Success(_) => Future.successful(insertResult)
           case Failure(GenericDatabaseException(errorString, code)) if (code == 11000) => createOrder(create)
@@ -83,8 +83,8 @@ trait OrderService extends OrderServiceComponent {
     override def updateOrder(id: IdType, update: JsObject) = {
 
       for {
-        totalTried <- calculateTotal(update)
-        updateResult <- updateInternal(id, for (total <- totalTried; numberOfPairs <- calculateNumberOfPairs(update); op <- toUpdateModel(update, total, numberOfPairs)) yield op)
+        sgs <- crudService.findAll[SizeGroupIn]
+        updateResult <- updateInternal(id, for (total <- calculateTotal(update, sgs); numberOfPairs <- calculateNumberOfPairs(update); op <- toUpdateModel(update, total, numberOfPairs)) yield op)
         result <- updateResult match {
           case Success(_) => Future.successful(updateResult)
         }
@@ -166,48 +166,48 @@ trait OrderService extends OrderServiceComponent {
 
     }
 
-    def calculateTotal(order: JsObject): Future[Try[Int]] = {
+    def calculateTotal(order: JsObject, sgs: Try[List[JsObject]]): Try[Int] = {
 
-      val sgs = crudService.findAll[SizeGroupIn]
-      val result = sgs.map {
-        case class SizeAndCatalog(productId: IdType, size: Int, quantity: Int, firstCatalog: JsValue)
-        _.flatMap {
-          (sizeGroups) => {
+      //      val sgss = crudService.findAll[SizeGroupIn]
+      //      val result = sgss.map {
+      case class SizeAndCatalog(productId: IdType, size: Int, quantity: Int, firstCatalog: JsValue)
+      sgs.flatMap {
+        (sizeGroups) => {
 
-            val itemSizesAndCatalogs = (order \ "items").as[JsArray].value.map { (item) =>
-              val size = (item \ "size").as[Int]
-              val quantity = (item \ "quantity").as[Int]
-              val firstCatalog = (item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj())
-              SizeAndCatalog((item \ "product" \ "_id").as[IdType], size, quantity, firstCatalog)
-            }
-
-
+          val itemSizesAndCatalogs = (order \ "items").as[JsArray].value.map { (item) =>
+            val size = (item \ "size").as[Int]
+            val quantity = (item \ "quantity").as[Int]
+            val firstCatalog = (item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj())
+            SizeAndCatalog((item \ "product" \ "_id").as[IdType], size, quantity, firstCatalog)
+          }
 
 
-            itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalog) => {
 
-              val targetSizeGroupOpt = findSizeGroupIdBySize(sizeGroups, sizeAndCatalog.size)
-              targetSizeGroupOpt match {
-                case Some(targetSizeGroup) => {
-                  val unitPriceOpt = (sizeAndCatalog.firstCatalog \ "sizeGroups").as[JsArray].value.collectFirst {
-                    case g: JsObject if ((g \ "sizeGroupId").as[IdType] == targetSizeGroup) => {
-                      (g \ "unitPrice").asOpt[Int]
-                    }
-                  }
 
-                  unitPriceOpt.flatten match {
-                    case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + (unitPrice * sizeAndCatalog.quantity))
-                    case _ if (acc.isFailure) => acc
-                    case _ => Failure(new RuntimeException(s"cannot calculate total for order. sizegroup[$targetSizeGroup] found by size[${sizeAndCatalog.size}] is not present in [${sizeAndCatalog}]"))
+          itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalog) => {
+
+            val targetSizeGroupOpt = findSizeGroupIdBySize(sizeGroups, sizeAndCatalog.size)
+            targetSizeGroupOpt match {
+              case Some(targetSizeGroup) => {
+                val unitPriceOpt = (sizeAndCatalog.firstCatalog \ "sizeGroups").as[JsArray].value.collectFirst {
+                  case g: JsObject if ((g \ "sizeGroupId").as[IdType] == targetSizeGroup) => {
+                    (g \ "unitPrice").asOpt[Int]
                   }
                 }
-                case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
+
+                unitPriceOpt.flatten match {
+                  case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + (unitPrice * sizeAndCatalog.quantity))
+                  case _ if (acc.isFailure) => acc
+                  case _ => Failure(new RuntimeException(s"cannot calculate total for order. sizegroup[$targetSizeGroup] found by size[${sizeAndCatalog.size}] is not present in [${sizeAndCatalog}]"))
+                }
               }
-            })
-          }
+              case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
+            }
+          })
         }
       }
-      result
+      //      }
+      //      result
     }
 
     private def calculateNumberOfPairs(order: JsObject): Try[Int] = {
