@@ -187,11 +187,11 @@ trait OrderService extends OrderServiceComponent {
 
           itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalog) => {
 
-            val targetSizeGroupOpt = findSizeGroupIdBySize(sizeGroups, sizeAndCatalog.size)
-            targetSizeGroupOpt match {
-              case Some(targetSizeGroup) => {
+            val targetSizeGroups = findSizeGroupIdBySize(sizeGroups, sizeAndCatalog.size)
+//            targetSizeGroupOpt match {
+//              case Some(targetSizeGroup) => {
                 val unitPriceOpt = (sizeAndCatalog.firstCatalog \ "sizeGroups").as[JsArray].value.collectFirst {
-                  case g: JsObject if ((g \ "sizeGroupId").as[IdType] == targetSizeGroup) => {
+                  case g: JsObject if (targetSizeGroups.contains((g \ "sizeGroupId").as[IdType])) => {
                     (g \ "unitPrice").asOpt[Int]
                   }
                 }
@@ -199,11 +199,12 @@ trait OrderService extends OrderServiceComponent {
                 unitPriceOpt.flatten match {
                   case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + (unitPrice * sizeAndCatalog.quantity))
                   case _ if (acc.isFailure) => acc
-                  case _ => Failure(new RuntimeException(s"cannot calculate total for order. sizegroup[$targetSizeGroup] found by size[${sizeAndCatalog.size}] is not present in [${sizeAndCatalog}]"))
+                  case _ => Failure(new RuntimeException(s"cannot calculate total for order. sizegroups[$targetSizeGroups] found by size[${sizeAndCatalog.size}] are" +
+                    s" not present in [${sizeAndCatalog}]"))
                 }
-              }
-              case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
-            }
+//              }
+//              case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
+//            }
           })
         }
       }
@@ -216,13 +217,13 @@ trait OrderService extends OrderServiceComponent {
       Success(qs.map(_.as[Int]).sum)
     }
 
-    def findSizeGroupIdBySize(sizeGroups: List[JsObject], size: Int): Option[IdType] = {
+    def findSizeGroupIdBySize(sizeGroups: List[JsObject], size: Int): List[IdType] = {
       def sizeMatch(obj: JsObject, size: Int) = {
         val above = (obj \ "from").asOpt[Int].map(_ <= size).getOrElse(false)
         val below = (obj \ "to").asOpt[Int].map(_ >= size).getOrElse(false)
         above & below
       }
-      sizeGroups.collectFirst({ case g: JsObject if (sizeMatch(g, size)) => (g \ "_id").as[IdType]})
+      sizeGroups.collect({ case g: JsObject if (sizeMatch(g, size)) => (g \ "_id").as[IdType]})
     }
 
 
