@@ -37,7 +37,9 @@ object ApplicationBuild extends Build {
     "xalan" % "xalan" % "2.7.1",
     "org.scalaz" %% "scalaz-effect" % "7.0.0",
     "org.apache.poi" % "poi" % "3.9",
-    "org.mockito" % "mockito-core" % "1.9.5" % "test"
+    "org.mockito" % "mockito-core" % "1.9.5" % "test",
+    "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
+    "com.typesafe.akka" %% "akka-testkit" % "2.2.1" % "test"
   )
 
   //FIXME: sort out versionbumping

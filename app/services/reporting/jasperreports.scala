@@ -197,7 +197,9 @@ trait JRXmlReportCompiler extends ReportCompiler {
       }
       design <- EitherT.fromTryCatch[Id, JasperReport] {
         println(s"jaspercompile $in")
-        JasperCompileManager.compileReport(input)
+        val res=JasperCompileManager.compileReport(input)
+        println(s"jaspercompile finished $in")
+        res
       }
     } yield design
   }
