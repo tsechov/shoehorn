@@ -10,23 +10,8 @@ import play.api.test.{PlaySpecification, FakeApplication}
 import javax.net.ssl.{X509TrustManager, TrustManager, SSLContext}
 import java.security.cert.X509Certificate
 
-class MailerTest extends PlaySpecification {
+class MailerActorTest extends PlaySpecification {
 
-  object TrustAll extends X509TrustManager {
-    override def checkClientTrusted(p1: Array[X509Certificate], p2: String) = Unit
-
-    override def getAcceptedIssuers = null
-
-    override def checkServerTrusted(p1: Array[X509Certificate], p2: String) = Unit
-  }
-
-  val trustAll = new X509TrustManager {
-    override def checkClientTrusted(p1: Array[X509Certificate], p2: String) = Unit
-
-    override def getAcceptedIssuers = null
-
-    override def checkServerTrusted(p1: Array[X509Certificate], p2: String) = Unit
-  }
 
   "Mailer actor" should {
     "act on order creation" in {
@@ -35,7 +20,7 @@ class MailerTest extends PlaySpecification {
 
 
         implicit val actorSystem = ActorSystem("testActorSystem", fakeApp.configuration.underlying)
-        val mailer = TestActorRef(new Mailer).underlyingActor
+        val mailer = TestActorRef(new MailerActor).underlyingActor
         mailer.receive(OrderCreate(Mail(Seq("tsechov@gmail.com"), subject = "foo", message = "bar")))
         success
       }

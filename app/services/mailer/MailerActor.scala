@@ -19,7 +19,7 @@ case class Mail(to: Seq[String],
                 richMessage: Option[String] = None,
                 attachment: Option[java.io.File] = None)
 
-class Mailer extends Actor {
+class MailerActor extends Actor {
 
   System.setProperty("mail.debug", "true")
   System.setProperty("mail.smtp.socketFactory.class", "services.mailer.DummySSLSocketFactory")
