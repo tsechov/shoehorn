@@ -32,5 +32,7 @@ class ReportController extends Actor {
     case query: OrderReportQuery => {
       sender ! requests.find(_.id == query.id).isDefined
     }
+    case OrderReportSuccess(id,fileName) => ???
+
   }
 }

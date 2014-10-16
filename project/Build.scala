@@ -39,7 +39,8 @@ object ApplicationBuild extends Build {
     "org.apache.poi" % "poi" % "3.9",
     "org.mockito" % "mockito-core" % "1.9.5" % "test",
     "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
-    "com.typesafe.akka" %% "akka-testkit" % "2.2.1" % "test"
+    "com.typesafe.akka" %% "akka-testkit" % "2.2.1" % "test",
+    "org.scalatest" % "scalatest_2.10" % "2.2.2"
   )
 
   //FIXME: sort out versionbumping
