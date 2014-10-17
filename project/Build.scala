@@ -40,7 +40,9 @@ object ApplicationBuild extends Build {
     "org.mockito" % "mockito-core" % "1.9.5" % "test",
     "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
     "com.typesafe.akka" %% "akka-testkit" % "2.2.1" % "test",
-    "org.scalatest" % "scalatest_2.10" % "2.2.2"
+    "org.scalatest" % "scalatest_2.10" % "2.2.2",
+    "com.amazonaws" % "aws-java-sdk-s3" % "1.9.0"
+
   )
 
   //FIXME: sort out versionbumping

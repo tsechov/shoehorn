@@ -24,16 +24,7 @@ class MailerActor extends Actor {
   System.setProperty("mail.debug", "true")
   System.setProperty("mail.smtp.socketFactory.class", "services.mailer.DummySSLSocketFactory")
 
-  import play.api.Play.current
-
-  def configKey(key: String, default: String = "N/A"): String = {
-    Play.configuration.getString(key).getOrElse({
-      Logger.error(s"missing config key [$key]; using default [$default]")
-      default
-    })
-
-
-  }
+  import services.ConfigSupport.configKey
 
   private val host = configKey("smtp.host")
   private val port = configKey("smtp.port")

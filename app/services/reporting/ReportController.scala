@@ -19,7 +19,7 @@ object ReportController {
 }
 
 class ReportController extends Actor {
-  private val requests: mutable.MutableList[OrderReportRequest] = mutable.MutableList()
+  private val requests: mutable.ListBuffer[OrderReportRequest] = mutable.ListBuffer()
 
   override def receive = {
     case req: OrderReportRequest => {
@@ -32,7 +32,7 @@ class ReportController extends Actor {
     case query: OrderReportQuery => {
       sender ! requests.find(_.id == query.id).isDefined
     }
-    case OrderReportSuccess(id,fileName) => ???
+
 
   }
 }
