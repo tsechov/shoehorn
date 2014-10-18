@@ -19,6 +19,12 @@ object AmazonS3Communicator {
   val amazonS3Client = new AmazonS3Client(credentials, client)
   val bucketName=configKey("aws.s3.bucket")
 
+  val pdf={
+    val res =new ObjectMetadata()
+    res.setContentType("application/pdf")
+    res
+  }
+  def storePdf(objectKey:String, stream: ByteArrayInputStream) = store(objectKey,stream,pdf)
 
   def store(objectKey: String, stream: ByteArrayInputStream, meta: ObjectMetadata=new ObjectMetadata): Option[String] = {
     try {
