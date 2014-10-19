@@ -1,5 +1,7 @@
 package services
 
+import services.storage.{S3Service, StorageService}
+
 import scala.concurrent.Future
 import play.api.libs.json._
 import models.{AssetBase, AssetUpdateBuilder, AssetCreate, AssetSupport}
@@ -19,6 +21,7 @@ object production
   extends RealMongo with CrudService with CrudRepository
   with EnvVarUserRepository with UserService
   with MongoOrderRepository with OrderService
+  with StorageService with S3Service
 
 
 

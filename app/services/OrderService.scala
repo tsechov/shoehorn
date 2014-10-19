@@ -1,7 +1,10 @@
 package services
 
+import java.io.ByteArrayInputStream
+
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.order._
+import services.storage.StorageComponent
 import scala.concurrent.{Await, Future}
 import models.AssetSupport.IdType
 import scala.util.Try
@@ -45,6 +48,7 @@ trait OrderServiceComponent {
 
   trait OrderPrintServiceInternal {
     def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]]
+    def storePdf(orderId: IdType): Future[Try[Option[String]]]
   }
 
   val orderService: OrderServiceInternal
@@ -53,7 +57,7 @@ trait OrderServiceComponent {
 }
 
 trait OrderService extends OrderServiceComponent {
-  this: OrderRepositoryComponent with CrudServiceComponent =>
+  this: OrderRepositoryComponent with CrudServiceComponent with StorageComponent =>
 
 
   override val orderService = new OrderServiceInternal {
@@ -273,6 +277,17 @@ trait OrderService extends OrderServiceComponent {
 
           }
 
+        }
+      }
+    }
+
+    def storePdf(orderId: IdType)={
+      getPdf(orderId).map {
+        _.map {
+          _.flatMap{
+            (bytes) =>
+            storage.storePdf(orderId,new ByteArrayInputStream(bytes))
+          }
         }
       }
     }

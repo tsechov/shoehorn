@@ -18,7 +18,7 @@ case class OrderReportFailure(id:UUID,cause:Throwable) extends OrderReportResult
 
 
 class ReportGenerator(request: OrderReportRequest) extends Actor {
-  self:S3 =>
+
   val log = Logging(context.system, this)
 
   override def receive = {

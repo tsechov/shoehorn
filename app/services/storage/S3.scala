@@ -29,11 +29,31 @@ object AmazonS3Communicator {
 
 }
 
-trait S3Component{
+trait RealStorageComponent{
+  val realStorage:RealComponentInternal
+}
+
+trait RealComponentInternal{
   def getUrl(objectKey: String):String
   def storePdf(objectKey: String, stream: ByteArrayInputStream):Option[String]
 }
-trait S3 {
+
+trait S3Service extends RealStorageComponent{
+
+  override val realStorage=new RealComponentInternal {
+    val s3=new S3
+    override def storePdf(objectKey: String, stream: ByteArrayInputStream): Option[String] = {
+      s3.storePdf(objectKey,stream)
+    }
+
+    override def getUrl(objectKey: String): String = {
+      s3.getUrl(objectKey)
+    }
+  }
+}
+
+
+class S3 {
 
   import AmazonS3Communicator._
 
