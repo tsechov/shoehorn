@@ -15,7 +15,7 @@ case class OrderReportQuery(id: UUID) extends OrderReportMessage
 
 object ReportController {
 
-  def props(req: OrderReportRequest) = Props(new ReportGenerator(req))
+  def props(req: OrderReportRequest) = Props(new ReportGenerator(req) )
 }
 
 class ReportController extends Actor {

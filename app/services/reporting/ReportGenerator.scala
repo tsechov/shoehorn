@@ -4,6 +4,7 @@ import java.util.UUID
 
 import akka.actor.Actor
 import akka.event.Logging
+import services.storage.S3
 
 sealed trait GoMessage
 case object Go extends GoMessage
@@ -17,6 +18,7 @@ case class OrderReportFailure(id:UUID,cause:Throwable) extends OrderReportResult
 
 
 class ReportGenerator(request: OrderReportRequest) extends Actor {
+  self:S3 =>
   val log = Logging(context.system, this)
 
   override def receive = {
