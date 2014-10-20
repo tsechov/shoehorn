@@ -129,6 +129,7 @@ DELETE         /orders/:id                  controllers.Orders.delete(id)
 GET            /orderlist                   controllers.Orders.list
 
 GET            /reports/orders/:id          controllers.Reports.order(id)
+GET            /reports/generate/orders/:id controllers.Reports.genOrder(id)
 
 
 GET            /assets/*file                controllers.Assets.at(path="/public", file)

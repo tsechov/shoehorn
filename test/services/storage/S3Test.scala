@@ -13,7 +13,7 @@ class S3Test extends PlaySpecification {
       running(fakeApp) {
         val meta=new ObjectMetadata()
         meta.setContentType("text/plain")
-        val res=AmazonS3Communicator.storePdf("foo",new ByteArrayInputStream("bar".getBytes))
+        val res=new S3().storePdf("foo",new ByteArrayInputStream("bar".getBytes))
         res must beSome[String]
       }
     }

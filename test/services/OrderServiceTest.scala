@@ -4,6 +4,7 @@ import org.specs2.mutable.Specification
 import org.specs2.mock.Mockito
 import org.mockito.Mockito._
 import play.api.libs.json._
+import services.storage.{StorageComponentInternal, StorageComponent}
 
 import scala.concurrent.{Await, Future}
 import scala.io.Source
@@ -30,9 +31,11 @@ class OrderServiceTest extends Specification with Mockito {
 
       val orderRepo = mock[OrderRepositoryInternal]
       val crudServiceMock = mock[CrudServiceInternal]
-      val target = new OrderService with OrderRepositoryComponent with CrudServiceComponent {
-        override val orderRepository: OrderRepositoryInternal = orderRepo
-        override val crudService: CrudServiceInternal = crudServiceMock
+      val storageMock=mock[StorageComponentInternal]
+      val target = new OrderService with OrderRepositoryComponent with CrudServiceComponent with StorageComponent{
+        override val orderRepository = orderRepo
+        override val crudService = crudServiceMock
+        override val storage = storageMock
       }
       val result = target.orderService.calculateTotal(orderJson.as[JsObject], Success(List(sizeGroupsJson.as[JsObject])))
 

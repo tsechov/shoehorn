@@ -32,6 +32,11 @@ import models.product.SizeGroupIn
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
+trait OrderPrintServiceInternal {
+  def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]]
+  def storePdf(orderId: IdType): Future[Try[Option[String]]]
+}
+
 trait OrderServiceComponent {
 
 
@@ -46,10 +51,7 @@ trait OrderServiceComponent {
 
   }
 
-  trait OrderPrintServiceInternal {
-    def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]]
-    def storePdf(orderId: IdType): Future[Try[Option[String]]]
-  }
+
 
   val orderService: OrderServiceInternal
   val orderPrintService: OrderPrintServiceInternal

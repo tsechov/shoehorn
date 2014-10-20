@@ -1,18 +1,24 @@
 package controllers
 
+import akka.actor.Props
 import controllers.utils.CrudController
 import models.AssetSupport.IdType
+import play.api.libs.concurrent.Akka
 import play.api.mvc.Action
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import services.reporting.{OrderReportRequest, ReportController, ReportGenerator}
+import scala.concurrent.Future
 import scalax.file.FileSystem
 import services.production
 import scala.util.{Failure, Success}
 import play.api.Logger
 import java.util.UUID
+import play.api.Play.current
 
 
 object Reports extends CrudController {
   lazy val orderPrintService = production orderPrintService
+  lazy val reports = Akka.system.actorOf(Props[ReportController], name = "reportcontroller")
 
   def order(id: IdType) = Action.async {
 
@@ -41,4 +47,14 @@ object Reports extends CrudController {
     }
 
   }
+
+  def genOrder(id:IdType) = Action.async {
+
+
+    val uid=UUID.randomUUID()
+    reports ! OrderReportRequest(uid,id)
+    Future.successful(Ok(uid.toString))
+  }
+
+
 }
