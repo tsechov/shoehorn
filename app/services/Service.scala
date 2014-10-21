@@ -17,7 +17,7 @@ import play.api.libs.json.JsObject
 import play.api.Play.current
 
 
-object production
+object runtime
   extends RealMongo with CrudService with CrudRepository
   with EnvVarUserRepository with UserService
   with MongoOrderRepository with OrderService

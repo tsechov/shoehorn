@@ -1,13 +1,13 @@
 package controllers
 
-import services.production
+import services.runtime
 import play.api.mvc.{Controller, Action}
 import play.api.Logger
 import play.api.libs.json.Json
 
 object Users extends Controller {
 
-  val userService = production userService
+  val userService = runtime userService
 
   def me = Action {
     request =>

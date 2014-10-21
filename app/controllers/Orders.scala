@@ -7,7 +7,7 @@ import play.api.mvc.BodyParsers.parse
 import models.order.{OrderIn, OrderUpdate, OrderCreate}
 import controllers.utils.CrudController
 import play.api.libs.json._
-import services.{DbQuery, production, JsonErrors}
+import services.{DbQuery, runtime, JsonErrors}
 import play.api.http.{HeaderNames, ContentTypes}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.util.{Try, Failure, Success}
@@ -17,7 +17,7 @@ import scala.concurrent.Future
 
 object Orders extends CrudController {
 
-  lazy val orderService = production orderService
+  lazy val orderService = runtime orderService
 
   orderService.ensureIndexOnOrderId
 

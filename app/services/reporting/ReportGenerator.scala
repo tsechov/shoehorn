@@ -2,29 +2,26 @@ package services.reporting
 
 import java.util.UUID
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 import akka.event.Logging
 
+import services.{OrderPrintServiceInternal, OrderReportRequest}
 
-sealed trait GoMessage
-case object Go extends GoMessage
-abstract sealed class OrderReportResult{
-  def id:UUID
+
+
+object ReportGenerator{
+  def props(printer: OrderPrintServiceInternal): Props = Props(new ReportGenerator(printer))
 }
 
-case class OrderReportSuccess(id:UUID,fileName:String) extends OrderReportResult
-case class OrderReportFailure(id:UUID,cause:Throwable) extends OrderReportResult
 
-
-
-class ReportGenerator(request: OrderReportRequest) extends Actor {
+class ReportGenerator(orderPrintService:OrderPrintServiceInternal) extends Actor {
 
   val log = Logging(context.system, this)
-  log.debug(s"created actor for $request")
 
   override def receive = {
-    case g: GoMessage => {
-      log.debug(s"received go for $request")
+    case req: OrderReportRequest => {
+      log.debug(s"received go for $req")
+      orderPrintService.storePdf(req)
 
     }
     case _ => log.error("unknown message received")

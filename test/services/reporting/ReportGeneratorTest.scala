@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{Props, ActorSystem}
 import akka.testkit._
 import org.joda.time.DateTime
+import org.specs2.mock.Mockito
+import services.{OrderReportRequest, OrderPrintServiceInternal}
 import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{Matchers, WordSpecLike, BeforeAndAfterAll, WordSpec}
@@ -16,21 +18,23 @@ import services.mailer.{Mail, OrderCreate, MailerActor}
 
 
 
-class ReportControllerTest extends TestKit(ActorSystem("ReportControllerTest",
-  ConfigFactory.parseString(ReportControllerTest.config)))
+class ReportGeneratorTest extends TestKit(ActorSystem("ReportGeneratorTest",
+  ConfigFactory.parseString(ReportGeneratorTest.config)))
 with DefaultTimeout with ImplicitSender
-with WordSpecLike with Matchers with BeforeAndAfterAll {
+with WordSpecLike with Matchers with BeforeAndAfterAll with Mockito{
 
 
   "ReportController actor" should {
     "act on report request" in {
       within(1 second) {
-        import akka.pattern.ask
-        val reporter = system.actorOf(Props[ReportController])
+
+        val mockPrinter=mock[OrderPrintServiceInternal]
+        val reporter = system.actorOf(Props(classOf[ReportGenerator],mockPrinter))
         val reqId=UUID.randomUUID
-        reporter ! OrderReportRequest(reqId,"blah",new DateTime)
-        reporter ? OrderReportQuery(reqId)
+        val req=OrderReportRequest(reqId,"blah","foo")
+        reporter ! req
         expectNoMsg
+        org.mockito.Mockito.verify(mockPrinter).storePdf(req)
 
 
       }
@@ -39,7 +43,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll {
   }
 }
 
-object ReportControllerTest {
+object ReportGeneratorTest {
   val config = """
     akka {
       loglevel = "DEBUG"

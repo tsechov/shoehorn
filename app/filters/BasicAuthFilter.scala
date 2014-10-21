@@ -5,11 +5,11 @@ import play.api.mvc._
 import scala.concurrent.Future
 import play.api.Logger
 import play.api.http.HeaderNames._
-import services.production
+import services.runtime
 
 object BasicAuthFilter extends Filter {
 
-  lazy val userService = production userService
+  lazy val userService = runtime userService
 
   private lazy val ajaxUnauthResult = Results.Unauthorized.withHeaders((AUTHENTICATION_REQUIRED_HEADER,
     """Basic realm="shoehorn basic authentication"""")

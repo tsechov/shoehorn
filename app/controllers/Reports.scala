@@ -4,21 +4,27 @@ import akka.actor.Props
 import controllers.utils.CrudController
 import models.AssetSupport.IdType
 import play.api.libs.concurrent.Akka
+import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import services.reporting.{OrderReportRequest, ReportController, ReportGenerator}
+import services.reporting.ReportGenerator
 import scala.concurrent.Future
 import scalax.file.FileSystem
-import services.production
+import services.{OrderReportRequest, runtime}
 import scala.util.{Failure, Success}
 import play.api.Logger
 import java.util.UUID
 import play.api.Play.current
+import services.ConfigSupport.configKey
 
 
 object Reports extends CrudController {
-  lazy val orderPrintService = production orderPrintService
-  lazy val reports = Akka.system.actorOf(Props[ReportController], name = "reportcontroller")
+  lazy val orderPrintService = runtime orderPrintService
+
+  lazy val reports = Akka.system.actorOf(ReportGenerator.props(orderPrintService), name = "reportgenerator")
+
+  val reportsFolder=configKey("aws.s3.reports.folder","reports")
+  val bucketName=configKey("aws.s3.bucket")
 
   def order(id: IdType) = Action.async {
 
@@ -48,12 +54,13 @@ object Reports extends CrudController {
 
   }
 
-  def genOrder(id:IdType) = Action.async {
+  def genOrder(orderId:IdType) = Action.async {
 
 
     val uid=UUID.randomUUID()
-    reports ! OrderReportRequest(uid,id)
-    Future.successful(Ok(uid.toString))
+    val req=OrderReportRequest(uid,orderId,reportsFolder)
+    reports ! req
+    Future.successful(Ok(Json.obj("reportUrl"->s"https://${bucketName}.s3.amazonaws.com/${req.storageKey}")))
   }
 
 

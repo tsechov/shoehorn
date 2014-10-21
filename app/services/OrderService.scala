@@ -1,9 +1,11 @@
 package services
 
 import java.io.ByteArrayInputStream
+import java.util.UUID
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.order._
+
 import services.storage.StorageComponent
 import scala.concurrent.{Await, Future}
 import models.AssetSupport.IdType
@@ -32,12 +34,18 @@ import models.product.SizeGroupIn
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
+case class OrderReportRequest(id: UUID, orderId: IdType,reportsFolder:String){
+  def storageKey=s"$reportsFolder/$orderId$id"
+}
+
 trait OrderPrintServiceInternal {
   def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]]
-  def storePdf(orderId: IdType): Future[Try[Option[String]]]
+  def storePdf(req:OrderReportRequest): Future[Try[Option[String]]]
 }
 
 trait OrderServiceComponent {
+
+
 
 
   trait OrderServiceInternal {
@@ -59,7 +67,7 @@ trait OrderServiceComponent {
 }
 
 trait OrderService extends OrderServiceComponent {
-  this: OrderRepositoryComponent with CrudServiceComponent with StorageComponent =>
+  this: OrderRepositoryComponent with CrudServiceComponent with StorageComponent=>
 
 
   override val orderService = new OrderServiceInternal {
@@ -283,12 +291,12 @@ trait OrderService extends OrderServiceComponent {
       }
     }
 
-    def storePdf(orderId: IdType)={
-      getPdf(orderId).map {
+    def storePdf(req:OrderReportRequest)={
+      getPdf(req.orderId).map {
         _.map {
           _.flatMap{
             (bytes) =>
-            storage.storePdf(orderId,new ByteArrayInputStream(bytes))
+            storage.storePdf(req.storageKey,new ByteArrayInputStream(bytes))
           }
         }
       }

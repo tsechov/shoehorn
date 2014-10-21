@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.{GeneratePresignedUrlRequest, PutObjectRequest, CannedAccessControlList, ObjectMetadata}
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
+import play.api.Logger
 
 object AmazonS3Communicator {
 
@@ -78,6 +79,7 @@ class S3 {
       val putObjectRequest = new PutObjectRequest(bucketName, objectKey, stream, meta)
       putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead)
       amazonS3Client.putObject(bucketName, objectKey, stream, meta)
+      Logger.debug(s"stored object [$bucketName/$objectKey]")
       Some(getUrl(objectKey))
     } catch {
       case ex: Exception => {
