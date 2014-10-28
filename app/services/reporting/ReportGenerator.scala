@@ -1,11 +1,10 @@
 package services.reporting
 
-import java.util.UUID
 
 import akka.actor.{Props, Actor}
 import akka.event.Logging
 
-import services.{OrderPrintServiceInternal, OrderReportRequest}
+import services.{ OrderPrintServiceInternal, OrderReportRequest}
 
 
 
@@ -20,7 +19,7 @@ class ReportGenerator(orderPrintService:OrderPrintServiceInternal) extends Actor
 
   override def receive = {
     case req: OrderReportRequest => {
-      log.debug(s"received go for $req")
+      log.debug(s"received OrderReportRequest: $req")
       orderPrintService.storePdf(req)
 
     }

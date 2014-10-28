@@ -1,15 +1,16 @@
 package services.mailer
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 import play.api.libs.json.JsObject
 import play.api.{Logger, Play}
 import org.apache.commons.mail._
 import play.api.libs.json.JsObject
+import services.OrderPrintServiceInternal
 
 
-sealed trait MailMessage
 
-case class OrderCreate(mail: Mail) extends MailMessage
+
+case class OrderCreate(mail: Mail)
 
 case class Mail(to: Seq[String],
                 cc: Seq[String] = Seq.empty,
@@ -19,7 +20,9 @@ case class Mail(to: Seq[String],
                 richMessage: Option[String] = None,
                 attachment: Option[java.io.File] = None)
 
-class MailerActor extends Actor {
+
+
+class MailSender extends Actor {
 
   System.setProperty("mail.debug", "true")
   System.setProperty("mail.smtp.socketFactory.class", "services.mailer.DummySSLSocketFactory")

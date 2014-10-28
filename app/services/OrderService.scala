@@ -34,32 +34,33 @@ import models.product.SizeGroupIn
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
-case class OrderReportRequest(id: UUID, orderId: IdType,reportsFolder:String){
-  def storageKey=s"$reportsFolder/$orderId$id"
+sealed trait OrderActionMessage{
+  def id:UUID
+  def orderId:IdType
+  def storageFolder:String
+  def storageKey=s"$storageFolder/$orderId$id"
+  def url(bucketName:String)=s"https://${bucketName}.s3.amazonaws.com/$storageKey"
 }
+case class OrderReportRequest(id: UUID, orderId: IdType,storageFolder:String) extends OrderActionMessage
+
+case class OrderMailRequest(id:UUID,orderId:IdType,storageFolder:String) extends OrderActionMessage
 
 trait OrderPrintServiceInternal {
   def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]]
-  def storePdf(req:OrderReportRequest): Future[Try[Option[String]]]
+  def storePdf(req:OrderActionMessage): Future[Try[Option[String]]]
+}
+trait OrderServiceInternal {
+  def orderId(): Future[Try[Int]]
+
+  def ensureIndexOnOrderId: Future[Unit]
+
+  def createOrder(create: JsObject): Future[Try[IdType]]
+
+  def updateOrder(id: IdType, update: JsObject): Future[Try[Unit]]
+
 }
 
 trait OrderServiceComponent {
-
-
-
-
-  trait OrderServiceInternal {
-    def orderId(): Future[Try[Int]]
-
-    def ensureIndexOnOrderId: Future[Unit]
-
-    def createOrder(create: JsObject): Future[Try[IdType]]
-
-    def updateOrder(id: IdType, update: JsObject): Future[Try[Unit]]
-
-  }
-
-
 
   val orderService: OrderServiceInternal
   val orderPrintService: OrderPrintServiceInternal
@@ -257,8 +258,8 @@ trait OrderService extends OrderServiceComponent {
               val deadlineNames = getDeadlines(deadlinesIds)
 
               val agentId = (orderJson \ "originatorId").as[IdType]
-
               val agent = crudService.getById[AgentIn](agentId)
+
               val customerId = (orderJson \ "customerId").as[IdType]
               val customer = crudService.getById[CustomerIn](customerId)
 
@@ -291,7 +292,7 @@ trait OrderService extends OrderServiceComponent {
       }
     }
 
-    def storePdf(req:OrderReportRequest)={
+    def storePdf(req:OrderActionMessage)={
       getPdf(req.orderId).map {
         _.map {
           _.flatMap{

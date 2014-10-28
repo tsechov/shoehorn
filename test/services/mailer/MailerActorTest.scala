@@ -20,7 +20,7 @@ class MailerActorTest extends PlaySpecification {
 
 
         implicit val actorSystem = ActorSystem("testActorSystem", fakeApp.configuration.underlying)
-        val mailer = TestActorRef(new MailerActor).underlyingActor
+        val mailer = TestActorRef(new MailSender).underlyingActor
         mailer.receive(OrderCreate(Mail(Seq("tsechov@gmail.com"), subject = "foo", message = "bar")))
         success
       }

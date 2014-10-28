@@ -24,6 +24,8 @@ object Reports extends CrudController {
   lazy val reports = Akka.system.actorOf(ReportGenerator.props(orderPrintService), name = "reportgenerator")
 
   val reportsFolder=configKey("aws.s3.reports.folder","reports")
+  val mailAttachmentFolder=configKey("aws.s3.mailattachment.folder","attachments")
+
   val bucketName=configKey("aws.s3.bucket")
 
   def order(id: IdType) = Action.async {
@@ -60,7 +62,7 @@ object Reports extends CrudController {
     val uid=UUID.randomUUID()
     val req=OrderReportRequest(uid,orderId,reportsFolder)
     reports ! req
-    Future.successful(Ok(Json.obj("reportUrl"->s"https://${bucketName}.s3.amazonaws.com/${req.storageKey}")))
+    Future.successful(Ok(Json.obj("reportUrl"->req.url(bucketName))))
   }
 
 

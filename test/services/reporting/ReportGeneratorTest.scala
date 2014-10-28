@@ -13,7 +13,7 @@ import com.typesafe.config.ConfigFactory
 import org.scalatest.{Matchers, WordSpecLike, BeforeAndAfterAll, WordSpec}
 
 import play.api.test.{FakeApplication, PlaySpecification}
-import services.mailer.{Mail, OrderCreate, MailerActor}
+import services.mailer.{Mail, OrderCreate, MailSender}
 
 
 
@@ -24,7 +24,7 @@ with DefaultTimeout with ImplicitSender
 with WordSpecLike with Matchers with BeforeAndAfterAll with Mockito{
 
 
-  "ReportController actor" should {
+  "ReportGenerator actor" should {
     "act on report request" in {
       within(1 second) {
 
