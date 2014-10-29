@@ -51,7 +51,7 @@ class MailSender extends Actor {
       val attachment = new EmailAttachment()
       attachment.setPath(mail.attachment.get.getAbsolutePath)
       attachment.setDisposition(EmailAttachment.ATTACHMENT)
-      attachment.setName("screenshot.png")
+      attachment.setName("foo.bar")
       new MultiPartEmail().attach(attachment).setMsg(mail.message)
     } else if (mail.richMessage.isDefined) {
       new HtmlEmail().setHtmlMsg(mail.richMessage.get).setTextMsg(mail.message)

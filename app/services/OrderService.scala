@@ -45,9 +45,13 @@ case class OrderReportRequest(id: UUID, orderId: IdType,storageFolder:String) ex
 
 case class OrderMailRequest(id:UUID,orderId:IdType,storageFolder:String) extends OrderActionMessage
 
+case class OrderReportContainer(agent: JsObject, customer: JsObject, order: JsObject,bytes:Array[Byte])
+
 trait OrderPrintServiceInternal {
-  def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]]
+  def getPdf(orderId: IdType): Future[Try[Option[OrderReportContainer]]]
   def storePdf(req:OrderActionMessage): Future[Try[Option[String]]]
+  def storeInternal(objectKey: String, stream: ByteArrayInputStream):Option[String]
+
 }
 trait OrderServiceInternal {
   def orderId(): Future[Try[Int]]
@@ -245,7 +249,7 @@ trait OrderService extends OrderServiceComponent {
   }
 
   override val orderPrintService = new OrderPrintServiceInternal with ReportFormats with DateFormatSupport {
-    override def getPdf(orderId: IdType): Future[Try[Option[Array[Byte]]]] = {
+    override def getPdf(orderId: IdType): Future[Try[Option[OrderReportContainer]]] = {
       val order = crudService.getById[OrderIn](orderId)
 
 
@@ -275,11 +279,14 @@ trait OrderService extends OrderServiceComponent {
                 } yield for {
                     aaa <- aa
                     ccc <- cc
-                  } yield binReport(mapOrderPrint(dd, aaa, ccc, orderJson))
+                  } yield {
+                    val report=binReport(mapOrderPrint(dd, aaa, ccc, orderJson))
+                    OrderReportContainer(aaa,ccc,orderJson,report)
+                  }
 
 
               Await.result(ff, 120 seconds) match {
-                case Success(pdf) => pdf
+                case Success(report) => report
                 case Failure(e) => throw e
               }
 
@@ -296,11 +303,15 @@ trait OrderService extends OrderServiceComponent {
       getPdf(req.orderId).map {
         _.map {
           _.flatMap{
-            (bytes) =>
-            storage.storePdf(req.storageKey,new ByteArrayInputStream(bytes))
+            (reportContainer) =>
+              storeInternal(req.storageKey,new ByteArrayInputStream(reportContainer.bytes))
           }
         }
       }
+    }
+
+    def storeInternal(objectKey: String, stream: ByteArrayInputStream)={
+      storage.storePdf(objectKey,stream)
     }
 
     private def mapOrderPrint(deadlineTypes: Map[IdType, String], agent: JsObject, customer: JsObject, order: JsObject): OrderReport = {

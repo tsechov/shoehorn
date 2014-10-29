@@ -1,7 +1,7 @@
 package controllers
 
 import akka.actor.Props
-import controllers.utils.CrudController
+import controllers.utils.{S3Bucket, CrudController}
 import models.AssetSupport.IdType
 import play.api.libs.concurrent.Akka
 import play.api.libs.json.Json
@@ -18,15 +18,15 @@ import play.api.Play.current
 import services.ConfigSupport.configKey
 
 
-object Reports extends CrudController {
+object Reports extends CrudController with S3Bucket{
   lazy val orderPrintService = runtime orderPrintService
 
   lazy val reports = Akka.system.actorOf(ReportGenerator.props(orderPrintService), name = "reportgenerator")
 
   val reportsFolder=configKey("aws.s3.reports.folder","reports")
-  val mailAttachmentFolder=configKey("aws.s3.mailattachment.folder","attachments")
 
-  val bucketName=configKey("aws.s3.bucket")
+
+
 
   def order(id: IdType) = Action.async {
 
@@ -34,10 +34,10 @@ object Reports extends CrudController {
       _ match {
         case Success(op) => {
           op match {
-            case Some(pdfBytes) => {
+            case Some(report) => {
               val targetFile = FileSystem.default.createTempFile(suffix = ".shoehorn-order.pdf")
               println(s"path: ${targetFile.toAbsolute.path}")
-              targetFile.outputStream().write(pdfBytes)
+              targetFile.outputStream().write(report.bytes)
               Ok.sendFile(targetFile.jfile, true, onClose = () => {
                 targetFile.delete()
               }).as("application/pdf")
