@@ -29,7 +29,7 @@ class OrderMailer(crudService:CrudServiceInternal,printer: OrderPrintServiceInte
           _.map{
             (reportContainer) =>
               val link=printer.storeInternal(req.storageKey,new ByteArrayInputStream(reportContainer.bytes))
-              val agentEmail = (reportContainer.agent \ "emails").as[JsArray].value.map(v => (v \ "address").asOpt[String]).headOption.flatten
+              val agentEmail = firstMailAddress(reportContainer.agent)
 
           }
         }
@@ -37,6 +37,13 @@ class OrderMailer(crudService:CrudServiceInternal,printer: OrderPrintServiceInte
 
 
     }
+  }
+
+  private def firstMailAddress(from:JsObject):Option[String]={
+   (from \ "emails").as[JsArray].value.map(v => (v \ "address").asOpt[String]).headOption.flatten.flatMap {
+     case s:String if s.trim.isEmpty => None
+     case s => Some(s)
+   }
   }
 
   private def customerMail(customer:JsObject):Option[String]={
@@ -47,9 +54,9 @@ class OrderMailer(crudService:CrudServiceInternal,printer: OrderPrintServiceInte
             val contact=crudService.getById[ContactIn](contactId)
             contact.map {
               _.map {
-                _.map {
+                _.flatMap {
                   (contact) => {
-                    ???
+                    firstMailAddress(contact)
                   }
                 }
               }
