@@ -1,4 +1,4 @@
-package controllers.utils
+package services.storage
 
 import services.ConfigSupport._
 

@@ -1,135 +1,138 @@
-OPTIONS        /                            controllers.Application.preflight(path: String ?= "")
-OPTIONS        /*path                       controllers.Application.preflight(path)
+OPTIONS        /                                   controllers.Application.preflight(path: String ?= "")
+OPTIONS        /*path                              controllers.Application.preflight(path)
 
-GET            /                            controllers.Application.index
-GET            /version                     controllers.Application.version
+GET            /                                   controllers.Application.index
+GET            /version                            controllers.Application.version
 
-GET            /users/me                    controllers.Users.me
-
-
-GET            /catalogs/:id                controllers.Catalogs.getById(id)
-GET            /catalogs                    controllers.Catalogs.find(q:Option[String])
-PUT            /catalogs/:id                controllers.Catalogs.update(id)
-POST           /catalogs                    controllers.Catalogs.create
-DELETE         /catalogs/:id                controllers.Catalogs.delete(id)
-
-GET            /products/:id                controllers.Products.getById(id)
-GET            /products                    controllers.Products.find(q:Option[String],catalogs:Option[String])
-PUT            /products/:id                controllers.Products.update(id)
-POST           /products                    controllers.Products.create
-DELETE         /products/:id                controllers.Products.delete(id)
-
-GET            /customers/:id               controllers.Customers.getById(id)
-GET            /customers                   controllers.Customers.find(q:Option[String])
-PUT            /customers/:id               controllers.Customers.update(id)
-POST           /customers                   controllers.Customers.create
-DELETE         /customers/:id               controllers.Customers.delete(id)
-
-GET            /warehouses/:id              controllers.Warehouses.getById(id)
-GET            /warehouses                  controllers.Warehouses.find(q:Option[String])
-PUT            /warehouses/:id              controllers.Warehouses.update(id)
-POST           /warehouses                  controllers.Warehouses.create
-DELETE         /warehouses/:id              controllers.Warehouses.delete(id)
-
-GET            /agents/:id                  controllers.Agents.getById(id)
-GET            /agents                      controllers.Agents.find(q:Option[String])
-PUT            /agents/:id                  controllers.Agents.update(id)
-POST           /agents                      controllers.Agents.create
-DELETE         /agents/:id                  controllers.Agents.delete(id)
-
-GET            /shops/:id                   controllers.Shops.getById(id)
-GET            /shops                       controllers.Shops.find(q:Option[String])
-PUT            /shops/:id                   controllers.Shops.update(id)
-POST           /shops                       controllers.Shops.create
-DELETE         /shops/:id                   controllers.Shops.delete(id)
-
-GET            /sizegroups/:id              controllers.SizeGroups.getById(id)
-GET            /sizegroups                  controllers.SizeGroups.find(q:Option[String])
-PUT            /sizegroups/:id              controllers.SizeGroups.update(id)
-POST           /sizegroups                  controllers.SizeGroups.create
-DELETE         /sizegroups/:id              controllers.SizeGroups.delete(id)
-
-GET            /deadlinetypes/:id           controllers.DeadlineTypes.getById(id)
-GET            /deadlinetypes               controllers.DeadlineTypes.find(q:Option[String])
-PUT            /deadlinetypes/:id           controllers.DeadlineTypes.update(id)
-POST           /deadlinetypes               controllers.DeadlineTypes.create
-DELETE         /deadlinetypes/:id           controllers.DeadlineTypes.delete(id)
-
-GET            /companytypes/:id            controllers.CompanyTypes.getById(id)
-GET            /companytypes                controllers.CompanyTypes.find(q:Option[String])
-PUT            /companytypes/:id            controllers.CompanyTypes.update(id)
-POST           /companytypes                controllers.CompanyTypes.create
-DELETE         /companytypes/:id            controllers.CompanyTypes.delete(id)
-
-GET            /addresstypes/:id            controllers.AddressTypes.getById(id)
-GET            /addresstypes                controllers.AddressTypes.find(q:Option[String])
-PUT            /addresstypes/:id            controllers.AddressTypes.update(id)
-POST           /addresstypes                controllers.AddressTypes.create
-DELETE         /addresstypes/:id            controllers.AddressTypes.delete(id)
-
-GET            /districts/:id               controllers.Districts.getById(id)
-GET            /districts                   controllers.Districts.find(q:Option[String])
-PUT            /districts/:id               controllers.Districts.update(id)
-POST           /districts                   controllers.Districts.create
-DELETE         /districts/:id               controllers.Districts.delete(id)
-
-GET            /lineofbusinesses/:id        controllers.LineOfBusinesses.getById(id)
-GET            /lineofbusinesses            controllers.LineOfBusinesses.find(q:Option[String])
-PUT            /lineofbusinesses/:id        controllers.LineOfBusinesses.update(id)
-POST           /lineofbusinesses            controllers.LineOfBusinesses.create
-DELETE         /lineofbusinesses/:id        controllers.LineOfBusinesses.delete(id)
-
-GET            /baskets/:id                 controllers.Baskets.getById(id)
-GET            /baskets                     controllers.Baskets.find(q:Option[String])
-PUT            /baskets/:id                 controllers.Baskets.update(id)
-POST           /baskets                     controllers.Baskets.create
-DELETE         /baskets/:id                 controllers.Baskets.delete(id,itemNumber:Option[String],size:Option[Int])
-
-GET            /variables/:id               controllers.Variables.getById(id)
-GET            /variables                   controllers.Variables.find(q:Option[String])
-PUT            /variables/:id               controllers.Variables.update(id)
-POST           /variables                   controllers.Variables.create
-DELETE         /variables/:id               controllers.Variables.delete(id)
-
-GET            /groups/:id                  controllers.Groups.getById(id)
-GET            /groups                      controllers.Groups.find(q:Option[String])
-PUT            /groups/:id                  controllers.Groups.update(id)
-POST           /groups                      controllers.Groups.create
-DELETE         /groups/:id                  controllers.Groups.delete(id)
-
-GET            /contacttypes/:id            controllers.ContactTypes.getById(id)
-GET            /contacttypes                controllers.ContactTypes.find(q:Option[String])
-PUT            /contacttypes/:id            controllers.ContactTypes.update(id)
-POST           /contacttypes                controllers.ContactTypes.create
-DELETE         /contacttypes/:id            controllers.ContactTypes.delete(id)
-
-GET            /contacts/:id                controllers.Contacts.getById(id)
-GET            /contacts                    controllers.Contacts.find(q:Option[String])
-PUT            /contacts/:id                controllers.Contacts.update(id)
-POST           /contacts                    controllers.Contacts.create
-DELETE         /contacts/:id                controllers.Contacts.delete(id)
-
-GET            /emailtypes/:id              controllers.EmailTypes.getById(id)
-GET            /emailtypes                  controllers.EmailTypes.find(q:Option[String])
-PUT            /emailtypes/:id              controllers.EmailTypes.update(id)
-POST           /emailtypes                  controllers.EmailTypes.create
-DELETE         /emailtypes/:id              controllers.EmailTypes.delete(id)
-
-GET            /phonenumbertypes/:id        controllers.PhoneNumberTypes.getById(id)
-GET            /phonenumbertypes            controllers.PhoneNumberTypes.find(q:Option[String])
-PUT            /phonenumbertypes/:id        controllers.PhoneNumberTypes.update(id)
-POST           /phonenumbertypes            controllers.PhoneNumberTypes.create
-DELETE         /phonenumbertypes/:id        controllers.PhoneNumberTypes.delete(id)
-
-GET            /orders/:id                  controllers.Orders.getById(id)
-GET            /orders                      controllers.Orders.find(q:Option[String])
-PUT            /orders/:id                  controllers.Orders.update(id)
-POST           /orders                      controllers.Orders.create
-DELETE         /orders/:id                  controllers.Orders.delete(id)
-GET            /orderlist                   controllers.Orders.list
-
-GET            /reports/orders/:id          controllers.Reports.order(id)
-GET            /reports/generate/orders/:id controllers.Reports.genOrder(id)
+GET            /users/me                           controllers.Users.me
 
 
-GET            /assets/*file                controllers.Assets.at(path="/public", file)
+GET            /catalogs/:id                       controllers.Catalogs.getById(id)
+GET            /catalogs                           controllers.Catalogs.find(q:Option[String])
+PUT            /catalogs/:id                       controllers.Catalogs.update(id)
+POST           /catalogs                           controllers.Catalogs.create
+DELETE         /catalogs/:id                       controllers.Catalogs.delete(id)
+
+GET            /products/:id                       controllers.Products.getById(id)
+GET            /products                           controllers.Products.find(q:Option[String],catalogs:Option[String])
+PUT            /products/:id                       controllers.Products.update(id)
+POST           /products                           controllers.Products.create
+DELETE         /products/:id                       controllers.Products.delete(id)
+
+GET            /customers/:id                      controllers.Customers.getById(id)
+GET            /customers                          controllers.Customers.find(q:Option[String])
+PUT            /customers/:id                      controllers.Customers.update(id)
+POST           /customers                          controllers.Customers.create
+DELETE         /customers/:id                      controllers.Customers.delete(id)
+
+GET            /warehouses/:id                     controllers.Warehouses.getById(id)
+GET            /warehouses                         controllers.Warehouses.find(q:Option[String])
+PUT            /warehouses/:id                     controllers.Warehouses.update(id)
+POST           /warehouses                         controllers.Warehouses.create
+DELETE         /warehouses/:id                     controllers.Warehouses.delete(id)
+
+GET            /agents/:id                         controllers.Agents.getById(id)
+GET            /agents                             controllers.Agents.find(q:Option[String])
+PUT            /agents/:id                         controllers.Agents.update(id)
+POST           /agents                             controllers.Agents.create
+DELETE         /agents/:id                         controllers.Agents.delete(id)
+
+GET            /shops/:id                          controllers.Shops.getById(id)
+GET            /shops                              controllers.Shops.find(q:Option[String])
+PUT            /shops/:id                          controllers.Shops.update(id)
+POST           /shops                              controllers.Shops.create
+DELETE         /shops/:id                          controllers.Shops.delete(id)
+
+GET            /sizegroups/:id                     controllers.SizeGroups.getById(id)
+GET            /sizegroups                         controllers.SizeGroups.find(q:Option[String])
+PUT            /sizegroups/:id                     controllers.SizeGroups.update(id)
+POST           /sizegroups                         controllers.SizeGroups.create
+DELETE         /sizegroups/:id                     controllers.SizeGroups.delete(id)
+
+GET            /deadlinetypes/:id                  controllers.DeadlineTypes.getById(id)
+GET            /deadlinetypes                      controllers.DeadlineTypes.find(q:Option[String])
+PUT            /deadlinetypes/:id                  controllers.DeadlineTypes.update(id)
+POST           /deadlinetypes                      controllers.DeadlineTypes.create
+DELETE         /deadlinetypes/:id                  controllers.DeadlineTypes.delete(id)
+
+GET            /companytypes/:id                   controllers.CompanyTypes.getById(id)
+GET            /companytypes                       controllers.CompanyTypes.find(q:Option[String])
+PUT            /companytypes/:id                   controllers.CompanyTypes.update(id)
+POST           /companytypes                       controllers.CompanyTypes.create
+DELETE         /companytypes/:id                   controllers.CompanyTypes.delete(id)
+
+GET            /addresstypes/:id                   controllers.AddressTypes.getById(id)
+GET            /addresstypes                       controllers.AddressTypes.find(q:Option[String])
+PUT            /addresstypes/:id                   controllers.AddressTypes.update(id)
+POST           /addresstypes                       controllers.AddressTypes.create
+DELETE         /addresstypes/:id                   controllers.AddressTypes.delete(id)
+
+GET            /districts/:id                      controllers.Districts.getById(id)
+GET            /districts                          controllers.Districts.find(q:Option[String])
+PUT            /districts/:id                      controllers.Districts.update(id)
+POST           /districts                          controllers.Districts.create
+DELETE         /districts/:id                      controllers.Districts.delete(id)
+
+GET            /lineofbusinesses/:id               controllers.LineOfBusinesses.getById(id)
+GET            /lineofbusinesses                   controllers.LineOfBusinesses.find(q:Option[String])
+PUT            /lineofbusinesses/:id               controllers.LineOfBusinesses.update(id)
+POST           /lineofbusinesses                   controllers.LineOfBusinesses.create
+DELETE         /lineofbusinesses/:id               controllers.LineOfBusinesses.delete(id)
+
+GET            /baskets/:id                        controllers.Baskets.getById(id)
+GET            /baskets                            controllers.Baskets.find(q:Option[String])
+PUT            /baskets/:id                        controllers.Baskets.update(id)
+POST           /baskets                            controllers.Baskets.create
+DELETE         /baskets/:id                        controllers.Baskets.delete(id,itemNumber:Option[String],size:Option[Int])
+
+GET            /variables/:id                      controllers.Variables.getById(id)
+GET            /variables                          controllers.Variables.find(q:Option[String])
+PUT            /variables/:id                      controllers.Variables.update(id)
+POST           /variables                          controllers.Variables.create
+DELETE         /variables/:id                      controllers.Variables.delete(id)
+
+GET            /groups/:id                         controllers.Groups.getById(id)
+GET            /groups                             controllers.Groups.find(q:Option[String])
+PUT            /groups/:id                         controllers.Groups.update(id)
+POST           /groups                             controllers.Groups.create
+DELETE         /groups/:id                         controllers.Groups.delete(id)
+
+GET            /contacttypes/:id                   controllers.ContactTypes.getById(id)
+GET            /contacttypes                       controllers.ContactTypes.find(q:Option[String])
+PUT            /contacttypes/:id                   controllers.ContactTypes.update(id)
+POST           /contacttypes                       controllers.ContactTypes.create
+DELETE         /contacttypes/:id                   controllers.ContactTypes.delete(id)
+
+GET            /contacts/:id                       controllers.Contacts.getById(id)
+GET            /contacts                           controllers.Contacts.find(q:Option[String])
+PUT            /contacts/:id                       controllers.Contacts.update(id)
+POST           /contacts                           controllers.Contacts.create
+DELETE         /contacts/:id                       controllers.Contacts.delete(id)
+
+GET            /emailtypes/:id                     controllers.EmailTypes.getById(id)
+GET            /emailtypes                         controllers.EmailTypes.find(q:Option[String])
+PUT            /emailtypes/:id                     controllers.EmailTypes.update(id)
+POST           /emailtypes                         controllers.EmailTypes.create
+DELETE         /emailtypes/:id                     controllers.EmailTypes.delete(id)
+
+GET            /phonenumbertypes/:id               controllers.PhoneNumberTypes.getById(id)
+GET            /phonenumbertypes                   controllers.PhoneNumberTypes.find(q:Option[String])
+PUT            /phonenumbertypes/:id               controllers.PhoneNumberTypes.update(id)
+POST           /phonenumbertypes                   controllers.PhoneNumberTypes.create
+DELETE         /phonenumbertypes/:id               controllers.PhoneNumberTypes.delete(id)
+
+GET            /orders/:id                         controllers.Orders.getById(id)
+GET            /orders                             controllers.Orders.find(q:Option[String])
+PUT            /orders/:id                         controllers.Orders.update(id)
+POST           /orders                             controllers.Orders.create
+DELETE         /orders/:id                         controllers.Orders.delete(id)
+GET            /orderlist                          controllers.Orders.list
+
+GET            /reports/orders/:id                 controllers.Reports.order(id)
+GET            /reports/generate/orders/:id        controllers.Reports.genOrder(id)
+
+POST           /mails/orders/:id                   controllers.Mails.sendOrderCreateMail(id)
+PUT            /mails/orders/:id                   controllers.Mails.sendOrderUpdateMail(id)
+
+
+GET            /assets/*file                       controllers.Assets.at(path="/public", file)

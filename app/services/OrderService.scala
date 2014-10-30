@@ -34,25 +34,35 @@ import models.product.SizeGroupIn
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
-sealed trait OrderActionMessage{
-  def id:UUID
-  def orderId:IdType
-  def storageFolder:String
-  def storageKey=s"$storageFolder/$orderId$id"
-  def url(bucketName:String)=s"https://${bucketName}.s3.amazonaws.com/$storageKey"
+sealed trait OrderActionMessage {
+  def id: UUID
+
+  def orderId: IdType
+
+  def storageFolder: String
+
+  def storageKey = s"$storageFolder/$orderId$id"
+
+  def url(bucketName: String) = s"https://${bucketName}.s3.amazonaws.com/$storageKey"
 }
-case class OrderReportRequest(id: UUID, orderId: IdType,storageFolder:String) extends OrderActionMessage
 
-case class OrderMailRequest(id:UUID,orderId:IdType,storageFolder:String) extends OrderActionMessage
+case class OrderReportRequest(id: UUID, orderId: IdType, storageFolder: String) extends OrderActionMessage
 
-case class OrderReportContainer(agent: JsObject, customer: JsObject, order: JsObject,bytes:Array[Byte])
+case class OrderCreateMailRequest(id: UUID, orderId: IdType, storageFolder: String) extends OrderActionMessage
+
+case class OrderUpdateMailRequest(id: UUID, orderId: IdType, storageFolder: String) extends OrderActionMessage
+
+case class OrderReportContainer(agent: JsObject, customer: JsObject, order: JsObject, bytes: Array[Byte])
 
 trait OrderPrintServiceInternal {
   def getPdf(orderId: IdType): Future[Try[Option[OrderReportContainer]]]
-  def storePdf(req:OrderActionMessage): Future[Try[Option[String]]]
-  def storeInternal(objectKey: String, stream: ByteArrayInputStream):Option[String]
+
+  def storePdf(req: OrderActionMessage): Future[Try[Option[String]]]
+
+  def storeInternal(objectKey: String, stream: ByteArrayInputStream): Option[String]
 
 }
+
 trait OrderServiceInternal {
   def orderId(): Future[Try[Int]]
 
@@ -72,7 +82,7 @@ trait OrderServiceComponent {
 }
 
 trait OrderService extends OrderServiceComponent {
-  this: OrderRepositoryComponent with CrudServiceComponent with StorageComponent=>
+  this: OrderRepositoryComponent with CrudServiceComponent with StorageComponent =>
 
 
   override val orderService = new OrderServiceInternal {
@@ -106,7 +116,7 @@ trait OrderService extends OrderServiceComponent {
         updateResult <- updateInternal(id, for (total <- calculateTotal(update, sgs); numberOfPairs <- calculateNumberOfPairs(update); op <- toUpdateModel(update, total, numberOfPairs)) yield op)
         result <- updateResult match {
           case Success(_) => Future.successful(updateResult)
-          case f:Failure[Unit] => Future.successful(f)
+          case f: Failure[Unit] => Future.successful(f)
         }
       } yield result
 
@@ -207,23 +217,23 @@ trait OrderService extends OrderServiceComponent {
           itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalog) => {
 
             val targetSizeGroups = findSizeGroupIdBySize(sizeGroups, sizeAndCatalog.size)
-//            targetSizeGroupOpt match {
-//              case Some(targetSizeGroup) => {
-                val unitPriceOpt = (sizeAndCatalog.firstCatalog \ "sizeGroups").as[JsArray].value.collectFirst {
-                  case g: JsObject if (targetSizeGroups.contains((g \ "sizeGroupId").as[IdType])) => {
-                    (g \ "unitPrice").asOpt[Int]
-                  }
-                }
+            //            targetSizeGroupOpt match {
+            //              case Some(targetSizeGroup) => {
+            val unitPriceOpt = (sizeAndCatalog.firstCatalog \ "sizeGroups").as[JsArray].value.collectFirst {
+              case g: JsObject if (targetSizeGroups.contains((g \ "sizeGroupId").as[IdType])) => {
+                (g \ "unitPrice").asOpt[Int]
+              }
+            }
 
-                unitPriceOpt.flatten match {
-                  case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + (unitPrice * sizeAndCatalog.quantity))
-                  case _ if (acc.isFailure) => acc
-                  case _ => Failure(new RuntimeException(s"cannot calculate total for order. sizegroups[$targetSizeGroups] found by size[${sizeAndCatalog.size}] are" +
-                    s" not present in [${sizeAndCatalog}]"))
-                }
-//              }
-//              case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
-//            }
+            unitPriceOpt.flatten match {
+              case Some(unitPrice) if (acc.isSuccess) => Success(acc.get + (unitPrice * sizeAndCatalog.quantity))
+              case _ if (acc.isFailure) => acc
+              case _ => Failure(new RuntimeException(s"cannot calculate total for order. sizegroups[$targetSizeGroups] found by size[${sizeAndCatalog.size}] are" +
+                s" not present in [${sizeAndCatalog}]"))
+            }
+            //              }
+            //              case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
+            //            }
           })
         }
       }
@@ -280,8 +290,9 @@ trait OrderService extends OrderServiceComponent {
                     aaa <- aa
                     ccc <- cc
                   } yield {
-                    val report=binReport(mapOrderPrint(dd, aaa, ccc, orderJson))
-                    OrderReportContainer(aaa,ccc,orderJson,report)
+                    val report = binReport(mapOrderPrint(dd, aaa, ccc, orderJson))
+                    Logger.debug(s"order report created successfully for order: $orderId")
+                    OrderReportContainer(aaa, ccc, orderJson, report)
                   }
 
 
@@ -299,19 +310,19 @@ trait OrderService extends OrderServiceComponent {
       }
     }
 
-    def storePdf(req:OrderActionMessage)={
+    def storePdf(req: OrderActionMessage) = {
       getPdf(req.orderId).map {
         _.map {
-          _.flatMap{
+          _.flatMap {
             (reportContainer) =>
-              storeInternal(req.storageKey,new ByteArrayInputStream(reportContainer.bytes))
+              storeInternal(req.storageKey, new ByteArrayInputStream(reportContainer.bytes))
           }
         }
       }
     }
 
-    def storeInternal(objectKey: String, stream: ByteArrayInputStream)={
-      storage.storePdf(objectKey,stream)
+    def storeInternal(objectKey: String, stream: ByteArrayInputStream) = {
+      storage.storePdf(objectKey, stream)
     }
 
     private def mapOrderPrint(deadlineTypes: Map[IdType, String], agent: JsObject, customer: JsObject, order: JsObject): OrderReport = {

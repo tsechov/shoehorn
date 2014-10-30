@@ -5,7 +5,6 @@ package object support {
 
   case class OrderMailBody(customerName: String, link: String, orderNumber: String)
 
-
   case class Mail(to: Seq[String],
                   cc: Seq[String] = Seq.empty,
                   bcc: Seq[String] = Seq.empty,
@@ -18,7 +17,7 @@ package object support {
     s"""
         |Kedves ${params.customerName}!
         |
-        |Rendszerünkben az alábbi linken található Ön által leadott megrendelés került rögzítésre a 2015. Tavasz-Nyár szezonra.
+        |Rendszerünkben az alábbi linken található, ${params.orderNumber} számú, Ön által leadott megrendelés került rögzítésre a 2015. Tavasz-Nyár szezonra.
         |
         |${params.link}
         |
@@ -40,7 +39,7 @@ package object support {
     s"""
 <p>Kedves ${params.customerName}!</p>
 
-<p>Rendszer&uuml;nkben az al&aacute;bbi&nbsp;linken&nbsp;tal&aacute;lhat&oacute; &Ouml;n &aacute;ltal leadott megrendel&eacute;s ker&uuml;lt r&ouml;gz&iacute;t&eacute;sre a 2015. Tavasz-Ny&aacute;r szezonra.</p>
+<p>Rendszer&uuml;nkben az al&aacute;bbi&nbsp;linken&nbsp;tal&aacute;lhat&oacute;, ${params.orderNumber} sz&aacute;m&uacute;, &Ouml;n &aacute;ltal leadott megrendel&eacute;s ker&uuml;lt r&ouml;gz&iacute;t&eacute;sre a 2015. Tavasz-Ny&aacute;r szezonra.</p>
 
 <p><a href="${params.link}">${params.orderNumber}</a></p>
 

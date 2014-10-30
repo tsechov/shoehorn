@@ -1,7 +1,7 @@
 package controllers
 
 import akka.actor.Props
-import controllers.utils.{S3Bucket, CrudController}
+import controllers.utils.CrudController
 import models.AssetSupport.IdType
 import play.api.libs.concurrent.Akka
 import play.api.libs.json.Json
@@ -16,6 +16,7 @@ import play.api.Logger
 import java.util.UUID
 import play.api.Play.current
 import services.ConfigSupport.configKey
+import services.storage.S3Bucket
 
 
 object Reports extends CrudController with S3Bucket{
