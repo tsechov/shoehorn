@@ -1,26 +1,9 @@
 package services.mailer
 
-import akka.actor.{Props, Actor}
-import play.api.libs.json.JsObject
-import play.api.{Logger, Play}
+import akka.actor.Actor
 import org.apache.commons.mail._
-import play.api.libs.json.JsObject
-import services.OrderPrintServiceInternal
-
-
-
-
-case class OrderCreate(mail: Mail)
-
-case class Mail(to: Seq[String],
-                cc: Seq[String] = Seq.empty,
-                bcc: Seq[String] = Seq.empty,
-                subject: String,
-                message: String,
-                richMessage: Option[String] = None,
-                attachment: Option[java.io.File] = None)
-
-
+import services.mailer.order.support.Mail
+import scala.util.Try
 
 class MailSender extends Actor {
 
@@ -38,15 +21,15 @@ class MailSender extends Actor {
 
 
   override def receive = {
-    case OrderCreate(mail) => {
-      sendMail(Mail(to = mail.to, subject = mail.subject, message = mail.message))
+    case mail: Mail => {
+      sender ! Try(sendMail(mail))
     }
 
   }
 
 
   def sendMail(mail: Mail) = {
-    //FIXME: sort this out
+    //FIXME: sort attachments out
     val commonsMail: Email = if (mail.attachment.isDefined) {
       val attachment = new EmailAttachment()
       attachment.setPath(mail.attachment.get.getAbsolutePath)
@@ -76,7 +59,7 @@ class MailSender extends Actor {
       setFrom(fromEmail, fromName).
       setSubject(mail.subject)
 
-    // Send the email and check for exceptions
+
     preparedMail.send
   }
 }

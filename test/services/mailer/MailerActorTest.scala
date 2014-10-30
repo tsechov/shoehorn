@@ -9,6 +9,7 @@ import play.api.libs.json.Json
 import play.api.test.{PlaySpecification, FakeApplication}
 import javax.net.ssl.{X509TrustManager, TrustManager, SSLContext}
 import java.security.cert.X509Certificate
+import services.mailer.order.support.Mail
 
 class MailerActorTest extends PlaySpecification {
 
@@ -21,7 +22,7 @@ class MailerActorTest extends PlaySpecification {
 
         implicit val actorSystem = ActorSystem("testActorSystem", fakeApp.configuration.underlying)
         val mailer = TestActorRef(new MailSender).underlyingActor
-        mailer.receive(OrderCreate(Mail(Seq("tsechov@gmail.com"), subject = "foo", message = "bar")))
+        mailer.receive(Mail(Seq("tsechov@gmail.com"), subject = "foo", message = "bar"))
         success
       }
     }
