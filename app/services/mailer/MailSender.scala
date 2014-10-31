@@ -43,7 +43,7 @@ class MailSender extends Actor {
       new SimpleEmail().setMsg(mail.message)
     }
 
-
+    commonsMail.setCharset("UTF-8")
     commonsMail.setHostName(host)
     commonsMail.setSmtpPort(port.toInt)
     commonsMail.setDebug(debug)
