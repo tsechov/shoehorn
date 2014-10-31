@@ -3,7 +3,7 @@ package services.mailer
 import akka.actor.Actor
 import org.apache.commons.mail._
 import services.mailer.order.support.Mail
-import scala.util.Try
+import scala.util.{Success, Try}
 
 class MailSender extends Actor {
 
@@ -18,6 +18,7 @@ class MailSender extends Actor {
   private val password = configKey("smtp.password")
   private val fromName = configKey("ordermail.from.name")
   private val fromEmail = configKey("ordermail.from.email")
+  private val debug: Boolean = Try(configKey("ordermail.debug", "false").toBoolean).getOrElse(false)
 
 
   override def receive = {
@@ -45,7 +46,7 @@ class MailSender extends Actor {
 
     commonsMail.setHostName(host)
     commonsMail.setSmtpPort(port.toInt)
-    commonsMail.setDebug(true)
+    commonsMail.setDebug(debug)
     commonsMail.setStartTLSEnabled(true)
     commonsMail.setSSLOnConnect(false)
     commonsMail.setAuthenticator(new DefaultAuthenticator(user, password))

@@ -48,9 +48,16 @@ sealed trait OrderActionMessage {
 
 case class OrderReportRequest(id: UUID, orderId: IdType, storageFolder: String) extends OrderActionMessage
 
-case class OrderCreateMailRequest(id: UUID, orderId: IdType, storageFolder: String) extends OrderActionMessage
+trait MailRequest extends OrderActionMessage {
+  def resultUrl(bucketName: String) = s"${url(bucketName)}.result"
 
-case class OrderUpdateMailRequest(id: UUID, orderId: IdType, storageFolder: String) extends OrderActionMessage
+  def resultKey = s"${storageKey}.result"
+}
+
+case class OrderCreateMailRequest(id: UUID, orderId: IdType, storageFolder: String) extends MailRequest
+
+
+case class OrderUpdateMailRequest(id: UUID, orderId: IdType, storageFolder: String) extends MailRequest
 
 case class OrderReportContainer(agent: JsObject, customer: JsObject, order: JsObject, bytes: Array[Byte])
 
@@ -59,7 +66,8 @@ trait OrderPrintServiceInternal {
 
   def storePdf(req: OrderActionMessage): Future[Try[Option[String]]]
 
-  def storeInternal(objectKey: String, stream: ByteArrayInputStream): Option[String]
+  def storePdfInternal(objectKey: String, stream: ByteArrayInputStream): Option[String]
+  
 
 }
 
@@ -315,13 +323,13 @@ trait OrderService extends OrderServiceComponent {
         _.map {
           _.flatMap {
             (reportContainer) =>
-              storeInternal(req.storageKey, new ByteArrayInputStream(reportContainer.bytes))
+              storePdfInternal(req.storageKey, new ByteArrayInputStream(reportContainer.bytes))
           }
         }
       }
     }
 
-    def storeInternal(objectKey: String, stream: ByteArrayInputStream) = {
+    def storePdfInternal(objectKey: String, stream: ByteArrayInputStream) = {
       storage.storePdf(objectKey, stream)
     }
 

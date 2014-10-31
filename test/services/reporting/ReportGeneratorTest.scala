@@ -13,25 +13,23 @@ import com.typesafe.config.ConfigFactory
 import org.scalatest.{Matchers, WordSpecLike, BeforeAndAfterAll, WordSpec}
 
 import play.api.test.{FakeApplication, PlaySpecification}
-import services.mailer.{Mail, OrderCreate, MailSender}
-
-
+import services.mailer.MailSender
 
 
 class ReportGeneratorTest extends TestKit(ActorSystem("ReportGeneratorTest",
   ConfigFactory.parseString(ReportGeneratorTest.config)))
 with DefaultTimeout with ImplicitSender
-with WordSpecLike with Matchers with BeforeAndAfterAll with Mockito{
+with WordSpecLike with Matchers with BeforeAndAfterAll with Mockito {
 
 
   "ReportGenerator actor" should {
     "act on report request" in {
       within(1 second) {
 
-        val mockPrinter=mock[OrderPrintServiceInternal]
-        val reporter = system.actorOf(Props(classOf[ReportGenerator],mockPrinter))
-        val reqId=UUID.randomUUID
-        val req=OrderReportRequest(reqId,"blah","foo")
+        val mockPrinter = mock[OrderPrintServiceInternal]
+        val reporter = system.actorOf(Props(classOf[ReportGenerator], mockPrinter))
+        val reqId = UUID.randomUUID
+        val req = OrderReportRequest(reqId, "blah", "foo")
         reporter ! req
         expectNoMsg
         org.mockito.Mockito.verify(mockPrinter).storePdf(req)

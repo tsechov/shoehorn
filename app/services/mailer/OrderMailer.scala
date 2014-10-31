@@ -4,13 +4,15 @@ import java.io.ByteArrayInputStream
 
 import akka.actor.{Props, Actor}
 import akka.event.Logging
+import models.AssetSupport.IdType
 import models.customer.ContactIn
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{JsObject, JsArray}
+import play.api.libs.json.{Json, JsObject, JsArray}
 import akka.pattern.ask
+import services.ConfigSupport._
 
-import services.{CrudServiceInternal, OrderCreateMailRequest, OrderPrintServiceInternal}
+import services.{MailRequest, CrudServiceInternal, OrderCreateMailRequest, OrderPrintServiceInternal}
 import services.mailer.order.support.{OrderMailBody, Mail}
 import akka.util.Timeout
 import scala.concurrent.duration._
@@ -25,15 +27,17 @@ object OrderMailer {
 }
 
 case class OrderMailIngredients(
+                                 agentEmail: String,
                                  customerContactId: String,
                                  orderNumber: String,
-                                 message: MessageTexts)
+                                 message: MessageTexts,
+                                 req: MailRequest)
 
 case class MessageTexts(text: String,
                         html: String)
 
 class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceInternal) extends Actor with S3Bucket {
-
+  val mode = configKey("shoehorn.mode", "dev")
   val log = Logging(context.system, this)
   val mailer = context.actorOf(Props[MailSender])
 
@@ -52,24 +56,18 @@ class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceIn
 
                 contactId <- (reportContainer.customer \ "contactIds").as[JsArray].value.headOption.flatMap(_.asOpt[String])
                 agentEmail <- firstMailAddress(reportContainer.agent)
-                storedLink <- printer.storeInternal(req.storageKey, new ByteArrayInputStream(reportContainer.bytes))
+                storedLink <- printer.storePdfInternal(req.storageKey, new ByteArrayInputStream(reportContainer.bytes))
 
               } yield {
                 log.debug(s"order report for mail stored at: $storedLink")
 
                 val mailParams = OrderMailBody(customerName, req.url(bucketName), orderNumber)
-
-
-
-                val params = OrderMailIngredients(contactId, orderNumber, createTexts(mailParams))
+                val params = OrderMailIngredients(agentEmail, contactId, orderNumber, createTexts(mailParams), req)
 
                 sendMail(params)
               }
+              res.getOrElse(log.error(s"cannot gather mail contents for order: ${req.orderId}"))
 
-              res match {
-                case None => log.error(s"cannot gather mail contents for order: ${req.orderId}")
-                case _ => log.debug(s"order report mail sent for order: ${req.orderId}")
-              }
 
           }
         }
@@ -77,12 +75,6 @@ class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceIn
 
 
     }
-  }
-
-  private def createTexts(mailParams: OrderMailBody): MessageTexts = {
-    val textMessage = orderCreateMailAsText(mailParams)
-    val htmlMessage = orderCreateMailAsHtml(mailParams)
-    MessageTexts(textMessage, htmlMessage)
   }
 
 
@@ -94,13 +86,24 @@ class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceIn
           (contact) => {
             firstMailAddress(contact).map {
               (customerMail) => {
+                val recipients = mode match {
+                  case "prod" => Seq(customerMail, params.agentEmail)
+                  case "dev" => Seq("tsechov@gmail.com", "zsoldoszsolt@gmail.com")
+                }
+                val mail = Mail(recipients, subject = s"SzamosKölyök rendelés [${params.orderNumber}]", message = params.message.text, richMessage = Some(params.message.html))
 
-                val mail: Mail = Mail(Seq("tsechov@gmail.com", "zsoldoszsolt@gmail.com"), subject = s"SzamosKölyök rendelés [${params.orderNumber}]", message = params.message.text, richMessage = Some(params.message.html))
-                val result: Future[Try[String]] = (mailer ? mail).mapTo[Try[String]]
-                result.andThen {
-                  case Failure(t) => mailError(t, mail)
-                  case Success(res: Failure[String]) => mailError(res.exception, mail)
-                  case Success(res: Success[String]) => log.debug(s"mail sent with id: ${res.get}\n$mail\n")
+                val result = (mailer ? mail).mapTo[Try[String]]
+
+
+                result.onFailure { case t => mailError(t, mail)}
+                result.onSuccess {
+                  case res: Failure[String] => mailError(res.exception, mail)
+                  case res: Success[String] => {
+                    log.debug(s"mail sent with id: ${res.get} for order: ${params.req.orderId}")
+                    val result = Json.prettyPrint(Json.obj("result" -> "OK", "Message-ID" -> res.get))
+                    printer.storePdfInternal(params.req.resultKey, new ByteArrayInputStream(result.getBytes))
+                    log.debug(s"mail result stored at: ${params.req.resultUrl(bucketName)} for order: ${params.req.orderId}")
+                  }
                 }
               }
             }
@@ -111,8 +114,15 @@ class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceIn
 
   }
 
+
+  private def createTexts(mailParams: OrderMailBody): MessageTexts = {
+    val textMessage = orderCreateMailAsText(mailParams)
+    val htmlMessage = orderCreateMailAsHtml(mailParams)
+    MessageTexts(textMessage, htmlMessage)
+  }
+
   private def mailError(t: Throwable, mail: Mail) = {
-    log.error(t, s"couldnt send email: \n$mail\n")
+    log.error(t, "couldnt send email")
   }
 
   private def firstMailAddress(from: JsObject): Option[String] = {

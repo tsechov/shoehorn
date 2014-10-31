@@ -9,7 +9,7 @@ import play.api.mvc.{Controller, Action}
 import services.ConfigSupport._
 import services.mailer.OrderMailer
 
-import services.{OrderUpdateMailRequest, OrderCreateMailRequest, runtime}
+import services.{MailRequest, OrderUpdateMailRequest, OrderCreateMailRequest, runtime}
 import play.api.Play.current
 
 import scala.concurrent.Future
@@ -25,18 +25,24 @@ object Mails extends Controller with S3Bucket {
   lazy val mailer = Akka.system.actorOf(OrderMailer.props(crudService, orderPrintService), name = "mailer")
 
   def sendOrderCreateMail(orderId: IdType) = Action.async {
-
-    val uid = UUID.randomUUID()
-    val req = OrderCreateMailRequest(uid, orderId, mailAttachmentFolder)
-    mailer ! req
-    Future.successful(Ok)
+    send(orderId, mailAttachmentFolder) {
+      (uid, oid, folder) => OrderCreateMailRequest(uid, oid, folder)
+    }
   }
 
   def sendOrderUpdateMail(orderId: IdType) = Action.async {
 
+    send(orderId, mailAttachmentFolder) {
+      (uid, oid, folder) => OrderUpdateMailRequest(uid, oid, folder)
+    }
+
+  }
+
+
+  private def send(orderId: IdType, folder: String)(reqFactory: (UUID, String, String) => MailRequest) = {
     val uid = UUID.randomUUID()
-    val req = OrderUpdateMailRequest(uid, orderId, mailAttachmentFolder)
+    val req = reqFactory(uid, orderId, folder)
     mailer ! req
-    Future.successful(Ok)
+    Future.successful(Ok(Json.obj("resultUrl" -> req.resultUrl(bucketName))))
   }
 }
