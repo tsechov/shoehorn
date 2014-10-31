@@ -44,7 +44,8 @@ case class OrderMailIngredients(
                                  customerContactId: String,
                                  orderNumber: String,
                                  message: MessageTexts,
-                                 req: MailRequest)
+                                 req: MailRequest,
+                                 reportGenerationTime: Long)
 
 case class MessageTexts(text: String,
                         html: String)
@@ -53,8 +54,10 @@ case class MailResult(_id: IdType = BSONObjectID.generate.stringify,
                       createdAt: DateTime = new DateTime(),
                       orderId: IdType,
                       to: List[String],
-                      storageKey: String,
+                      reportGenerationTime: Long,
                       success: Boolean = false,
+                      resultsKey: String,
+                      reportStorageKey: Option[String] = None,
                       mailId: Option[String] = None,
                       error: Option[String] = None
                        )
@@ -95,7 +98,7 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
                 log.debug(s"order report for mail stored at: $storedLink")
 
                 val mailParams = OrderMailBody(s"$customerName ${reportContainer.companyType}", req.url(bucketName), orderNumber)
-                val params = OrderMailIngredients(agentEmail, contactId, orderNumber, createTexts(mailParams), req)
+                val params = OrderMailIngredients(agentEmail, contactId, orderNumber, createTexts(mailParams), req, reportContainer.elapsedTime)
 
                 sendMail(params)
               }
@@ -133,7 +136,7 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
                   case res: Failure[String] => mailError(res.exception, params, mail)
                   case res: Success[String] => {
                     log.debug(s"mail sent with id: ${res.get} for order: ${params.req.orderId}")
-                    val result = MailResult(orderId = params.req.orderId, to = recipients, storageKey = params.req.resultKey, success = true, mailId = Some(res.get))
+                    val result = MailResult(orderId = params.req.orderId, to = recipients, resultsKey = params.req.resultKey, reportStorageKey = Some(params.req.storageKey), reportGenerationTime = params.reportGenerationTime, success = true, mailId = Some(res.get))
                     persistAndStoreMailResult(result)
                     log.debug(s"mail result stored at: ${params.req.resultUrl(bucketName)} for order: ${params.req.orderId}")
                   }
@@ -159,11 +162,11 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
     mongo.insert[MailResult](resultJson).onFailure {
       case t => log.error(t, s"couldnt presist mail result: $result")
     }
-    printer.storeInternal(result.storageKey, new ByteArrayInputStream(Json.prettyPrint(resultJson).getBytes))(MimeTypes.JSON)
+    printer.storeInternal(result.resultsKey, new ByteArrayInputStream(Json.prettyPrint(resultJson).getBytes))(MimeTypes.JSON)
   }
 
   private def mailError(t: Throwable, params: OrderMailIngredients, mail: Mail) = {
-    val result = MailResult(orderId = params.req.orderId, to = mail.to, storageKey = params.req.resultKey, error = Some(Option(t.getMessage).getOrElse("unknown error")))
+    val result = MailResult(orderId = params.req.orderId, to = mail.to, resultsKey = params.req.resultKey, reportGenerationTime = params.reportGenerationTime, error = Some(Option(t.getMessage).getOrElse("unknown error")))
     persistAndStoreMailResult(result)
 
     log.error(t, "couldnt send email")
