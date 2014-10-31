@@ -4,10 +4,6 @@ import org.specs2.mutable.Specification
 import org.specs2.execute.Result
 import java.io.FileOutputStream
 
-/**
- * @author janmachacek
- */
-
 
 class ReportRunnerSpec extends Specification with ReportFormats {
 

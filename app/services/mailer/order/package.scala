@@ -5,7 +5,7 @@ package object support {
 
   case class OrderMailBody(customerName: String, link: String, orderNumber: String)
 
-  case class Mail(to: Seq[String],
+  case class Mail(to: List[String],
                   cc: Seq[String] = Seq.empty,
                   bcc: Seq[String] = Seq.empty,
                   subject: String,

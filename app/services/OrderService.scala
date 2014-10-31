@@ -14,7 +14,7 @@ import play.api.libs.json._
 import play.api.Logger
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import models.customer.{CustomerIn, AgentIn}
+import models.customer.{CompanyTypeIn, CustomerIn, AgentIn}
 import scala.concurrent.duration._
 import services.reporting._
 import scalax.file.FileSystem
@@ -31,6 +31,7 @@ import services.reporting.XmlParameterExpression
 import play.api.libs.json.JsObject
 import models.DateFormatSupport
 import models.product.SizeGroupIn
+import play.api.http.MimeTypes
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
@@ -59,15 +60,17 @@ case class OrderCreateMailRequest(id: UUID, orderId: IdType, storageFolder: Stri
 
 case class OrderUpdateMailRequest(id: UUID, orderId: IdType, storageFolder: String) extends MailRequest
 
-case class OrderReportContainer(agent: JsObject, customer: JsObject, order: JsObject, bytes: Array[Byte])
+case class OrderReportContainer(agent: JsObject, customer: JsObject, order: JsObject, companyType: String, bytes: Array[Byte])
 
 trait OrderPrintServiceInternal {
   def getPdf(orderId: IdType): Future[Try[Option[OrderReportContainer]]]
 
   def storePdf(req: OrderActionMessage): Future[Try[Option[String]]]
 
-  def storePdfInternal(objectKey: String, stream: ByteArrayInputStream): Option[String]
-  
+  final def storePdfInternal(objectKey: String, stream: ByteArrayInputStream): Option[String] = storeInternal(objectKey, stream)("application/pdf")
+
+  def storeInternal(objectKey: String, stream: ByteArrayInputStream)(contentType: String = MimeTypes.BINARY): Option[String]
+
 
 }
 
@@ -267,6 +270,8 @@ trait OrderService extends OrderServiceComponent {
   }
 
   override val orderPrintService = new OrderPrintServiceInternal with ReportFormats with DateFormatSupport {
+
+
     override def getPdf(orderId: IdType): Future[Try[Option[OrderReportContainer]]] = {
       val order = crudService.getById[OrderIn](orderId)
 
@@ -279,30 +284,34 @@ trait OrderService extends OrderServiceComponent {
               val deadlinesIds = (orderJson \ "deadlines").as[JsArray].value.map(v => (v \ "deadlineTypeId").as[String])
               val deadlineNames = getDeadlines(deadlinesIds)
 
-              val agentId = (orderJson \ "originatorId").as[IdType]
-              val agent = crudService.getById[AgentIn](agentId)
+
 
               val customerId = (orderJson \ "customerId").as[IdType]
               val customer = crudService.getById[CustomerIn](customerId)
 
 
               val ff = for {
-                d <- deadlineNames
-                a <- agent
-                c <- customer
-              } yield for {
-                  dd <- d
-                  aa <- a
-                  cc <- c
-                } yield for {
-                    aaa <- aa
-                    ccc <- cc
-                  } yield {
-                    val report = binReport(mapOrderPrint(dd, aaa, ccc, orderJson))
-                    Logger.debug(s"order report created successfully for order: $orderId")
-                    OrderReportContainer(aaa, ccc, orderJson, report)
-                  }
+                deadlinesTry <- deadlineNames
 
+                customerTry <- customer
+
+              } yield for {
+                  deadlinesOption <- deadlinesTry
+
+                  customerOption <- customerTry
+                } yield for {
+
+                    customerJson <- customerOption
+                    agentId = (customerJson \ "agentId").as[IdType]
+                    companyTypeId = (customerJson \ "companyTypeId").as[IdType]
+                  } yield {
+                    val agentJson: JsObject = fetchEntity[AgentIn](agentId)
+                    val companyType: String = (fetchEntity[CompanyTypeIn](companyTypeId) \ "name").as[String]
+
+                    val report = binReport(mapOrderPrint(deadlinesOption, agentJson, customerJson, companyType, orderJson))
+                    Logger.debug(s"order report created successfully for order: $orderId")
+                    OrderReportContainer(agentJson, customerJson, orderJson, companyType, report)
+                  }
 
               Await.result(ff, 120 seconds) match {
                 case Success(report) => report
@@ -318,7 +327,22 @@ trait OrderService extends OrderServiceComponent {
       }
     }
 
-    def storePdf(req: OrderActionMessage) = {
+    private def fetchEntity[A: CollectionName](id: IdType): JsObject = {
+
+      Await.result(crudService.getById[A](id), 10 seconds) match {
+
+        case Success(obj) if obj.isDefined => obj.get
+        case Success(obj) if obj.isEmpty => {
+          val col = implicitly[CollectionName[A]].get
+          val msg = s"entity not found in collection[$col] with id: $id"
+          Logger.error(msg)
+          throw new IllegalStateException(msg)
+        }
+        case Failure(e) => throw e
+      }
+    }
+
+    override def storePdf(req: OrderActionMessage) = {
       getPdf(req.orderId).map {
         _.map {
           _.flatMap {
@@ -329,11 +353,10 @@ trait OrderService extends OrderServiceComponent {
       }
     }
 
-    def storePdfInternal(objectKey: String, stream: ByteArrayInputStream) = {
-      storage.storePdf(objectKey, stream)
-    }
 
-    private def mapOrderPrint(deadlineTypes: Map[IdType, String], agent: JsObject, customer: JsObject, order: JsObject): OrderReport = {
+    override def storeInternal(objectKey: String, stream: ByteArrayInputStream)(contentType: String) = storage.store(objectKey, stream)(contentType)
+
+    private def mapOrderPrint(deadlineTypes: Map[IdType, String], agent: JsObject, customer: JsObject, companyType: String, order: JsObject): OrderReport = {
       def address(order: JsObject)(mode: String) = {
 
         val postalcode = (order \ mode \ "postalcode").asOpt[String].getOrElse("")
@@ -346,7 +369,7 @@ trait OrderService extends OrderServiceComponent {
       val addressFn = address(order) _
       val shippingName = (order \ "shippingAddress" \ "description").asOpt[String].getOrElse("")
 
-      val customerName = (customer \ "name").asOpt[String].getOrElse("")
+      val customerName = (customer \ "name").asOpt[String].getOrElse("") + " " + companyType
       val taxExemptNumber = (customer \ "taxExemptNumber").asOpt[String].getOrElse("")
       val bankAccount = (customer \ "bankAccountNumber").asOpt[String].getOrElse("")
 

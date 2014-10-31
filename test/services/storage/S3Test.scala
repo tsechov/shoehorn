@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream
 
 import com.amazonaws.services.s3.model.ObjectMetadata
 import play.api.test.{FakeApplication, PlaySpecification}
+import play.api.http.MimeTypes
 
 
 class S3Test extends PlaySpecification {
@@ -11,9 +12,9 @@ class S3Test extends PlaySpecification {
     "should be able to store data" in {
       val fakeApp = FakeApplication()
       running(fakeApp) {
-        val meta=new ObjectMetadata()
+        val meta = new ObjectMetadata()
         meta.setContentType("text/plain")
-        val res=new S3().storePdf("foo",new ByteArrayInputStream("bar".getBytes))
+        val res = new S3().store("foo", new ByteArrayInputStream("bar".getBytes))(MimeTypes.TEXT)
         res must beSome[String]
       }
     }

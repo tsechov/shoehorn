@@ -24,8 +24,6 @@ object runtime
   with StorageService with S3Service
 
 
-
-
 trait CrudServiceComponent {
 
   val crudService: CrudServiceInternal
@@ -53,7 +51,7 @@ trait CrudService extends CrudServiceComponent {
 
 
   override val crudService = new CrudServiceInternal {
-    val updateCommand = obj(AssetSupport.activeFieldName -> false)
+    val deactivateCommand = obj(AssetSupport.activeFieldName -> false)
 
     override def getById[A: CollectionName](id: models.AssetSupport.IdType) = {
       val query = DbQuery(obj(AssetSupport.idFieldName -> id))
@@ -90,7 +88,7 @@ trait CrudService extends CrudServiceComponent {
       implicit val cn = new CollectionName[JsObject] {
         override def get: String = collectionName
       }
-      crudRepository.update[JsObject](id, updateCommand)
+      crudRepository.update[JsObject](id, deactivateCommand)
 
     }
   }

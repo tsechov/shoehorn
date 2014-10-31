@@ -18,11 +18,12 @@ import services.storage.S3Bucket
 object Mails extends Controller with S3Bucket {
   lazy val orderPrintService = runtime orderPrintService
   lazy val crudService = runtime crudService
+  lazy val mongo = runtime mongo
 
   val mailAttachmentFolder = configKey("aws.s3.mailattachment.folder", "attachments")
 
 
-  lazy val mailer = Akka.system.actorOf(OrderMailer.props(crudService, orderPrintService), name = "mailer")
+  lazy val mailer = Akka.system.actorOf(OrderMailer.props(mongo, crudService, orderPrintService), name = "mailer")
 
   def sendOrderCreateMail(orderId: IdType) = Action.async {
     send(orderId, mailAttachmentFolder) {
@@ -31,10 +32,10 @@ object Mails extends Controller with S3Bucket {
   }
 
   def sendOrderUpdateMail(orderId: IdType) = Action.async {
-
-    send(orderId, mailAttachmentFolder) {
-      (uid, oid, folder) => OrderUpdateMailRequest(uid, oid, folder)
-    }
+    Future.successful(InternalServerError("not supported yet"))
+    //    send(orderId, mailAttachmentFolder) {
+    //      (uid, oid, folder) => OrderUpdateMailRequest(uid, oid, folder)
+    //    }
 
   }
 

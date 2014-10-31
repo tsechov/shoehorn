@@ -35,7 +35,7 @@ case class ProductReport(
                           sortiment: List[SortimentItem],
                           totalCount: Int
                           ) {
-  if (sortiment.size != 23) throw new IllegalArgumentException("there has to be 22 sortiment items")
+  if (sortiment.size != 24) throw new IllegalArgumentException("there has to be 24 sortiment items")
 }
 
 
@@ -43,7 +43,7 @@ object ProductReport {
 
   def apply(modelNumber: String, imageUrl: String, sortiment: List[SortimentItem]): ProductReport = {
 
-    val expandedSortiment = (18 to 40).foldLeft(List[SortimentItem]())((list, pos) => {
+    val expandedSortiment = (17 to 40).foldLeft(List[SortimentItem]())((list, pos) => {
       val item = sortiment.find(_.size == pos) match {
         case Some(item) => item
         case None => SortimentItem(pos, 0)

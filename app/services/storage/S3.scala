@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.model.{GeneratePresignedUrlRequest, PutObjectRe
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.Logger
+import play.api.http.MimeTypes
 
 object AmazonS3Communicator {
 
@@ -22,33 +23,36 @@ object AmazonS3Communicator {
   val amazonS3Client = new AmazonS3Client(credentials, client)
   val bucketName = configKey("aws.s3.bucket")
 
-  val pdf = {
+  def contentTypeMeta(contentType: String) = {
     val res = new ObjectMetadata()
-    res.setContentType("application/pdf")
+    res.setContentType(contentType)
     res
   }
 
 }
 
-trait RealStorageComponent{
-  val realStorage:RealComponentInternal
+trait RealStorageComponent {
+  val realStorage: RealComponentInternal
 }
 
-trait RealComponentInternal{
-  def getUrl(objectKey: String):String
-  def storePdf(objectKey: String, stream: ByteArrayInputStream):Option[String]
+trait RealComponentInternal {
+  def getUrl(objectKey: String): String
+
+  def store(objectKey: String, stream: ByteArrayInputStream)(contentType: String): Option[String]
 }
 
-trait S3Service extends RealStorageComponent{
+trait S3Service extends RealStorageComponent {
 
-  override val realStorage=new RealComponentInternal {
-    val s3=new S3
-    override def storePdf(objectKey: String, stream: ByteArrayInputStream): Option[String] = {
-      s3.storePdf(objectKey,stream)
-    }
+  override val realStorage = new RealComponentInternal {
+    val s3 = new S3
+
 
     override def getUrl(objectKey: String): String = {
       s3.getUrl(objectKey)
+    }
+
+    override def store(objectKey: String, stream: ByteArrayInputStream)(contentType: String): Option[String] = {
+      s3.store(objectKey, stream)(contentType)
     }
   }
 }
@@ -71,9 +75,9 @@ class S3 {
     url.toString
   }
 
-  def storePdf(objectKey: String, stream: ByteArrayInputStream) = store(objectKey, stream, pdf)
+  def store(objectKey: String, stream: ByteArrayInputStream)(contentType: String) = storeWithMeta(objectKey, stream, contentTypeMeta(contentType))
 
-  def store(objectKey: String, stream: ByteArrayInputStream, meta: ObjectMetadata = new ObjectMetadata): Option[String] = {
+  private def storeWithMeta(objectKey: String, stream: ByteArrayInputStream, meta: ObjectMetadata = new ObjectMetadata): Option[String] = {
     try {
 
       val putObjectRequest = new PutObjectRequest(bucketName, objectKey, stream, meta)

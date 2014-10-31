@@ -12,7 +12,7 @@ import play.api.libs.json.{Json, JsObject, JsArray}
 import akka.pattern.ask
 import services.ConfigSupport._
 
-import services.{MailRequest, CrudServiceInternal, OrderCreateMailRequest, OrderPrintServiceInternal}
+import services._
 import services.mailer.order.support.{OrderMailBody, Mail}
 import akka.util.Timeout
 import scala.concurrent.duration._
@@ -20,10 +20,23 @@ import scala.util.{Success, Failure, Try}
 import scala.concurrent.Future
 import services.storage.S3Bucket
 import services.mailer.order.support._
+import play.api.http.MimeTypes
+import org.joda.time.DateTime
+import models.{DateFormatSupport, AssetIn, AssetInCompanion}
+import services.OrderCreateMailRequest
+import play.api.libs.json.JsArray
+import scala.util.Failure
+import scala.Some
+import services.mailer.order.support.Mail
+import scala.util.Success
+import services.mailer.order.support.OrderMailBody
+import play.api.libs.json.JsObject
 
+import play.api.Play.current
+import reactivemongo.bson.BSONObjectID
 
 object OrderMailer {
-  def props(crudService: CrudServiceInternal, printer: OrderPrintServiceInternal): Props = Props(new OrderMailer(crudService, printer))
+  def props(mongo: MongoDb, crudService: CrudServiceInternal, printer: OrderPrintServiceInternal): Props = Props(new OrderMailer(mongo, crudService, printer))
 }
 
 case class OrderMailIngredients(
@@ -36,7 +49,27 @@ case class OrderMailIngredients(
 case class MessageTexts(text: String,
                         html: String)
 
-class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceInternal) extends Actor with S3Bucket {
+case class MailResult(_id: IdType = BSONObjectID.generate.stringify,
+                      createdAt: DateTime = new DateTime(),
+                      orderId: IdType,
+                      to: List[String],
+                      storageKey: String,
+                      success: Boolean = false,
+                      mailId: Option[String] = None,
+                      error: Option[String] = None
+                       )
+
+object MailResult extends DateFormatSupport {
+
+  implicit val format = Json.format[MailResult]
+
+  implicit def cn: CollectionName[MailResult] = new CollectionName[MailResult] {
+    override def get: String = "mails"
+  }
+}
+
+
+class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: OrderPrintServiceInternal) extends Actor with S3Bucket {
   val mode = configKey("shoehorn.mode", "dev")
   val log = Logging(context.system, this)
   val mailer = context.actorOf(Props[MailSender])
@@ -61,7 +94,7 @@ class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceIn
               } yield {
                 log.debug(s"order report for mail stored at: $storedLink")
 
-                val mailParams = OrderMailBody(customerName, req.url(bucketName), orderNumber)
+                val mailParams = OrderMailBody(s"$customerName ${reportContainer.companyType}", req.url(bucketName), orderNumber)
                 val params = OrderMailIngredients(agentEmail, contactId, orderNumber, createTexts(mailParams), req)
 
                 sendMail(params)
@@ -87,21 +120,21 @@ class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceIn
             firstMailAddress(contact).map {
               (customerMail) => {
                 val recipients = mode match {
-                  case "prod" => Seq(customerMail, params.agentEmail)
-                  case "dev" => Seq("tsechov@gmail.com", "zsoldoszsolt@gmail.com")
+                  case "prod" => List(customerMail, params.agentEmail)
+                  case "dev" => List("tsechov@gmail.com", "zsoldoszsolt@gmail.com")
                 }
                 val mail = Mail(recipients, subject = s"SzamosKölyök rendelés [${params.orderNumber}]", message = params.message.text, richMessage = Some(params.message.html))
 
                 val result = (mailer ? mail).mapTo[Try[String]]
 
 
-                result.onFailure { case t => mailError(t, mail)}
+                result.onFailure { case t => mailError(t, params, mail)}
                 result.onSuccess {
-                  case res: Failure[String] => mailError(res.exception, mail)
+                  case res: Failure[String] => mailError(res.exception, params, mail)
                   case res: Success[String] => {
                     log.debug(s"mail sent with id: ${res.get} for order: ${params.req.orderId}")
-                    val result = Json.prettyPrint(Json.obj("result" -> "OK", "Message-ID" -> res.get))
-                    printer.storePdfInternal(params.req.resultKey, new ByteArrayInputStream(result.getBytes))
+                    val result = MailResult(orderId = params.req.orderId, to = recipients, storageKey = params.req.resultKey, success = true, mailId = Some(res.get))
+                    persistAndStoreMailResult(result)
                     log.debug(s"mail result stored at: ${params.req.resultUrl(bucketName)} for order: ${params.req.orderId}")
                   }
                 }
@@ -121,7 +154,18 @@ class OrderMailer(crudService: CrudServiceInternal, printer: OrderPrintServiceIn
     MessageTexts(textMessage, htmlMessage)
   }
 
-  private def mailError(t: Throwable, mail: Mail) = {
+  private def persistAndStoreMailResult(result: MailResult) = {
+    val resultJson = Json.toJson(result)
+    mongo.insert[MailResult](resultJson).onFailure {
+      case t => log.error(t, s"couldnt presist mail result: $result")
+    }
+    printer.storeInternal(result.storageKey, new ByteArrayInputStream(Json.prettyPrint(resultJson).getBytes))(MimeTypes.JSON)
+  }
+
+  private def mailError(t: Throwable, params: OrderMailIngredients, mail: Mail) = {
+    val result = MailResult(orderId = params.req.orderId, to = mail.to, storageKey = params.req.resultKey, error = Some(Option(t.getMessage).getOrElse("unknown error")))
+    persistAndStoreMailResult(result)
+
     log.error(t, "couldnt send email")
   }
 
