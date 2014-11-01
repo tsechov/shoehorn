@@ -98,7 +98,8 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
                 log.debug(s"order report for mail stored at: $storedLink")
 
                 val mailParams = OrderMailBody(s"$customerName ${reportContainer.companyType}", req.url(bucketName), orderNumber)
-                val params = OrderMailIngredients(agentEmail, contactId, orderNumber, createTexts(mailParams), req, reportContainer.elapsedTime)
+                //FIXME: reportgenerationtime
+                val params = OrderMailIngredients(agentEmail, contactId, orderNumber, createTexts(mailParams), req, 0L)
 
                 sendMail(params)
               }
