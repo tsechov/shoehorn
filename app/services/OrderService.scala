@@ -32,6 +32,7 @@ import play.api.libs.json.JsObject
 import models.DateFormatSupport
 import models.product.SizeGroupIn
 import play.api.http.MimeTypes
+import org.apache.commons.lang3.time.StopWatch
 
 case class JsonErrors(errors: Seq[(JsPath, Seq[ValidationError])]) extends Throwable
 
@@ -60,7 +61,7 @@ case class OrderCreateMailRequest(id: UUID, orderId: IdType, storageFolder: Stri
 
 case class OrderUpdateMailRequest(id: UUID, orderId: IdType, storageFolder: String) extends MailRequest
 
-case class OrderReportContainer(agent: JsObject, customer: JsObject, order: JsObject, companyType: String, bytes: Array[Byte])
+case class OrderReportContainer(agent: JsObject, customer: JsObject, order: JsObject, companyType: String, bytes: Array[Byte], elapsedTime: Long)
 
 trait OrderPrintServiceInternal {
   def getPdf(orderId: IdType): Future[Try[Option[OrderReportContainer]]]
@@ -273,6 +274,9 @@ trait OrderService extends OrderServiceComponent {
 
 
     override def getPdf(orderId: IdType): Future[Try[Option[OrderReportContainer]]] = {
+      val stopper = new StopWatch()
+      stopper.start
+
       val order = crudService.getById[OrderIn](orderId)
 
 
@@ -309,8 +313,9 @@ trait OrderService extends OrderServiceComponent {
                     val companyType: String = (fetchEntity[CompanyTypeIn](companyTypeId) \ "name").as[String]
 
                     val report = binReport(mapOrderPrint(deadlinesOption, agentJson, customerJson, companyType, orderJson))
-                    Logger.debug(s"order report created successfully for order: $orderId")
-                    OrderReportContainer(agentJson, customerJson, orderJson, companyType, report)
+                    stopper.stop
+                    Logger.debug(s"order report created successfully for order: $orderId, took: ${stopper.getTime}ms")
+                    OrderReportContainer(agentJson, customerJson, orderJson, companyType, report, stopper.getTime)
                   }
 
               Await.result(ff, 120 seconds) match {
