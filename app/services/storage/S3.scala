@@ -7,15 +7,14 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.{GeneratePresignedUrlRequest, PutObjectRequest, CannedAccessControlList, ObjectMetadata}
 import org.joda.time.DateTime
-import org.slf4j.LoggerFactory
 import play.api.Logger
-import play.api.http.MimeTypes
+
 
 object AmazonS3Communicator {
 
   import services.ConfigSupport.configKey
 
-  val logger = LoggerFactory.getLogger(this.getClass().getName())
+
   val credentials = new BasicAWSCredentials(configKey("aws.access.key.id"), configKey("aws.secret.key"))
 
   val client = new ClientConfiguration()
@@ -87,7 +86,7 @@ class S3 {
       Some(getUrl(objectKey))
     } catch {
       case ex: Exception => {
-        logger.error(ex.getMessage(), ex)
+        Logger.error(ex.getMessage(), ex)
         None
       }
 

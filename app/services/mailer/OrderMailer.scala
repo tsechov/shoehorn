@@ -91,7 +91,8 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
                 customerName <- (reportContainer.customer \ "name").asOpt[String]
 
                 contactId <- (reportContainer.customer \ "contactIds").as[JsArray].value.headOption.flatMap(_.asOpt[String])
-                agentEmail <- firstMailAddress(reportContainer.agent)
+                agent = reportContainer.agent
+                agentEmail <- firstMailAddress(agent).orElse(mailAddressNotFound(agent))
                 storedLink <- printer.storePdfInternal(req.storageKey, new ByteArrayInputStream(reportContainer.bytes))
 
               } yield {
@@ -143,11 +144,18 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
                   }
                 }
               }
-            }
+            }.orElse(mailAddressNotFound(contact))
           }
         }
       }
     }
+
+  }
+
+  private def mailAddressNotFound(obj: JsObject) = {
+
+    log.error(s"no email address found in contact: ${(obj \ "_id").asOpt[String]}")
+    None
 
   }
 

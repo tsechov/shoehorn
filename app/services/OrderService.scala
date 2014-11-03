@@ -315,6 +315,7 @@ trait OrderService extends OrderServiceComponent {
                     val report = binReport(mapOrderPrint(deadlinesOption, agentJson, customerJson, companyType, orderJson))
                     stopper.stop
                     Logger.debug(s"order report created successfully for order: $orderId, took: ${stopper.getTime}ms")
+
                     OrderReportContainer(agentJson, customerJson, orderJson, companyType, report, stopper.getTime)
                   }
 

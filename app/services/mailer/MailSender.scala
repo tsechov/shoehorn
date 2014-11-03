@@ -4,10 +4,13 @@ import akka.actor.Actor
 import org.apache.commons.mail._
 import services.mailer.order.support.Mail
 import scala.util.{Success, Try}
+import akka.event.Logging
 
 class MailSender extends Actor {
 
-  System.setProperty("mail.debug", "true")
+  val log = Logging(context.system, this)
+
+  //  System.setProperty("mail.debug", "true")
   System.setProperty("mail.smtp.socketFactory.class", "services.mailer.DummySSLSocketFactory")
 
   import services.ConfigSupport.configKey
@@ -23,6 +26,7 @@ class MailSender extends Actor {
 
   override def receive = {
     case mail: Mail => {
+      log.debug(s"received Mail request: $mail")
       sender ! Try(sendMail(mail))
     }
 
