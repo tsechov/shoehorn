@@ -6,7 +6,7 @@ import java.util.UUID
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.order._
 
-import services.storage.StorageComponent
+import services.storage.{StreamAndLength, StorageComponent}
 import scala.concurrent.{Await, Future}
 import models.AssetSupport.IdType
 import scala.util.Try
@@ -68,9 +68,9 @@ trait OrderPrintServiceInternal {
 
   def storePdf(req: OrderActionMessage): Future[Try[Option[String]]]
 
-  final def storePdfInternal(objectKey: String, stream: ByteArrayInputStream): Option[String] = storeInternal(objectKey, stream)("application/pdf")
+  final def storePdfInternal(objectKey: String, content: StreamAndLength): Option[String] = storeInternal(objectKey, content.copy(contentType = "application/pdf"))
 
-  def storeInternal(objectKey: String, stream: ByteArrayInputStream)(contentType: String = MimeTypes.BINARY): Option[String]
+  def storeInternal(objectKey: String, content: StreamAndLength): Option[String]
 
 
 }
@@ -353,14 +353,14 @@ trait OrderService extends OrderServiceComponent {
         _.map {
           _.flatMap {
             (reportContainer) =>
-              storePdfInternal(req.storageKey, new ByteArrayInputStream(reportContainer.bytes))
+              storePdfInternal(req.storageKey, StreamAndLength(new ByteArrayInputStream(reportContainer.bytes), reportContainer.bytes.length))
           }
         }
       }
     }
 
 
-    override def storeInternal(objectKey: String, stream: ByteArrayInputStream)(contentType: String) = storage.store(objectKey, stream)(contentType)
+    override def storeInternal(objectKey: String, content: StreamAndLength) = storage.store(objectKey, content)
 
     private def mapOrderPrint(deadlineTypes: Map[IdType, String], agent: JsObject, customer: JsObject, companyType: String, order: JsObject): OrderReport = {
       def address(order: JsObject)(mode: String) = {

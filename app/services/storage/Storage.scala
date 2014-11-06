@@ -3,6 +3,8 @@ package services.storage
 import java.io.ByteArrayInputStream
 import play.api.http.MimeTypes
 
+case class StreamAndLength(stream: ByteArrayInputStream, length: Long, contentType: String = MimeTypes.BINARY)
+
 trait StorageComponent {
   val storage: StorageComponentInternal
 }
@@ -10,7 +12,7 @@ trait StorageComponent {
 trait StorageComponentInternal {
   def getUrl(objectKey: String): String
 
-  def store(objectKey: String, stream: ByteArrayInputStream)(contentType: String = MimeTypes.BINARY): Option[String]
+  def store(objectKey: String, content: StreamAndLength): Option[String]
 }
 
 trait StorageService extends StorageComponent {
@@ -18,7 +20,7 @@ trait StorageService extends StorageComponent {
   override val storage = new StorageComponentInternal {
 
 
-    def store(objectKey: String, stream: ByteArrayInputStream)(contentType: String = MimeTypes.BINARY) = realStorage.store(objectKey, stream)(contentType)
+    def store(objectKey: String, content: StreamAndLength) = realStorage.store(objectKey, content)
 
     override def getUrl(objectKey: String) = realStorage.getUrl(objectKey)
   }

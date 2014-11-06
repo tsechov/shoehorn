@@ -14,7 +14,8 @@ class S3Test extends PlaySpecification {
       running(fakeApp) {
         val meta = new ObjectMetadata()
         meta.setContentType("text/plain")
-        val res = new S3().store("foo", new ByteArrayInputStream("bar".getBytes))(MimeTypes.TEXT)
+        val datas = "bar".getBytes
+        val res = new S3().store("foo", StreamAndLength(new ByteArrayInputStream(datas), datas.length, MimeTypes.TEXT))
         res must beSome[String]
       }
     }

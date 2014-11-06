@@ -22,9 +22,10 @@ object AmazonS3Communicator {
   val amazonS3Client = new AmazonS3Client(credentials, client)
   val bucketName = configKey("aws.s3.bucket")
 
-  def contentTypeMeta(contentType: String) = {
+  def contentTypeMeta(contentType: String, length: Option[Long] = None) = {
     val res = new ObjectMetadata()
     res.setContentType(contentType)
+    length.foreach(res.setContentLength(_))
     res
   }
 
@@ -37,7 +38,7 @@ trait RealStorageComponent {
 trait RealComponentInternal {
   def getUrl(objectKey: String): String
 
-  def store(objectKey: String, stream: ByteArrayInputStream)(contentType: String): Option[String]
+  def store(objectKey: String, content: StreamAndLength): Option[String]
 }
 
 trait S3Service extends RealStorageComponent {
@@ -50,8 +51,8 @@ trait S3Service extends RealStorageComponent {
       s3.getUrl(objectKey)
     }
 
-    override def store(objectKey: String, stream: ByteArrayInputStream)(contentType: String): Option[String] = {
-      s3.store(objectKey, stream)(contentType)
+    override def store(objectKey: String, content: StreamAndLength): Option[String] = {
+      s3.store(objectKey, content)
     }
   }
 }
@@ -74,7 +75,9 @@ class S3 {
     url.toString
   }
 
-  def store(objectKey: String, stream: ByteArrayInputStream)(contentType: String) = storeWithMeta(objectKey, stream, contentTypeMeta(contentType))
+  def store(objectKey: String, content: StreamAndLength) = {
+    storeWithMeta(objectKey, content.stream, contentTypeMeta(content.contentType, Some(content.length)))
+  }
 
   private def storeWithMeta(objectKey: String, stream: ByteArrayInputStream, meta: ObjectMetadata = new ObjectMetadata): Option[String] = {
     try {

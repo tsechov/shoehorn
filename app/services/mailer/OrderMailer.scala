@@ -18,7 +18,7 @@ import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.util.{Success, Failure, Try}
 import scala.concurrent.Future
-import services.storage.S3Bucket
+import services.storage.{StreamAndLength, S3Bucket}
 import services.mailer.order.support._
 import play.api.http.MimeTypes
 import org.joda.time.DateTime
@@ -57,6 +57,7 @@ case class MailResult(_id: IdType = BSONObjectID.generate.stringify,
                       reportGenerationTime: Long,
                       success: Boolean = false,
                       resultsKey: String,
+                      reportDataLength: Option[Long] = None,
                       reportStorageKey: Option[String] = None,
                       mailId: Option[String] = None,
                       error: Option[String] = None
@@ -93,7 +94,7 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
                 contactId <- (reportContainer.customer \ "contactIds").as[JsArray].value.headOption.flatMap(_.asOpt[String])
                 agent = reportContainer.agent
                 agentEmail <- firstMailAddress(agent).orElse(mailAddressNotFound(agent))
-                storedLink <- printer.storePdfInternal(req.storageKey, new ByteArrayInputStream(reportContainer.bytes))
+                storedLink <- printer.storePdfInternal(req.storageKey, StreamAndLength(new ByteArrayInputStream(reportContainer.bytes), reportContainer.bytes.length))
 
               } yield {
                 log.debug(s"order report for mail stored at: $storedLink")
@@ -171,7 +172,9 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
     mongo.insert[MailResult](resultJson).onFailure {
       case t => log.error(t, s"couldnt presist mail result: $result")
     }
-    printer.storeInternal(result.resultsKey, new ByteArrayInputStream(Json.prettyPrint(resultJson).getBytes))(MimeTypes.JSON)
+    val datas = Json.prettyPrint(resultJson).getBytes
+    val content = StreamAndLength(new ByteArrayInputStream(datas), datas.length, MimeTypes.JSON)
+    printer.storeInternal(result.resultsKey, content)
   }
 
   private def mailError(t: Throwable, params: OrderMailIngredients, mail: Mail) = {
