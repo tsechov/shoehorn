@@ -24,7 +24,7 @@ deploy:
                 while read a ; do echo ${a//GIT_COMMIT/${WERCKER_GIT_COMMIT}} ; done < $WERCKER_SOURCE_DIR/conf/application.conf > $WERCKER_SOURCE_DIR/conf/application.conf.tmp
                 mv $WERCKER_SOURCE_DIR/conf/application.conf.tmp $WERCKER_SOURCE_DIR/conf/application.conf
                 cat $WERCKER_SOURCE_DIR/conf/application.conf
-        - conditional-heroku-deploy:
+        - heroku-deploy:
             key-name: HEROKU_KEYPAIR
     after-steps:
         - kobim/slack-post:
