@@ -26,6 +26,8 @@ deploy:
                 cat $WERCKER_SOURCE_DIR/conf/application.conf
         - heroku-deploy:
             key-name: HEROKU_KEYPAIR
+        - conditional-heroku-deploy:
+            key-name: HEROKU_KEYPAIR
     after-steps:
         - kobim/slack-post:
             subdomain: szamos
