@@ -1,4 +1,4 @@
-box: tsechov/oracle-java7-sbt.0.13.0@0.0.3
+box: tsechov/oracle-java7-sbt.0.13.0@0.0.4
 build:
     steps:
         - script:
