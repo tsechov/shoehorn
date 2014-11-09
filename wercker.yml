@@ -21,6 +21,8 @@ deploy:
         - script:
             name: perform release
             code: |-
+                pwd
+                ls -la
                 git status
         - tal-silo/heroku-deploy@3.0.1:
             key-name: HEROKU_KEYPAIR
