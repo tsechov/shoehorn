@@ -19,11 +19,9 @@ build:
 deploy:
     steps:
         - script:
-            name: persist commit-id
+            name: perform release
             code: |-
-                while read a ; do echo ${a//GIT_COMMIT/${WERCKER_GIT_COMMIT}} ; done < $WERCKER_SOURCE_DIR/conf/application.conf > $WERCKER_SOURCE_DIR/conf/application.conf.tmp
-                mv $WERCKER_SOURCE_DIR/conf/application.conf.tmp $WERCKER_SOURCE_DIR/conf/application.conf
-                cat $WERCKER_SOURCE_DIR/conf/application.conf
+                git status
         - tal-silo/heroku-deploy@3.0.1:
             key-name: HEROKU_KEYPAIR
     after-steps:
