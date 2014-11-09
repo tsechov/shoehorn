@@ -21,7 +21,10 @@ deploy:
         - script:
             name: perform release
             code: |-
-                git checkout master
+                if [ "$WERCKER_DEPLOYTARGET_NAME" == "perform-release" ]; then
+                    git checkout master
+                    ./github-release-latest.sh
+                fi
         - tal-silo/heroku-deploy@3.0.1:
             key-name: HEROKU_KEYPAIR
     after-steps:
