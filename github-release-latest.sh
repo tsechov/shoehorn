@@ -8,7 +8,7 @@ if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ] ;then error "not on mast
 
 . setenv.sh
 
-sbt "release with-defaults" || error "sbt release failed"
+echo -ne '\n' | sbt "release with-defaults" || error "sbt release failed"
 
 VERSION=$(git describe --abbrev=0 --tags|sed 's/^v//')
 
