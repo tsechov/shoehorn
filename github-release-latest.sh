@@ -7,6 +7,7 @@ function error {
 if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ] ;then error "not on master branch"; fi
 
 . setenv.sh
+ssh -T git@github.com
 export GIT_TRACE=1
 echo -ne '\n' | sbt "release with-defaults" || error "sbt release failed"
 
