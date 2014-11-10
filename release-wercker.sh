@@ -6,6 +6,7 @@ if [ "$WERCKER_DEPLOYTARGET_NAME" == "perform-release" ]; then
     echo $GITHUB_KEY_PRIVATE > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
     echo $GITHUB_KEY_PUBLIC > ~/.ssh/id_rsa.pub && chmod 600 ~/.ssh/id_rsa.pub
     ls -al ~/.ssh
+    cat ~/.ssh/id_rsa
     ./github-release-latest.sh
 else
     echo "not on perform-release target, not releasing"
