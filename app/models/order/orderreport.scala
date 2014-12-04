@@ -28,22 +28,33 @@ case class SortimentItem(
                           count: Int
                           )
 
+case class PriceItem(
+                      from: Int,
+                      to: Int,
+                      price: Int
+                      )
+
 
 case class ProductReport(
                           modelNumber: String,
                           imageUrl: String,
                           sortiment: List[SortimentItem],
+                          prices: List[PriceItem],
                           totalCount: Int
                           ) {
-  if (sortiment.size != 24) throw new IllegalArgumentException("there has to be 24 sortiment items")
+  if (sortiment.size != ProductReport.SORTIMENT_COUNT) throw new IllegalArgumentException(s"there has to be ${ProductReport.SORTIMENT_COUNT} sortiment items")
 }
 
 
 object ProductReport {
 
-  def apply(modelNumber: String, imageUrl: String, sortiment: List[SortimentItem]): ProductReport = {
+  val MIN_SIZE: Int = 17
+  val MAX_SIZE: Int = 40
+  val SORTIMENT_COUNT = MAX_SIZE - MIN_SIZE + 1
 
-    val expandedSortiment = (17 to 40).foldLeft(List[SortimentItem]())((list, pos) => {
+  def apply(modelNumber: String, imageUrl: String, sortiment: List[SortimentItem], prices: List[PriceItem]): ProductReport = {
+
+    val expandedSortiment = (MIN_SIZE to MAX_SIZE).foldLeft(List[SortimentItem]())((list, pos) => {
       val item = sortiment.find(_.size == pos) match {
         case Some(item) => item
         case None => SortimentItem(pos, 0)
@@ -52,7 +63,7 @@ object ProductReport {
     })
 
 
-    ProductReport(modelNumber, imageUrl, expandedSortiment, expandedSortiment.foldLeft(0)((sum, item) => sum + item.count))
+    ProductReport(modelNumber, imageUrl, expandedSortiment, prices, expandedSortiment.foldLeft(0)((sum, item) => sum + item.count))
 
   }
 }

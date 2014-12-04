@@ -210,8 +210,6 @@ trait OrderService extends OrderServiceComponent {
 
     def calculateTotal(order: JsObject, sgs: Try[List[JsObject]]): Try[Int] = {
 
-      //      val sgss = crudService.findAll[SizeGroupIn]
-      //      val result = sgss.map {
       case class SizeAndCatalog(productId: IdType, size: Int, quantity: Int, firstCatalog: JsValue)
       sgs.flatMap {
         (sizeGroups) => {
@@ -229,8 +227,7 @@ trait OrderService extends OrderServiceComponent {
           itemSizesAndCatalogs.foldLeft(Try(0))((acc, sizeAndCatalog) => {
 
             val targetSizeGroups = findSizeGroupIdBySize(sizeGroups, sizeAndCatalog.size)
-            //            targetSizeGroupOpt match {
-            //              case Some(targetSizeGroup) => {
+
             val unitPriceOpt = (sizeAndCatalog.firstCatalog \ "sizeGroups").as[JsArray].value.collectFirst {
               case g: JsObject if (targetSizeGroups.contains((g \ "sizeGroupId").as[IdType])) => {
                 (g \ "unitPrice").asOpt[Int]
@@ -243,14 +240,11 @@ trait OrderService extends OrderServiceComponent {
               case _ => Failure(new RuntimeException(s"cannot calculate total for order. sizegroups[$targetSizeGroups] found by size[${sizeAndCatalog.size}] are" +
                 s" not present in [${sizeAndCatalog}]"))
             }
-            //              }
-            //              case None => Failure(new RuntimeException(s"no sizegroup found for size ${sizeAndCatalog.size}"))
-            //            }
+
           })
         }
       }
-      //      }
-      //      result
+
     }
 
     private def calculateNumberOfPairs(order: JsObject): Try[Int] = {
@@ -287,7 +281,8 @@ trait OrderService extends OrderServiceComponent {
             orderJson => {
               val deadlinesIds = (orderJson \ "deadlines").as[JsArray].value.map(v => (v \ "deadlineTypeId").as[String])
               val deadlineNames = getDeadlines(deadlinesIds)
-
+              val sizeGroupIds = getSizeGroupIds(orderJson)
+              println(s"sizegroupids: $sizeGroupIds")
 
 
               val customerId = (orderJson \ "customerId").as[IdType]
@@ -408,7 +403,7 @@ trait OrderService extends OrderServiceComponent {
 
       })
 
-      val productlist = products.map(triple => ProductReport(triple._1, triple._2._1, triple._2._2)).toList
+      val productlist = products.map(triple => ProductReport(triple._1, triple._2._1, triple._2._2, List())).toList
 
       val orderId = (order \ "_id").as[IdType]
 
@@ -474,6 +469,13 @@ trait OrderService extends OrderServiceComponent {
           }
         }
       }
+    }
+
+    private def getSizeGroupIds(order: JsObject): Seq[IdType] = {
+      println("getSizeGroupIds")
+      (order \ "items").as[JsArray].value.map(item => {
+        ((item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj()) \ "sizeGroups").as[JsArray].value.map(sizeGroup => (sizeGroup \ "sizeGroupId").as[IdType])
+      }).flatten
     }
 
 

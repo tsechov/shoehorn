@@ -9,15 +9,6 @@ class ReportRunnerSpec extends Specification with ReportFormats {
 
   val runner = new ReportRunner with JRXmlReportCompiler with ClasspathResourceReportLoader
 
-  //  "failure collection" should {
-  //    "report errors in loader" in {
-  //      runner.runReportT("foo")(PdfDS).run.isLeft mustEqual true
-  //    }
-  //
-  //    "report errors in compiler" in {
-  //      runner.runReportT("broken.jrxml")(PdfDS).run.isLeft mustEqual true
-  //    }
-  //  }
 
   "simple report" in {
     runReport("/order2.jrxml", EmptyExpression, XmlParameterExpression("conf/order2.xml", "/order/items/product"))
