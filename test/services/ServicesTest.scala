@@ -1,14 +1,15 @@
 package services
 
-import org.specs2.mutable._
-import org.specs2.mock.Mockito
-import org.mockito.Mockito._
-import models.AssetSupport
-import scala.concurrent.{Await, Future}
-import play.api.libs.json.{Reads, Json}
-import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.TimeUnit
-import scala.util.{Failure, Success, Try}
+
+import models.AssetSupport
+import org.mockito.Mockito._
+import org.specs2.mock.Mockito
+import org.specs2.mutable._
+import play.api.libs.json.{Json, Reads}
+
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.{Await, Future}
 
 
 class ServicesTest extends Specification with Mockito {

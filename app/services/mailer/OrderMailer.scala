@@ -79,8 +79,8 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
   val mailer = context.actorOf(Props[MailSender])
 
   override def receive = {
-    case req: OrderCreateMailRequest => {
-      log.debug(s"received OrderCreateMailRequest: $req")
+    case req: MailRequest => {
+      log.debug(s"received MailRequest: $req")
 
       printer.getPdf(req.orderId).map {
         _.map {
@@ -101,7 +101,7 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
 
                 val mailParams = OrderMailBody(s"$customerName ${reportContainer.companyType}", req.url(bucketName), orderNumber)
                 //FIXME: reportgenerationtime
-                val params = OrderMailIngredients(agentEmail, contactId, orderNumber, createTexts(mailParams), req, 0L)
+                val params = OrderMailIngredients(agentEmail, contactId, orderNumber, createTexts(mailParams, req), req, 0L)
 
                 sendMail(params)
               }
@@ -161,10 +161,16 @@ class OrderMailer(mongo: MongoDb, crudService: CrudServiceInternal, printer: Ord
   }
 
 
-  private def createTexts(mailParams: OrderMailBody): MessageTexts = {
-    val textMessage = orderCreateMailAsText(mailParams)
-    val htmlMessage = orderCreateMailAsHtml(mailParams)
+  private def createTexts(mailParams: OrderMailBody, req: MailRequest): MessageTexts = {
+    val m = req match {
+      case r: OrderCreateMailRequest => order.support.create
+      case r: OrderUpdateMailRequest => order.support.update
+    }
+
+    val textMessage = m.asText(mailParams)
+    val htmlMessage = m.asHtml(mailParams)
     MessageTexts(textMessage, htmlMessage)
+
   }
 
   private def persistAndStoreMailResult(result: MailResult) = {

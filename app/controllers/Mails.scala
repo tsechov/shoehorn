@@ -32,10 +32,9 @@ object Mails extends Controller with S3Bucket {
   }
 
   def sendOrderUpdateMail(orderId: IdType) = Action.async {
-    Future.successful(InternalServerError("not supported yet"))
-    //    send(orderId, mailAttachmentFolder) {
-    //      (uid, oid, folder) => OrderUpdateMailRequest(uid, oid, folder)
-    //    }
+    send(orderId, mailAttachmentFolder) {
+      (uid, oid, folder) => OrderUpdateMailRequest(uid, oid, folder)
+    }
 
   }
 
