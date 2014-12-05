@@ -282,7 +282,8 @@ trait OrderService extends OrderServiceComponent {
               val deadlinesIds = (orderJson \ "deadlines").as[JsArray].value.map(v => (v \ "deadlineTypeId").as[String])
               val deadlineNames = getDeadlines(deadlinesIds)
               val sizeGroupIds = getSizeGroupIds(orderJson)
-              println(s"sizegroupids: $sizeGroupIds")
+              val sizeGroups = getSizeGroups(sizeGroupIds)
+              println(s"sizeGroups: $sizeGroups")
 
 
               val customerId = (orderJson \ "customerId").as[IdType]
@@ -291,13 +292,13 @@ trait OrderService extends OrderServiceComponent {
 
               val ff = for {
                 deadlinesTry <- deadlineNames
-
                 customerTry <- customer
+                sizeGroupTry <- sizeGroups
 
               } yield for {
                   deadlinesOption <- deadlinesTry
-
                   customerOption <- customerTry
+                  sizeGroupOption <- sizeGroupTry
                 } yield for {
 
                     customerJson <- customerOption
@@ -307,7 +308,7 @@ trait OrderService extends OrderServiceComponent {
                     val agentJson: JsObject = fetchEntity[AgentIn](agentId)
                     val companyType: String = (fetchEntity[CompanyTypeIn](companyTypeId) \ "name").as[String]
 
-                    val report = binReport(mapOrderPrint(deadlinesOption, agentJson, customerJson, companyType, orderJson))
+                    val report = binReport(mapOrderPrint(deadlinesOption, sizeGroupOption, agentJson, customerJson, companyType, orderJson))
                     stopper.stop
                     Logger.debug(s"order report created successfully for order: $orderId, took: ${stopper.getTime}ms")
 
@@ -357,7 +358,7 @@ trait OrderService extends OrderServiceComponent {
 
     override def storeInternal(objectKey: String, content: StreamAndLength) = storage.store(objectKey, content)
 
-    private def mapOrderPrint(deadlineTypes: Map[IdType, String], agent: JsObject, customer: JsObject, companyType: String, order: JsObject): OrderReport = {
+    private def mapOrderPrint(deadlineTypes: Map[IdType, String], sizeGroups: Map[IdType, (Int, Int)], agent: JsObject, customer: JsObject, companyType: String, order: JsObject): OrderReport = {
       def address(order: JsObject)(mode: String) = {
 
         val postalcode = (order \ mode \ "postalcode").asOpt[String].getOrElse("")
@@ -402,6 +403,8 @@ trait OrderService extends OrderServiceComponent {
         }
 
       })
+
+      val prices =
 
       val productlist = products.map(triple => ProductReport(triple._1, triple._2._1, triple._2._2, List())).toList
 
@@ -457,15 +460,31 @@ trait OrderService extends OrderServiceComponent {
       ds.map {
         _.map {
           jsonList => {
-
             jsonList.foldLeft(Map[IdType, String]())(
               (map, json) => {
-                Logger.debug(s"deadlines: $json")
+                Logger.debug(s"deadline: $json")
                 map ++ Map((json \ "_id").as[IdType] -> (json \ "name").as[String])
               }
             )
+          }
+        }
+      }
+    }
 
-
+    private def getSizeGroups(ids: Seq[IdType]): Future[Try[Map[IdType, (Int, Int)]]] = {
+      val exprs = ids.foldLeft(JsArray())((array, id) => array :+ Json.obj("_id" -> id))
+      val query = DbQuery(Json.obj("$or" -> exprs))
+      Logger.debug(s"sizegroups query: $query")
+      val ds = crudService.find[SizeGroupIn](query)
+      ds.map {
+        _.map {
+          jsonList => {
+            jsonList.foldLeft(Map[IdType, (Int, Int)]())(
+              (map, json) => {
+                Logger.debug(s"sizegroup: $json")
+                map ++ Map((json \ "_id").as[IdType] ->((json \ "from").as[Int], (json \ "to").as[Int]))
+              }
+            )
           }
         }
       }
@@ -473,9 +492,11 @@ trait OrderService extends OrderServiceComponent {
 
     private def getSizeGroupIds(order: JsObject): Seq[IdType] = {
       println("getSizeGroupIds")
-      (order \ "items").as[JsArray].value.map(item => {
-        ((item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj()) \ "sizeGroups").as[JsArray].value.map(sizeGroup => (sizeGroup \ "sizeGroupId").as[IdType])
-      }).flatten
+      (order \ "items").as[JsArray].value.map(product2SizeGroupIds).flatten
+    }
+
+    private def product2SizeGroupIds(item: JsValue) = {
+      ((item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj()) \ "sizeGroups").as[JsArray].value.map(sizeGroup => (sizeGroup \ "sizeGroupId").as[IdType])
     }
 
 
