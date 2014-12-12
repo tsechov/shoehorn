@@ -395,19 +395,19 @@ trait OrderService extends OrderServiceComponent {
         val itemNumber = (p \ "product" \ "itemNumber").as[String]
         val imageUrl = (p \ "product" \ "image").asOpt[String].getOrElse("")
 
-        val sizeGroupsWithPrice: Map[String, Int] = (firstCatalog(p) \ "sizeGroups").as[JsArray].value.map { (sg) =>
-          (sg \ "sizeGroupId").as[String] -> (sg \ "unitPrice").asOpt[Int]
-        }.filter(_._2.isDefined).map(e => e._1 -> e._2.get).toMap
+        val sizeGroupsWithPrice = (firstCatalog(p) \ "sizeGroups").as[JsArray].value.map { (sg) =>
+          (sg \ "sizeGroupId").as[IdType] -> (sg \ "unitPrice").asOpt[Int]
+        }.filter(_._2.isDefined).map(e => e._1 -> e._2.get)
 
-        (itemNumber, imageUrl, SortimentItem((p \ "size").as[Int], (p \ "quantity").as[Int]))
+        (itemNumber, imageUrl, SortimentItem((p \ "size").as[Int], (p \ "quantity").as[Int]), sizeGroupsWithPrice)
       })
 
-      val products = sortimentTriples.foldLeft(Map[String, (String, List[SortimentItem])]())((map, tuple) => {
+      val products = sortimentTriples.foldLeft(Map[String, (String, List[SortimentItem], Seq[(IdType, Int)])]())((map, tuple) => {
         map.get(tuple._1) match {
           case Some(p) => {
-            map ++ Map(tuple._1 ->(tuple._2, (tuple._3 :: p._2)))
+            map ++ Map(tuple._1 ->(tuple._2, (tuple._3 :: p._2), p._3 ++ tuple._4))
           }
-          case None => map ++ Map(tuple._1 ->(tuple._2, List(tuple._3)))
+          case None => map ++ Map(tuple._1 ->(tuple._2, List(tuple._3), tuple._4))
         }
 
       })
