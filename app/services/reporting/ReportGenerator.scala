@@ -4,16 +4,15 @@ package services.reporting
 import akka.actor.{Props, Actor}
 import akka.event.Logging
 
-import services.{ OrderPrintServiceInternal, OrderReportRequest}
+import services.{OrderPrintServiceInternal, OrderReportRequest}
 
 
-
-object ReportGenerator{
+object ReportGenerator {
   def props(printer: OrderPrintServiceInternal): Props = Props(new ReportGenerator(printer))
 }
 
 
-class ReportGenerator(orderPrintService:OrderPrintServiceInternal) extends Actor {
+class ReportGenerator(orderPrintService: OrderPrintServiceInternal) extends Actor {
 
   val log = Logging(context.system, this)
 
@@ -24,5 +23,9 @@ class ReportGenerator(orderPrintService:OrderPrintServiceInternal) extends Actor
 
     }
     case _ => log.error("unknown message received")
+  }
+
+  override def preRestart(reason: Throwable, message: Option[Any]) = {
+    log.error(reason,"error processing request: {}",message)
   }
 }

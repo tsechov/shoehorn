@@ -217,8 +217,8 @@ trait OrderService extends OrderServiceComponent {
           val itemSizesAndCatalogs = (order \ "items").as[JsArray].value.map { (item) =>
             val size = (item \ "size").as[Int]
             val quantity = (item \ "quantity").as[Int]
-            val firstCatalog = (item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj())
-            SizeAndCatalog((item \ "product" \ "_id").as[IdType], size, quantity, firstCatalog)
+            //val firstCatalog = (item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj())
+            SizeAndCatalog((item \ "product" \ "_id").as[IdType], size, quantity, firstCatalog(item))
           }
 
 
@@ -264,6 +264,9 @@ trait OrderService extends OrderServiceComponent {
 
   }
 
+  private def firstCatalog(item: JsValue) = (item \ "product" \ "catalogs").as[JsArray].value.headOption.getOrElse(Json.obj())
+
+
   override val orderPrintService = new OrderPrintServiceInternal with ReportFormats with DateFormatSupport {
 
 
@@ -283,7 +286,7 @@ trait OrderService extends OrderServiceComponent {
               val deadlineNames = getDeadlines(deadlinesIds)
               val sizeGroupIds = getSizeGroupIds(orderJson)
               val sizeGroups = getSizeGroups(sizeGroupIds)
-              println(s"sizeGroups: $sizeGroups")
+
 
 
               val customerId = (orderJson \ "customerId").as[IdType]
@@ -391,22 +394,27 @@ trait OrderService extends OrderServiceComponent {
       val sortimentTriples = (order \ "items").as[JsArray].value.map(p => {
         val itemNumber = (p \ "product" \ "itemNumber").as[String]
         val imageUrl = (p \ "product" \ "image").asOpt[String].getOrElse("")
+
+        val sizeGroupsWithPrice: Map[String, Int] = (firstCatalog(p) \ "sizeGroups").as[JsArray].value.map { (sg) =>
+          (sg \ "sizeGroupId").as[String] -> (sg \ "unitPrice").asOpt[Int]
+        }.filter(_._2.isDefined).map(e => e._1 -> e._2.get).toMap
+
         (itemNumber, imageUrl, SortimentItem((p \ "size").as[Int], (p \ "quantity").as[Int]))
       })
 
-      val products = sortimentTriples.foldLeft(Map[String, (String, List[SortimentItem])]())((map, triple) => {
-        map.get(triple._1) match {
+      val products = sortimentTriples.foldLeft(Map[String, (String, List[SortimentItem])]())((map, tuple) => {
+        map.get(tuple._1) match {
           case Some(p) => {
-            map ++ Map(triple._1 ->(triple._2, (triple._3 :: p._2)))
+            map ++ Map(tuple._1 ->(tuple._2, (tuple._3 :: p._2)))
           }
-          case None => map ++ Map(triple._1 ->(triple._2, List(triple._3)))
+          case None => map ++ Map(tuple._1 ->(tuple._2, List(tuple._3)))
         }
 
       })
 
-      val prices =
+      def prices(modelNumber: String): List[PriceItem] = ???
 
-      val productlist = products.map(triple => ProductReport(triple._1, triple._2._1, triple._2._2, List())).toList
+      val productlist = products.map(triple => ProductReport(triple._1, triple._2._1, triple._2._2, prices(triple._1))).toList
 
       val orderId = (order \ "_id").as[IdType]
 
