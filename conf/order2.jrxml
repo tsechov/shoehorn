@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="667d2897-2080-48ea-b922-6e743da723d2">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="order2"/>
-	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="27"/>
+	<property name="ireport.zoom" value="4.0"/>
+	<property name="ireport.x" value="896"/>
+	<property name="ireport.y" value="1227"/>
 	<queryString language="XPath">
 		<![CDATA[/order/items/product]]>
 	</queryString>
@@ -159,6 +159,42 @@
 	</field>
 	<field name="deadlineDate5" class="java.lang.String">
 		<fieldDescription><![CDATA[/order/deadlineDate5]]></fieldDescription>
+	</field>
+	<field name="prices_range_0" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem0/range]]></fieldDescription>
+	</field>
+	<field name="prices_range_1" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem1/range]]></fieldDescription>
+	</field>
+	<field name="prices_range_2" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem2/range]]></fieldDescription>
+	</field>
+	<field name="prices_range_3" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem3/range]]></fieldDescription>
+	</field>
+	<field name="prices_range_4" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem4/range]]></fieldDescription>
+	</field>
+	<field name="prices_range_5" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem5/range]]></fieldDescription>
+	</field>
+	<field name="prices_price_0" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem0/price]]></fieldDescription>
+	</field>
+	<field name="prices_price_1" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem1/price]]></fieldDescription>
+	</field>
+	<field name="prices_price_2" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem2/price]]></fieldDescription>
+	</field>
+	<field name="prices_price_3" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem3/price]]></fieldDescription>
+	</field>
+	<field name="prices_price_4" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem4/price]]></fieldDescription>
+	</field>
+	<field name="prices_price_5" class="java.lang.String">
+		<fieldDescription><![CDATA[prices/priceitem5/price]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -490,7 +526,7 @@
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="100" splitType="Stretch">
+		<band height="145" splitType="Stretch">
 			<property name="local_mesure_unitheight" value="pixel"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<frame>
@@ -1389,6 +1425,100 @@
 					<textFieldExpression><![CDATA[$F{totalCount_1}]]></textFieldExpression>
 				</textField>
 			</frame>
+			<textField isBlankWhenNull="true">
+				<reportElement x="209" y="102" width="36" height="14" uuid="1874ea19-a5f5-445e-81c6-94e069c848a0"/>
+				<textFieldExpression><![CDATA[$F{prices_range_0}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="209" y="116" width="36" height="14" uuid="2bd48e8a-e344-45e2-b7ca-9072989514f3"/>
+				<textFieldExpression><![CDATA[$F{prices_range_1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="209" y="130" width="36" height="14" uuid="c9b546d4-e9cc-41d5-9562-793071aa7ac0"/>
+				<textFieldExpression><![CDATA[$F{prices_range_2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="332" y="102" width="36" height="14" uuid="a81b0132-eb73-443b-99ec-2550c94d308b"/>
+				<textFieldExpression><![CDATA[$F{prices_range_3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="332" y="116" width="36" height="14" uuid="3da7f7e4-a941-4085-8b9b-d263d764c45b"/>
+				<textFieldExpression><![CDATA[$F{prices_range_4}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="332" y="130" width="36" height="14" uuid="5956fba7-5f2a-48f4-80fa-6d5e178908f6"/>
+				<textFieldExpression><![CDATA[$F{prices_range_5}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="246" y="102" width="45" height="14" uuid="557eec93-4695-4012-a14a-9d0bbbc60fa4"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{prices_price_0}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="246" y="116" width="45" height="14" uuid="f055e76f-6094-429e-a118-6d86b5fac3b2"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{prices_price_1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="246" y="130" width="45" height="14" uuid="9252081d-d40a-4f87-9f78-1b662e9ca475"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{prices_price_2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="369" y="116" width="45" height="14" uuid="5a57e854-3528-48ef-8377-df986d30a32b"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{prices_price_4}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="369" y="130" width="45" height="14" uuid="577d3d9f-142c-410b-bab8-e2159b934f2a"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{prices_price_5}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="369" y="102" width="45" height="14" uuid="03bc6da7-bceb-4856-b052-1d373ad4a0a7"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{prices_price_3}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="107" y="102" width="100" height="14" uuid="6db78262-4006-4c50-a40e-22549047c302"/>
+				<text><![CDATA[Mérettartomány árak:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="292" y="102" width="15" height="14" uuid="94e755dc-cae0-4302-a2dc-06e8c1ae2333">
+					<printWhenExpression><![CDATA[!$F{prices_price_0}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Ft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="292" y="116" width="15" height="14" isPrintInFirstWholeBand="true" uuid="eead6424-bbe0-4322-b4c4-536ef1d6b548">
+					<printWhenExpression><![CDATA[!$F{prices_price_1}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Ft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="292" y="130" width="15" height="14" isPrintInFirstWholeBand="true" uuid="ff65702d-e9be-427d-85b6-9e6487de45cf">
+					<printWhenExpression><![CDATA[!$F{prices_price_2}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Ft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="415" y="130" width="15" height="14" isPrintInFirstWholeBand="true" uuid="c35c94f9-2ea7-44ab-bc67-4e585b03254f">
+					<printWhenExpression><![CDATA[!$F{prices_price_5}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Ft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="415" y="102" width="15" height="14" uuid="716182aa-7981-4600-b82e-ec728a5380c5">
+					<printWhenExpression><![CDATA[!$F{prices_price_3}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Ft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="415" y="116" width="15" height="14" isPrintInFirstWholeBand="true" uuid="645af850-5afb-42c9-b909-412d7a3176cc">
+					<printWhenExpression><![CDATA[!$F{prices_price_4}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<text><![CDATA[Ft]]></text>
+			</staticText>
 		</band>
 	</detail>
 	<pageFooter>

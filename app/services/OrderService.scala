@@ -371,6 +371,12 @@ trait OrderService extends OrderServiceComponent {
         s"$postalcode $city $addressLine"
       }
 
+      def sizeGroup2PriceItem(p: (IdType, Int)): Iterable[PriceItem] = {
+        sizeGroups.collect {
+          case (id, (from, to)) if (id == p._1) => PriceItem(from, to, p._2)
+        }
+      }
+
       val addressFn = address(order) _
       val shippingName = (order \ "shippingAddress" \ "description").asOpt[String].getOrElse("")
 
@@ -402,19 +408,20 @@ trait OrderService extends OrderServiceComponent {
         (itemNumber, imageUrl, SortimentItem((p \ "size").as[Int], (p \ "quantity").as[Int]), sizeGroupsWithPrice)
       })
 
-      val products = sortimentTriples.foldLeft(Map[String, (String, List[SortimentItem], Seq[(IdType, Int)])]())((map, tuple) => {
+      val products = sortimentTriples.foldLeft(Map[String, (String, List[SortimentItem], List[PriceItem])]())((map, tuple) => {
         map.get(tuple._1) match {
           case Some(p) => {
-            map ++ Map(tuple._1 ->(tuple._2, (tuple._3 :: p._2), p._3 ++ tuple._4))
+            map ++ Map(tuple._1 ->(tuple._2, (tuple._3 :: p._2), p._3 ++ tuple._4.map(sizeGroup2PriceItem).flatten.toList))
           }
-          case None => map ++ Map(tuple._1 ->(tuple._2, List(tuple._3), tuple._4))
+          case None => map ++ Map(tuple._1 ->(tuple._2, List(tuple._3), tuple._4.map(sizeGroup2PriceItem).flatten.toList))
         }
-
       })
 
-      def prices(modelNumber: String): List[PriceItem] = ???
 
-      val productlist = products.map(triple => ProductReport(triple._1, triple._2._1, triple._2._2, prices(triple._1))).toList
+      println("=" * 80)
+      println(products.map(_._2._3.groupBy((p) => s"${p.from}-${p.to}").map(_._2.head).toList))
+      println("=" * 80)
+      val productlist = products.map(tuple => ProductReport(tuple._1, tuple._2._1, tuple._2._2, tuple._2._3.groupBy((p) => s"${p.from}-${p.to}").map(_._2.head).toList)).toList
 
       val orderId = (order \ "_id").as[IdType]
 

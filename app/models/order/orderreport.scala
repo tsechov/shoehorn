@@ -34,15 +34,25 @@ case class PriceItem(
                       price: Int
                       )
 
+case class PriceItemIndexed(
+                             range: String,
+                             price: Int,
+                             index: Int
+                             )
+
+object PriceItemIndexed {
+  def apply(price: PriceItem, index: Int): PriceItemIndexed = PriceItemIndexed(s"${price.from} - ${price.to}", price.price, index)
+}
 
 case class ProductReport(
                           modelNumber: String,
                           imageUrl: String,
                           sortiment: List[SortimentItem],
-                          prices: List[PriceItem],
+                          prices: List[PriceItemIndexed],
                           totalCount: Int
                           ) {
   if (sortiment.size != ProductReport.SORTIMENT_COUNT) throw new IllegalArgumentException(s"there has to be ${ProductReport.SORTIMENT_COUNT} sortiment items")
+
 }
 
 
@@ -63,7 +73,7 @@ object ProductReport {
     })
 
 
-    ProductReport(modelNumber, imageUrl, expandedSortiment, prices, expandedSortiment.foldLeft(0)((sum, item) => sum + item.count))
+    ProductReport(modelNumber, imageUrl, expandedSortiment, prices.sortBy(_.from).zipWithIndex.map { case (price, index) => PriceItemIndexed(price, index)}, expandedSortiment.foldLeft(0)((sum, item) => sum + item.count))
 
   }
 }

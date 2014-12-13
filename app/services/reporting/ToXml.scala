@@ -42,8 +42,21 @@ object ToXml {
       }
 
     }
+    object replacePrices extends RewriteRule {
 
-    object transform extends RuleTransformer(replaceSortiments)
+      override def transform(n: Node): Seq[Node] = n match {
+
+        case e: Elem if (e.label == "priceitem") => {
+          val num = e.child.find(_.label == "index").map(_.text).getOrElse("NA")
+          e.copy(label = "priceitem" + num)
+        }
+        case other => other
+
+      }
+
+    }
+
+    object transform extends RuleTransformer(replaceSortiments, replacePrices)
 
     transform(dom)
 

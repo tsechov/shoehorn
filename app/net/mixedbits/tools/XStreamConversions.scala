@@ -130,6 +130,8 @@ object XStreamConversions {
     stream.alias("order", classOf[models.order.OrderReport])
     stream.alias("sortimentitem", classOf[models.order.SortimentItem])
     stream.alias("product", classOf[models.order.ProductReport])
+    stream.alias("priceitem", classOf[models.order.PriceItemIndexed])
+
     //list
     stream.alias("list", classOf[::[_]])
     stream.alias("list", Nil.getClass)
