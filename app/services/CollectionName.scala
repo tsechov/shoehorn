@@ -6,7 +6,7 @@ trait CollectionName[A] {
   def get: String
 }
 
-case class DbQuery(query: JsObject, projection: Option[JsObject] = None)
+case class DbQuery(query: JsObject, projection: Option[JsObject] = None, limit: Option[Int] = None)
 
 
 

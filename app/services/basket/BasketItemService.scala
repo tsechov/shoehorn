@@ -42,7 +42,7 @@ case class BasketIn2(_id: IdType,
 
 class BasketItemService extends MongoCollection with MongoRead with MongoUpdate {
 
-  override def collectionName: String = "basket"
+  override def collectionName: String = "baskets"
 
   def update(basketUpdate: BasketIn2) = {
     val query = obj(idFieldName -> basketUpdate._id)

@@ -16,16 +16,15 @@ class BasketItemServiceTest extends PlaySpecification {
       val app = FakeApplication(
         withoutPlugins = Seq("com.typesafe.plugin.CommonsMailerPlugin"),
         additionalConfiguration = Map(
-          "mongodb.uri" -> MONGO_URI,
-          "mongo-async-driver.akka.loglevel" -> "DEBUG"
+          "mongodb.uri" -> MONGO_URI
         )
       )
 
       running(app) {
         val target = new BasketItemService
         val res = await(target.find(DbQuery(Json.obj(AssetSupport.idFieldName -> "543c1871b00b00090c54f8e5"))))
-        println(res)
-        res.size must be_>=(0)
+
+        res.size must be_>=(1)
       }
 
     }
