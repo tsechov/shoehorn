@@ -21,6 +21,7 @@ test-result
 server.pid
 *.iml
 *.eml
+.idea
 activator-*.sbt
 /dist/
 setenv.sh
