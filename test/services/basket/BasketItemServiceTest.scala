@@ -16,7 +16,8 @@ class BasketItemServiceTest extends PlaySpecification {
       val app = FakeApplication(
         withoutPlugins = Seq("com.typesafe.plugin.CommonsMailerPlugin"),
         additionalConfiguration = Map(
-          "mongodb.uri" -> MONGO_URI
+          "mongodb.uri" -> MONGO_URI,
+          "mongo-async-driver.akka.loglevel" -> "DEBUG"
         )
       )
 
