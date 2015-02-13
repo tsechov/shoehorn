@@ -4,7 +4,7 @@ import models.AssetSupport
 import play.api.libs.json.Json
 import play.api.test.FakeApplication
 import play.api.test.PlaySpecification
-
+import scala.concurrent.duration._
 import services.DbQuery
 
 /**
@@ -25,8 +25,9 @@ class BasketItemServiceTest extends PlaySpecification {
 
         val target = new BasketItemService
         //val res = await(target.find(DbQuery(Json.obj(AssetSupport.idFieldName -> "543c1871b00b00090c54f8e5"))))
-        val res = await(target.find(DbQuery(limit = 1)))
+        val res = await(target.find[BasketIn2](DbQuery(limit = 1)))(10 seconds)
         println(res)
+
         res.size must be_>=(1)
       }
 
