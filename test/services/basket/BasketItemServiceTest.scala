@@ -4,6 +4,7 @@ import models.AssetSupport
 import play.api.libs.json.Json
 import play.api.test.FakeApplication
 import play.api.test.PlaySpecification
+
 import services.DbQuery
 
 /**
@@ -21,9 +22,11 @@ class BasketItemServiceTest extends PlaySpecification {
       )
 
       running(app) {
-        val target = new BasketItemService
-        val res = await(target.find(DbQuery(Json.obj(AssetSupport.idFieldName -> "543c1871b00b00090c54f8e5"))))
 
+        val target = new BasketItemService
+        //val res = await(target.find(DbQuery(Json.obj(AssetSupport.idFieldName -> "543c1871b00b00090c54f8e5"))))
+        val res = await(target.find(DbQuery(limit = 1)))
+        println(res)
         res.size must be_>=(1)
       }
 

@@ -24,7 +24,12 @@ trait MongoRead {
     (query.projection match {
       case None => collection.find(query.query)
       case Some(p) => collection.find(query.query, p)
-    }).cursor[JsObject].collect[List](query.limit match { case Some(limit) => limit; case None => Int.MaxValue})
+    }).cursor[JsObject].collect[List](
+        query.limit match {
+          case Some(limit) => limit
+          case None => Int.MaxValue
+        }
+      )
 
   }
 }
