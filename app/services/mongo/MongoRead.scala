@@ -12,9 +12,9 @@ trait MongoRead {
   self: MongoCollection =>
 
 
-  def findOne[A](query: DbQuery)(implicit fjs: Reads[A]) = {
+  def findOne[A](query: DbQuery)(implicit fjs: Reads[A]): Future[A] = {
     find[A](query.copy(limit = Some(1))).flatMap {
-      case head :: Nil => Future.successful(Json.fromJson[A](head))
+      case head :: Nil => Future.successful(head)
       case head :: tail => Future.failed[A](new IllegalStateException(s"more than one element in collection[$collectionName}] for query[$query]"))
       case Nil => Future.failed[A](new NoSuchElementException(s"no matching element in collection[$collectionName}] for query[$query]"))
     }
@@ -26,7 +26,7 @@ trait MongoRead {
     (query.projection match {
       case None => collection.find(query.query)
       case Some(p) => collection.find(query.query, p)
-    }).cursor[JsObject].collect[List](
+    }).cursor[A].collect[List](
         query.limit match {
           case Some(limit) => limit
           case None => Int.MaxValue
