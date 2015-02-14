@@ -10,11 +10,9 @@ build:
             code: |-
                 sbt test
     after-steps:
-        - kobim/slack-post:
-            subdomain: szamos
-            token: $SLACK_WEBHOOK_TOKEN
+        - lotustm/ultimate-slack-notify@1.0.0:
+            webhook_url: ${SLACK_WEBHOOK_URL}
             channel: shoehorn-build
-            username: ${WERCKER_GIT_BRANCH}-build@werckerbot
 
 deploy:
     steps:
@@ -25,11 +23,9 @@ deploy:
         - tal-silo/heroku-deploy@3.0.1:
             key-name: HEROKU_KEYPAIR
     after-steps:
-        - kobim/slack-post:
-            subdomain: szamos
-            token: $SLACK_WEBHOOK_TOKEN
+        - lotustm/ultimate-slack-notify@1.0.0:
+            webhook_url: ${SLACK_WEBHOOK_URL}
             channel: shoehorn-build
-            username: ${WERCKER_GIT_BRANCH}-deploy@werckerbot
 
 #        - script:
 #            name: runscope trigger
