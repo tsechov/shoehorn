@@ -41,7 +41,7 @@ case class ProductIn2(
 case class BasketItem2(product: ProductIn2, quantity: Int, size: Int)
 
 case class BasketIn2(_id: IdType,
-
+                     lastModifiedAt: DateTime,
                      items: List[BasketItem2])
 
 object BasketIn2 extends DateFormatSupport {
@@ -62,7 +62,7 @@ class BasketItemService extends MongoCollection with MongoRead with MongoUpdate 
     val result = for {
       basket <- findOne[BasketIn2](DbQuery(selector))
       newItems = updateItems(basketUpdate.items, basket.items)
-      newBasket = basket.copy(items = newItems)
+      newBasket = basket.copy(items = newItems, lastModifiedAt = new DateTime)
       json = Json.toJson(newBasket)
       result <- update(selector, json)
 

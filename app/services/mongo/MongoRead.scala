@@ -12,8 +12,6 @@ trait MongoRead {
 
   self: MongoCollection =>
 
-  private def log: Logger = LoggerFactory.getLogger(this.getClass)
-
 
   def findOne[A](query: DbQuery)(implicit fjs: Reads[A]): Future[A] = {
     find[A](query.copy(limit = Some(1))).flatMap {
@@ -24,9 +22,9 @@ trait MongoRead {
   }
 
   def find[A](query: DbQuery)(implicit fjs: Reads[A]) = {
+    import play.api.Logger
 
-
-    log.debug(s"running query againts collection[$collectionName]: [$query]")
+    Logger.debug(s"running query againts collection[$collectionName]: [$query]")
 
     (query.projection match {
       case None => collection.find(query.query)

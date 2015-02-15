@@ -1,21 +1,70 @@
 package controllers
 
+import java.util.UUID
+
+import org.joda.time.DateTime
+import org.scalactic.Fail
+import play.api.Logger
 import play.api.mvc.Action
 import models.AssetSupport.IdType
 
 import play.api.mvc.BodyParsers.parse
 import models.order.{BasketItem, BasketIn, BasketUpdate, BasketCreate}
 import controllers.utils.CrudController
+import play.api.mvc.SimpleResult
+import services.basket.BasketIn2
+import services.basket.BasketItemService
 import scala.concurrent.Future
-import play.api.libs.json.{JsError, JsSuccess, Json, JsObject}
+import play.api.libs.json._
+import scala.util.Failure
 import scala.util.Success
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+import scala.util.Try
 
 
 object Baskets extends CrudController {
   override type MODEL = BasketIn
   override type UPDATEMODEL = BasketUpdate
   override type CREATEMODEL = BasketCreate
+
+  val basketItemService: BasketItemService = new BasketItemService
+
+  def updateItems = Action.async(parse.json) {
+    request => {
+
+      val operation: PartialFunction[JsResult[BasketIn2], Future[SimpleResult]] = {
+        badJsonRequest[BasketIn2]("erroneous input for basketitemupdate") orElse {
+          case jsSuccess: JsSuccess[BasketIn2] => {
+            val futureResult = basketItemService.updateItems(jsSuccess.get)
+            futureResult.onFailure({
+              case notFound: NoSuchElementException => NotFound
+              case error => {
+                val uuid = UUID.randomUUID().toString
+                val msg = "cannot update basket items"
+                Logger.error(s"[$uuid] - $msg: $error", error)
+                InternalServerError(s"logId: [$uuid]")
+              }
+            })
+
+            futureResult.map({ case _ => Ok})
+
+
+          }
+        }
+      }
+      operation(request.body.validate[BasketIn2])
+    }
+
+  }
+
+  private def simpleInternalServerError[A](msg: String): PartialFunction[A, SimpleResult] = {
+    case Failure(error) => {
+      val uuid = UUID.randomUUID().toString
+      Logger.error(s"[$uuid] - $msg: $error", error)
+      InternalServerError(s"logId: [$uuid]")
+    }
+  }
 
   def create = Action.async(parse.json) {
     request =>
