@@ -80,8 +80,12 @@ class BasketItemService extends MongoCollection with MongoRead with MongoUpdate 
     val res = (targetItems.map((true, _)) ::: updateItems.map((false, _))).groupBy(toKey).map {
       entry => {
         val value = entry._2
+        val originalQuantity = value.collect { case (original, item) if original => item.quantity}.sum
+
+        val hasNew = value.exists(!_._1)
+
         val newQuantity = value.collect { case (original, item) if !original => item.quantity}.sum
-        value.last._2.copy(quantity = newQuantity)
+        value.last._2.copy(quantity = if (hasNew) newQuantity else originalQuantity)
       }
     }
     res.toList.filterNot(_.quantity.equals(0))
