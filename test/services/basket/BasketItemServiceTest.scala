@@ -29,7 +29,7 @@ class BasketItemServiceTest extends PlaySpecification {
         //val res = await(target.find[BasketIn2](DbQuery(limit = 1)))(15 seconds)
         val res = await(target.updateItems(testInput))(15 seconds)
         println(res)
-        res must_== Unit
+        res must_==()
       }
 
     }
@@ -198,7 +198,7 @@ class BasketItemServiceTest extends PlaySpecification {
       |                    }
       |                ]
       |            },
-      |            "quantity" : 1,
+      |            "quantity" : 3,
       |            "size" : 30
       |        }
       |    ]

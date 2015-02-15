@@ -73,24 +73,20 @@ class BasketItemService extends MongoCollection with MongoRead with MongoUpdate 
     }
   }
 
-  case class ProductKey(_id: IdType, size: Int)
+  sealed case class ProductKey(_id: IdType, size: Int)
 
 
   private def updateItems(updateItems: List[BasketItem2], targetItems: List[BasketItem2]) = {
-    val res = (targetItems ::: updateItems).groupBy(toKey).reduce((aaa, aaa) => ???)
-    targetItems.map {
-      targetItem => {
-        val matches = updateItems.filter(toKey(_) == toKey(targetItem))
-        matches match {
-          case Nil => targetItem
-          case list => targetItem.copy(quantity = list.map(_.size).sum)
-        }
-
-
+    val res = (targetItems.map((true, _)) ::: updateItems.map((false, _))).groupBy(toKey).map {
+      entry => {
+        val value = entry._2
+        val newQuantity = value.collect { case (original, item) if !original => item.quantity}.sum
+        value.last._2.copy(quantity = newQuantity)
       }
-    }.filterNot(_.size == 0)
+    }
+    res.toList.filterNot(_.quantity.equals(0))
   }
 
-  private def toKey(item: BasketItem2) = ProductKey(item.product._id, item.size)
+  private def toKey(item: (Boolean, BasketItem2)) = ProductKey(item._2.product._id, item._2.size)
 
 }
