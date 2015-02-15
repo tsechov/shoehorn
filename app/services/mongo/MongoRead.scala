@@ -1,15 +1,18 @@
 package services.mongo
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.JsObject
-import play.api.libs.json.Json
 import play.api.libs.json.Reads
 import services.DbQuery
 
 import scala.concurrent.Future
 
 trait MongoRead {
+
   self: MongoCollection =>
+
+  private def log: Logger = LoggerFactory.getLogger(this.getClass)
 
 
   def findOne[A](query: DbQuery)(implicit fjs: Reads[A]): Future[A] = {
@@ -22,6 +25,8 @@ trait MongoRead {
 
   def find[A](query: DbQuery)(implicit fjs: Reads[A]) = {
 
+
+    log.debug(s"running query againts collection[$collectionName]: [$query]")
 
     (query.projection match {
       case None => collection.find(query.query)
