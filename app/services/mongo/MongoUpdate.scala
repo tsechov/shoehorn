@@ -1,6 +1,7 @@
 package services.mongo
 
 import models.DateFormatSupport
+import org.joda.time.DateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.obj
@@ -16,10 +17,12 @@ import scala.concurrent.Future
 trait MongoUpdate extends DateFormatSupport {
   self: MongoCollection =>
   def update(selector: JsObject, data: JsValue): Future[LastError] = {
-    val transformer = (__ \ '_id).json.prune
-    val woId = data.transform(transformer).get
-    dateFormat
-    val jsonTransformer = (__ \ 'lastModifiedAt).json.put(JsNumber(456))
-    collection.update(selector, obj("$set" -> woId))
+    val idPrune = (__ \ '_id).json.prune
+
+    val lastModified = (__ \ 'lastModifiedAt).json.put(dateFormat.writes(new DateTime))
+
+    val augemented = data.transform(idPrune andThen lastModified).get
+
+    collection.update(selector, obj("$set" -> augemented))
   }
 }

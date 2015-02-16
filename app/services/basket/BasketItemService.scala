@@ -40,9 +40,7 @@ case class ProductIn2(
 
 case class BasketItem2(product: ProductIn2, quantity: Int, size: Int)
 
-case class BasketIn2(_id: IdType,
-                     lastModifiedAt: DateTime,
-                     items: List[BasketItem2])
+case class BasketIn2(_id: IdType, items: List[BasketItem2])
 
 object BasketIn2 extends DateFormatSupport {
   implicit val pricedSizeGroup2Format = Json.format[PricedSizeGroup2]
@@ -62,7 +60,7 @@ class BasketItemService extends MongoCollection with MongoRead with MongoUpdate 
     val result = for {
       basket <- findOne[BasketIn2](DbQuery(selector))
       newItems = updateItems(basketUpdate.items, basket.items)
-      newBasket = basket.copy(items = newItems, lastModifiedAt = new DateTime)
+      newBasket = basket.copy(items = newItems)
       json = Json.toJson(newBasket)
       result <- update(selector, json)
 
