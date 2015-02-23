@@ -1,10 +1,10 @@
 package models.customer
 
 import models.AssetSupport.IdType
-import org.joda.time.DateTime
-import models.common._
-import play.api.libs.json.Json
 import models._
+import models.common._
+import org.joda.time.DateTime
+import play.api.libs.json.Json
 
 
 case class TermsOfPayment(
@@ -88,9 +88,10 @@ case class CustomerIn(
                        shopIds: List[IdType],
                        addresses: List[Address],
                        groupIds: List[IdType],
-                       contactIds: List[IdType]
+                       contactIds: List[IdType],
+                       accountNumber: Option[String]
                        ) extends AssetIn with AssetUpdateBuilder[CustomerUpdate] {
-  override def fillup(lastModifiedAt: DateTime) = CustomerUpdate(lastModifiedAt, active, description, name, agentId, taxExemptNumber, lineOfBusinessId, siteId, companyTypeId, shopIds, addresses, groupIds, contactIds)
+  override def fillup(lastModifiedAt: DateTime) = CustomerUpdate(lastModifiedAt, active, description, name, agentId, taxExemptNumber, lineOfBusinessId, siteId, companyTypeId, shopIds, addresses, groupIds, contactIds, accountNumber)
 }
 
 object CustomerIn extends AssetInCompanion[CustomerIn] {
@@ -113,7 +114,8 @@ case class CustomerUpdate(lastModifiedAt: DateTime,
                           shopIds: List[IdType],
                           addresses: List[Address],
                           groupIds: List[IdType],
-                          contactIds: List[IdType]) extends AssetUpdate
+                          contactIds: List[IdType],
+                          accountNumber: Option[String]) extends AssetUpdate
 
 object CustomerUpdate extends AssetUpdateCompanion[CustomerUpdate] {
   val format = Json.format[CustomerUpdate]
@@ -134,8 +136,9 @@ case class CustomerCreate(active: Boolean,
                           shopIds: List[IdType],
                           addresses: List[Address],
                           groupIds: List[IdType],
-                          contactIds: List[IdType]) extends AssetCreate[CustomerIn] {
-  override def fillup(b: AssetBase): CustomerIn = CustomerIn(b.id, b.createdAt, b.lastModifiedAt, active, description, name, agentId, taxExemptNumber, lineOfBusinessId, siteId, companyTypeId, shopIds, addresses, groupIds, contactIds)
+                          contactIds: List[IdType],
+                          accountNumber: Option[String]) extends AssetCreate[CustomerIn] {
+  override def fillup(b: AssetBase): CustomerIn = CustomerIn(b.id, b.createdAt, b.lastModifiedAt, active, description, name, agentId, taxExemptNumber, lineOfBusinessId, siteId, companyTypeId, shopIds, addresses, groupIds, contactIds, accountNumber)
 }
 
 object CustomerCreate {

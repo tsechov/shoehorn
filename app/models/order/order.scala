@@ -1,12 +1,12 @@
 package models.order
 
-import play.api.libs.json.Json
-import models._
-import models.AssetSupport._
-import org.joda.time.DateTime
-import models.product._
 import models.AssetBase
+import models.AssetSupport._
+import models._
 import models.common.Address
+import models.product._
+import org.joda.time.DateTime
+import play.api.libs.json.Json
 
 
 case class OrderItem(productId: Option[IdType], product: ProductIn, quantity: Int, size: Int)
@@ -37,8 +37,9 @@ case class OrderIn(_id: IdType,
                    numberOfPairs: Int,
                    items: List[OrderItem],
                    agentNotifiedAt: Option[DateTime],
+                   comment: Option[String],
                    customerNotifiedAt: Option[DateTime]) extends AssetIn with AssetUpdateBuilder[OrderUpdate] {
-  override def fillup(lastModifiedAt: DateTime): OrderUpdate = OrderUpdate(lastModifiedAt, active, description, orderNumber, orderId, originatorId, customerId, billingAddress, shippingAddress, deadlines, total, numberOfPairs, items, agentNotifiedAt, customerNotifiedAt)
+  override def fillup(lastModifiedAt: DateTime): OrderUpdate = OrderUpdate(lastModifiedAt, active, description, orderNumber, orderId, originatorId, customerId, billingAddress, shippingAddress, deadlines, total, numberOfPairs, items, agentNotifiedAt, comment, customerNotifiedAt)
 }
 
 object OrderIn extends AssetInCompanion[OrderIn] {
@@ -63,6 +64,7 @@ case class OrderUpdate(lastModifiedAt: DateTime,
                        numberOfPairs: Int,
                        items: List[OrderItem],
                        agentNotifiedAt: Option[DateTime],
+                       comment: Option[String],
                        customerNotifiedAt: Option[DateTime]) extends AssetUpdate
 
 object OrderUpdate extends AssetUpdateCompanion[OrderUpdate] {
@@ -83,8 +85,9 @@ case class OrderCreate(active: Boolean,
                        numberOfPairs: Int,
                        items: List[OrderItem],
                        agentNotifiedAt: Option[DateTime],
+                       comment: Option[String],
                        customerNotifiedAt: Option[DateTime]) extends AssetCreate[OrderIn] {
-  override def fillup(b: AssetBase) = OrderIn(b.id, b.createdAt, b.lastModifiedAt, active, description, orderNumber, orderId, originatorId, customerId, billingAddress, shippingAddress, deadlines, total, numberOfPairs, items, agentNotifiedAt, customerNotifiedAt)
+  override def fillup(b: AssetBase) = OrderIn(b.id, b.createdAt, b.lastModifiedAt, active, description, orderNumber, orderId, originatorId, customerId, billingAddress, shippingAddress, deadlines, total, numberOfPairs, items, agentNotifiedAt, comment, customerNotifiedAt)
 
 }
 
