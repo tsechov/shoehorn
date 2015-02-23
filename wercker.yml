@@ -10,7 +10,7 @@ build:
             code: |-
                 sbt test
     after-steps:
-        - lotustm/ultimate-slack-notify@1.0.0:
+        - tsechov/ultimate-slack-notify@1.0.1:
             webhook_url: ${SLACK_WEBHOOK_URL}
             channel: shoehorn-build
 
@@ -23,7 +23,7 @@ deploy:
         - tal-silo/heroku-deploy@3.0.1:
             key-name: HEROKU_KEYPAIR
     after-steps:
-        - lotustm/ultimate-slack-notify@1.0.0:
+        - tsechov/ultimate-slack-notify@1.0.1:
             webhook_url: ${SLACK_WEBHOOK_URL}
             channel: shoehorn-build
 
