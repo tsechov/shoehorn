@@ -95,7 +95,8 @@ case class OrderReport(
                         customer: CustomerReport,
                         agent: AgentReport,
                         items: List[ProductReport],
-                        sumPrice: Int)
+                        sumPrice: Int,
+                        sumCount: Int)
 
 object OrderReport {
   val fmt = "yyyy. MM. dd."
@@ -125,7 +126,7 @@ object OrderReport {
       deadline4.map(_._2.toString(fmt)).getOrElse(""),
       deadline5.map(_._1).getOrElse(""),
       deadline5.map(_._2.toString(fmt)).getOrElse(""),
-      customer, agent, items, sumPrice)
+      customer, agent, items, sumPrice, items.foldLeft(0)(_ + _.totalCount))
   }
 }
 

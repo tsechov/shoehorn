@@ -25,6 +25,22 @@ class OrderServiceTest extends Specification with Mockito {
   val sizeGroupsJson = readJson("public/api/sizegroup.json")
 
   val timeout = FiniteDuration(5, TimeUnit.SECONDS)
+//      s"""
+//         |Kedves ${params.customerName}!
+//                                         |
+//                                         |Üzletkötőnk a mai napon az Ön kérésének megfelelően módosította a 2015. Tavasz-Nyár szezonra leadott, ${params.orderNumber} számú megrendelését. A módosított adatokat tartalmazó megrendelését az alábbi hivatkozáson keresztül tekintheti meg.
+//                                                                                                                                                                       |    |
+//                                                                                                                                                                       |${params.link}
+//          |
+//          |Amennyiben bármilyen eltérést tapasztal a rögzített adatokban, úgy azt minél előbb jelezze üzletkötőjének.
+//          |
+//          |Megrendelését köszönjük, örülünk, hogy Vevőink között tudhatjuk Önt!
+//          |
+//          |Üdvözlettel:
+//          |Szamos Kft.
+//          |
+//          |Ez egy automatikusan generált e-mail, kérem ne válaszoljon rá.
+//      """.stripMargin
 
   "OrderService" should {
     "be able to calculate total for order" in {
