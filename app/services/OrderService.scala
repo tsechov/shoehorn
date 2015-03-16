@@ -444,7 +444,7 @@ trait OrderService extends OrderServiceComponent {
 
       val lastModified = (order \ "lastModifiedAt").as[DateTime]
 
-      OrderReport(orderId, orderNumber, lastModified, deadline1, deadline2, deadline3, deadline4, deadline5, customerReport, agentReport, productlist, total)
+      OrderReport(orderId, orderNumber, lastModified, deadline1, deadline2, deadline3, deadline4, deadline5, customerReport, agentReport, productlist.sortBy(_.modelNumber), total)
 
     }
 
